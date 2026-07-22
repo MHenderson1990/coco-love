@@ -1,15 +1,6 @@
-# Dependencies
 node_modules/
-
-# Secrets
 .env
-
-# Logs
 *.log
 npm-debug.log*
-
-# OS junk
 .DS_Store
-
-# Editor
 .vscode/
