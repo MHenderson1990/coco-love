@@ -1,5 +1,6 @@
 let User = require('../models/User');
 let Affirmation = require('../models/Affirmation');
+let dailyAffirmationJob = require('../jobs/dailyAffirmation.job');
 
 // GET /api/admin/stats
 exports.stats = async (req, res) => {
@@ -74,6 +75,15 @@ exports.topAffirmations = async (req, res) => {
     ]);
 
     res.json({ affirmations: results });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+exports.runNotifications = async (req, res) => {
+  try {
+    await dailyAffirmationJob.runDailyNotifications();
+    res.json({ success: true });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }

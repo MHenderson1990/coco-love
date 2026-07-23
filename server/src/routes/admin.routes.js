@@ -6,5 +6,6 @@ let adminController = require('../controllers/admin.controller');
 
 router.get('/stats', auth, admin, adminController.stats);
 router.get('/affirmations/top', auth, admin, adminController.topAffirmations);
+router.post('/notifications/run', auth, admin, adminController.runNotifications);
 
 module.exports = router;
