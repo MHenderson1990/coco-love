@@ -13,6 +13,7 @@ const userSchema = new mongoose.Schema({
   longestStreak:   { type: Number, default: 0 },
   lastOpenedDate:  { type: Date },
   promoUnlockedAt: { type: Date },
+  lastNotifiedAt: { type: Date },
 
   preferences: {
     theme:        { type: String, enum: ['light', 'dark'], default: 'light' },
