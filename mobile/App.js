@@ -6,8 +6,8 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { AuthProvider, useAuth } from './src/context/AuthContext';
 import { ThemeProvider, useTheme } from './src/context/ThemeContext';
 import LoginScreen from './src/screens/LoginScreen';
-import TodayScreen from './src/screens/TodayScreen';
 import SignupScreen from './src/screens/SignupScreen';
+import TabNavigator from './src/navigation/TabNavigator';
 
 let Stack = createNativeStackNavigator();
 
@@ -27,7 +27,7 @@ function Root() {
     <NavigationContainer>
       <Stack.Navigator screenOptions={{ headerShown: false }}>
         {user ? (
-          <Stack.Screen name="Today" component={TodayScreen} />
+          <Stack.Screen name="Main" component={TabNavigator} />
         ) : (
           <>
             <Stack.Screen name="Login" component={LoginScreen} />
