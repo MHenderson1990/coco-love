@@ -1,31 +1,31 @@
 require('dotenv').config();
-const mongoose = require('mongoose');
-const { mongoUri } = require('./config/env');
-const Affirmation = require('./models/Affirmation');
-
-const affirmations = [
-  { text: 'You are exactly where you need to be.', tags: ['grounding'] },
-  { text: 'Your peace is a priority, not a luxury.', tags: ['self-care'] },
-  { text: 'Small steps still move you forward.', tags: ['motivation'] },
-];
+let mongoose = require('mongoose');
+let { mongoUri } = require('./config/env');
+let Affirmation = require('./models/Affirmation');
+let affirmations = require('./data/affirmations');
 
 async function seed() {
   await mongoose.connect(mongoUri);
 
-  // assign scheduledDate: today, tomorrow, day after — one per day
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
+  // start the day after the latest scheduled affirmation, or today if none exist
+  let latest = await Affirmation.findOne().sort({ scheduledDate: -1 });
 
-  const docs = affirmations.map((a, i) => {
-    const date = new Date(today);
-    date.setDate(today.getDate() + i);
+  let start = new Date();
+  start.setHours(0, 0, 0, 0);
+  if (latest) {
+    start = new Date(latest.scheduledDate);
+    start.setDate(start.getDate() + 1);
+  }
+
+  let docs = affirmations.map((a, i) => {
+    let date = new Date(start);
+    date.setDate(start.getDate() + i);
     return { ...a, scheduledDate: date };
   });
 
-  await Affirmation.deleteMany({}); // clear first so reruns don't collide on unique date
-  await Affirmation.insertMany(docs);
+  let inserted = await Affirmation.insertMany(docs);
+  console.log(`Seeded ${inserted.length} affirmations starting ${start.toDateString()}`);
 
-  console.log(`Seeded ${docs.length} affirmations`);
   await mongoose.disconnect();
 }
 
