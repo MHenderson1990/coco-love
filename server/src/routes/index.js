@@ -7,6 +7,8 @@ const favoriteRoutes = require('./favorite.routes');
 const feedbackRoutes = require('./feedback.routes');
 const journalRoutes = require('./journal.routes');
 const announcementRoutes = require('./announcement.routes');
+const videoRoutes = require('./video.routes');
+const adminRoutes = require('./admin.routes');
 
 router.use('/auth', authRoutes);
 router.use('/users', userRoutes);
@@ -15,5 +17,7 @@ router.use('/favorites', favoriteRoutes);
 router.use('/feedback', feedbackRoutes);
 router.use('/journal', journalRoutes);
 router.use('/announcements', announcementRoutes);
+router.use('/videos', videoRoutes);
+router.use('/admin', adminRoutes);
 
 module.exports = router;
