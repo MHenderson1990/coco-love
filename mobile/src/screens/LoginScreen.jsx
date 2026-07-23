@@ -30,8 +30,8 @@ export default function LoginScreen({ navigation }) {
       style={[styles.wrap, { backgroundColor: colors.bg }]}
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
     >
-      <Text style={[styles.title, { color: colors.ink }]}>The Sanctuary</Text>
-      <Text style={[styles.sub, { color: colors.muted }]}>Peace and love. Sign in to begin.</Text>
+      <Text style={[styles.title, { color: colors.ink }]}>House of Love</Text>
+      <Text style={[styles.sub, { color: colors.muted }]}>Peace and love, friend. Sign in to begin.</Text>
 
       <TextInput
         style={[styles.input, { backgroundColor: colors.surface, color: colors.ink, borderColor: colors.line }]}
