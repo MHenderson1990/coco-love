@@ -10,6 +10,8 @@ import { useTheme } from '../context/ThemeContext';
 import { CALENDLY_URL } from '../constants/config';
 import * as adminApi from '../api/admin';
 import * as announcementsApi from '../api/announcements';
+import * as ImagePicker from 'expo-image-picker';
+import * as videosApi from '../api/videos';
 
 export default function AdminScreen({ navigation }) {
   let { colors } = useTheme();
@@ -20,6 +22,7 @@ export default function AdminScreen({ navigation }) {
 
   let [showAffirmation, setShowAffirmation] = useState(false);
   let [showAnnouncement, setShowAnnouncement] = useState(false);
+  let [showVideo, setShowVideo] = useState(false);
 
   let load = useCallback(() => {
     let active = true;
@@ -101,6 +104,13 @@ export default function AdminScreen({ navigation }) {
                 <Text style={[styles.btnText, { color: colors.ink }]}>Send an announcement</Text>
               </Pressable>
 
+            <Pressable
+                style={[styles.btn, styles.ghost, { backgroundColor: colors.surface, borderColor: colors.line }]}
+                onPress={() => setShowVideo(true)}
+              >
+                <Text style={[styles.btnText, { color: colors.ink }]}>Upload a video</Text>
+              </Pressable>
+
               <Pressable
                 style={[styles.btn, styles.ghost, { backgroundColor: colors.surface, borderColor: colors.line }]}
                 onPress={() => Linking.openURL(CALENDLY_URL)}
@@ -122,6 +132,12 @@ export default function AdminScreen({ navigation }) {
       <AnnouncementModal
         visible={showAnnouncement}
         onClose={() => setShowAnnouncement(false)}
+        colors={colors}
+      />
+
+      <VideoModal
+        visible={showVideo}
+        onClose={() => setShowVideo(false)}
         colors={colors}
       />
     </SafeAreaView>
@@ -296,6 +312,130 @@ function Sheet({ visible, onClose, title, colors, children }) {
   );
 }
 
+function VideoModal({ visible, onClose, colors }) {
+  let [file, setFile] = useState(null);
+  let [title, setTitle] = useState('');
+  let [description, setDescription] = useState('');
+  let [tier, setTier] = useState('paid');
+  let [busy, setBusy] = useState(false);
+  let [status, setStatus] = useState('');
+  let [error, setError] = useState('');
+
+  async function pick() {
+    let perm = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (!perm.granted) {
+      setError('Allow library access to upload a video.');
+      return;
+    }
+
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Videos,
+      quality: 1,
+    });
+
+    if (!result.canceled && result.assets?.length) {
+      setFile(result.assets[0]);
+      setError('');
+    }
+  }
+
+  async function upload() {
+    if (!file) {
+      setError('Pick a video first.');
+      return;
+    }
+    if (!title.trim()) {
+      setError('Give it a title.');
+      return;
+    }
+
+    setError('');
+    setBusy(true);
+    try {
+      setStatus('Uploading to Cloudinary…');
+      let uploaded = await adminApi.uploadVideo(file.uri);
+
+      setStatus('Saving…');
+      await videosApi.createVideo({
+        title: title.trim(),
+        description: description.trim(),
+        videoUrl: uploaded.videoUrl,
+        thumbnailUrl: uploaded.thumbnailUrl,
+        duration: uploaded.duration,
+        tier,
+      });
+
+      setFile(null);
+      setTitle('');
+      setDescription('');
+      setTier('paid');
+      onClose();
+      Alert.alert('Uploaded', 'Your session is in the library.');
+    } catch (err) {
+      setError(err.message || 'Upload failed. Try again.');
+    } finally {
+      setBusy(false);
+      setStatus('');
+    }
+  }
+
+  return (
+    <Sheet visible={visible} onClose={onClose} title="Upload a video" colors={colors}>
+      <Pressable
+        style={[styles.input, { backgroundColor: colors.bg, justifyContent: 'center' }]}
+        onPress={pick}
+      >
+        <Text style={{ color: file ? colors.ink : colors.muted, fontSize: 14 }}>
+          {file ? `Selected · ${(file.fileSize / 1048576).toFixed(1)} MB` : 'Choose a video'}
+        </Text>
+      </Pressable>
+
+      <TextInput
+        style={[styles.input, { backgroundColor: colors.bg, color: colors.ink }]}
+        placeholder="Title"
+        placeholderTextColor={colors.muted}
+        value={title}
+        onChangeText={setTitle}
+      />
+
+      <TextInput
+        style={[styles.input, { backgroundColor: colors.bg, color: colors.ink }]}
+        placeholder="Short description"
+        placeholderTextColor={colors.muted}
+        value={description}
+        onChangeText={setDescription}
+      />
+
+      <View style={[styles.tierToggle, { borderColor: colors.line }]}>
+        {['free', 'paid'].map((t) => (
+          <Pressable
+            key={t}
+            style={[styles.tierBtn, tier === t && { backgroundColor: colors.accent }]}
+            onPress={() => setTier(t)}
+          >
+            <Text style={{ color: tier === t ? colors.surface : colors.muted, fontSize: 12, fontWeight: '700' }}>
+              {t === 'free' ? 'Free for everyone' : 'Members only'}
+            </Text>
+          </Pressable>
+        ))}
+      </View>
+
+      {status ? <Text style={[styles.error, { color: colors.muted }]}>{status}</Text> : null}
+      {error ? <Text style={[styles.error, { color: colors.accent }]}>{error}</Text> : null}
+
+      <Pressable
+        style={[styles.btn, { backgroundColor: colors.accent, opacity: busy ? 0.6 : 1 }]}
+        onPress={upload}
+        disabled={busy}
+      >
+        <Text style={[styles.btnText, { color: colors.surface }]}>
+          {busy ? 'Working…' : 'Upload'}
+        </Text>
+      </Pressable>
+    </Sheet>
+  );
+}
+
 let styles = StyleSheet.create({
   wrap: { flex: 1 },
   body: { paddingHorizontal: 22, paddingBottom: 40 },
@@ -329,4 +469,6 @@ let styles = StyleSheet.create({
   input: { borderRadius: 12, padding: 14, fontSize: 14, marginBottom: 12 },
   textarea: { minHeight: 90, textAlignVertical: 'top' },
   error: { fontSize: 13, marginBottom: 10 },
+  tierToggle: { flexDirection: 'row', borderWidth: 1, borderRadius: 100, overflow: 'hidden', marginBottom: 14 },
+  tierBtn: { flex: 1, paddingVertical: 10, alignItems: 'center' },
 });

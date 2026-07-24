@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "House of Love",
-    "slug": "House of Love",
+    "slug": "house-of-love",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -26,7 +26,12 @@
       "favicon": "./assets/favicon.png"
     },
     "plugins": [
-      "@react-native-community/datetimepicker"
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "House of Love needs access to your library so you can upload sessions."
+        }
+      ]
     ]
   }
 }

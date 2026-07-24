@@ -89,3 +89,36 @@ exports.runNotifications = async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 };
+
+let crypto = require('crypto');
+let {
+  cloudinaryCloudName,
+  cloudinaryApiKey,
+  cloudinaryApiSecret,
+} = require('../config/env');
+
+// GET /api/admin/upload-signature  (admin)
+exports.uploadSignature = async (req, res) => {
+  try {
+    if (!cloudinaryCloudName || !cloudinaryApiKey || !cloudinaryApiSecret) {
+      return res.status(500).json({ error: 'Cloudinary is not configured' });
+    }
+
+    let timestamp = Math.round(Date.now() / 1000);
+    let folder = 'house-of-love/videos';
+
+    // params must be sorted alphabetically, joined, then the secret appended
+    let toSign = `folder=${folder}&timestamp=${timestamp}${cloudinaryApiSecret}`;
+    let signature = crypto.createHash('sha1').update(toSign).digest('hex');
+
+    res.json({
+      signature,
+      timestamp,
+      folder,
+      apiKey: cloudinaryApiKey,
+      cloudName: cloudinaryCloudName,
+    });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
