@@ -1,15 +1,18 @@
 import { View, Text, StyleSheet, Pressable, ScrollView, Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTheme } from '../context/ThemeContext';
+import { useAuth } from '../context/AuthContext';
 
 let PERKS = [
   'Every session in the library',
   'New videos as Coco adds them',
-  'Support the work directly',
 ];
 
 export default function UpgradeScreen({ navigation }) {
   let { colors } = useTheme();
+  let { user } = useAuth();
+
+  let isMember = user?.tier === 'paid';
 
   return (
     <SafeAreaView style={[styles.wrap, { backgroundColor: colors.bg }]} edges={['top']}>
@@ -18,9 +21,13 @@ export default function UpgradeScreen({ navigation }) {
           <Text style={[styles.back, { color: colors.muted }]}>‹ Back</Text>
         </Pressable>
 
-        <Text style={[styles.title, { color: colors.ink }]}>Go deeper</Text>
+        <Text style={[styles.title, { color: colors.ink }]}>
+          {isMember ? 'You’re a member' : 'Go deeper'}
+        </Text>
         <Text style={[styles.sub, { color: colors.muted }]}>
-          The daily message is always free. Membership opens the full library.
+          {isMember
+            ? 'Thank you for supporting the work. The full library is yours.'
+            : 'The daily message is always free. Membership opens the full library.'}
         </Text>
 
         <View style={[styles.card, { backgroundColor: colors.surface, borderColor: colors.line }]}>
@@ -32,16 +39,29 @@ export default function UpgradeScreen({ navigation }) {
           ))}
         </View>
 
-        <Pressable
-          style={[styles.btn, { backgroundColor: colors.accent }]}
-          onPress={() => Alert.alert('Almost there', 'Memberships open soon.')}
-        >
-          <Text style={[styles.btnText, { color: colors.surface }]}>Become a member</Text>
-        </Pressable>
-
-        <Text style={[styles.fine, { color: colors.muted }]}>
-          Pricing coming soon.
-        </Text>
+        {isMember ? (
+          <>
+            <Pressable
+              style={[styles.btn, { backgroundColor: colors.accent }]}
+              onPress={() => navigation.navigate('Main', { screen: 'Watch' })}
+            >
+              <Text style={[styles.btnText, { color: colors.surface }]}>Browse the library</Text>
+            </Pressable>
+            <Text style={[styles.fine, { color: colors.muted }]}>
+              Manage your membership in your device settings.
+            </Text>
+          </>
+        ) : (
+          <>
+            <Pressable
+              style={[styles.btn, { backgroundColor: colors.accent }]}
+              onPress={() => Alert.alert('Almost there', 'Memberships open soon.')}
+            >
+              <Text style={[styles.btnText, { color: colors.surface }]}>Become a member</Text>
+            </Pressable>
+            <Text style={[styles.fine, { color: colors.muted }]}>Pricing coming soon.</Text>
+          </>
+        )}
       </ScrollView>
     </SafeAreaView>
   );
