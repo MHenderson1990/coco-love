@@ -4,7 +4,7 @@ import { useTheme } from '../context/ThemeContext';
 import { useAuth } from '../context/AuthContext';
 import { PALETTES, PALETTE_KEYS } from '../theme/palettes';
 
-export default function ProfileScreen() {
+export default function ProfileScreen({ navigation }) {
   let { colors, palette, setPalette, mode, setMode } = useTheme();
   let { user, logout } = useAuth();
 
@@ -13,6 +13,7 @@ export default function ProfileScreen() {
       <ScrollView contentContainerStyle={styles.body}>
         <Text style={[styles.title, { color: colors.ink }]}>Make it yours</Text>
         <Text style={[styles.sub, { color: colors.muted }]}>{user?.name} · {user?.email}</Text>
+       
 
         <View style={[styles.card, { backgroundColor: colors.surface, borderColor: colors.line }]}>
           <Text style={[styles.label, { color: colors.ink }]}>Appearance</Text>
@@ -47,7 +48,17 @@ export default function ProfileScreen() {
             ))}
           </View>
         </View>
-
+        {user?.role === 'admin' && (
+          <Pressable
+            style={[styles.card, { backgroundColor: colors.surface, borderColor: colors.line }]}
+            onPress={() => navigation.navigate('Admin')}
+          >
+            <Text style={[styles.label, { color: colors.ink }]}>Your dashboard</Text>
+            <Text style={{ fontSize: 12, color: colors.muted, marginTop: -8 }}>
+              Members, messages, and announcements
+            </Text>
+          </Pressable>
+        )}
         <Pressable
           style={[styles.signout, { borderColor: colors.line, backgroundColor: colors.surface }]}
           onPress={logout}
