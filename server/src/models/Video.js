@@ -7,6 +7,7 @@ let videoSchema = new mongoose.Schema({
   thumbnailUrl: { type: String, trim: true },
   duration:     { type: Number },              // seconds
   tags:         [{ type: String, trim: true }],
+  tier:         { type: String, enum: ['free', 'paid'], default: 'paid' },
   createdBy:    { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
 }, { timestamps: true });
 

@@ -5,14 +5,15 @@ let dailyAffirmationJob = require('../jobs/dailyAffirmation.job');
 // GET /api/admin/stats
 exports.stats = async (req, res) => {
   try {
-    let [totalUsers, totalAffirmations, activeStreaks, promoUnlocked] = await Promise.all([
+    let [totalUsers, totalAffirmations, activeStreaks, promoUnlocked, paidMembers] = await Promise.all([
       User.countDocuments(),
       Affirmation.countDocuments(),
       User.countDocuments({ currentStreak: { $gt: 0 } }),
       User.countDocuments({ promoUnlockedAt: { $ne: null } }),
+      User.countDocuments({ tier: 'paid' }),
     ]);
 
-    res.json({ totalUsers, totalAffirmations, activeStreaks, promoUnlocked });
+    res.json({ totalUsers, totalAffirmations, activeStreaks, promoUnlocked, paidMembers });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }

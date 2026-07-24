@@ -8,5 +8,6 @@ router.post('/', auth, admin, videoController.create);
 router.get('/', auth, videoController.list);
 router.get('/:id', auth, videoController.getOne);
 router.delete('/:id', auth, admin, videoController.remove);
+router.patch('/:id', auth, admin, videoController.update);
 
 module.exports = router;

@@ -57,6 +57,7 @@ export default function AdminScreen({ navigation }) {
               <Stat label="On a streak" value={stats?.activeStreaks} colors={colors} />
               <Stat label="Messages queued" value={stats?.totalAffirmations} colors={colors} />
               <Stat label="Rewards earned" value={stats?.promoUnlocked} colors={colors} />
+              <Stat label="Members paid" value={stats?.paidMembers} colors={colors} />
             </View>
 
             <Text style={[styles.label, { color: colors.muted }]}>LANDING BEST</Text>

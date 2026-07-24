@@ -4,7 +4,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTheme } from '../context/ThemeContext';
 import * as videosApi from '../api/videos';
 
-export default function WatchScreen() {
+export default function WatchScreen({ navigation }) {
   let { colors } = useTheme();
   let [items, setItems] = useState([]);
   let [loading, setLoading] = useState(true);
@@ -43,14 +43,27 @@ export default function WatchScreen() {
           renderItem={({ item }) => (
             <Pressable
               style={[styles.row, { backgroundColor: colors.surface, borderColor: colors.line }]}
-              onPress={() => Linking.openURL(item.videoUrl)}
+              onPress={() => {
+                if (item.locked) {
+                  navigation.navigate('Upgrade');
+                } else {
+                  Linking.openURL(item.videoUrl);
+                }
+              }}
             >
               <View style={[styles.thumb, { backgroundColor: colors.accentSoft }]}>
                 <View style={[styles.play, { backgroundColor: colors.surface }]}>
-                  <Text style={{ color: colors.accent, fontSize: 13 }}>▶</Text>
+                  <Text style={{ color: colors.accent, fontSize: 13 }}>
+                    {item.locked ? '🔒' : '▶'}
+                  </Text>
                 </View>
                 {item.duration ? (
                   <Text style={styles.dur}>{formatDuration(item.duration)}</Text>
+                ) : null}
+                {item.locked ? (
+                  <View style={[styles.badge, { backgroundColor: colors.accent }]}>
+                    <Text style={[styles.badgeText, { color: colors.surface }]}>MEMBERS</Text>
+                  </View>
                 ) : null}
               </View>
               <View style={styles.meta}>
@@ -70,18 +83,20 @@ export default function WatchScreen() {
 }
 
 let styles = StyleSheet.create({
-  wrap: { flex: 1, paddingHorizontal: 22 },
-  title: { fontSize: 24, fontWeight: '500', marginTop: 18, letterSpacing: -0.4 },
-  sub: { fontSize: 13.5, marginTop: 5, marginBottom: 16 },
-  list: { gap: 10, paddingBottom: 24 },
-  row: { borderWidth: 1, borderRadius: 15, overflow: 'hidden' },
-  thumb: { height: 90, alignItems: 'center', justifyContent: 'center' },
-  play: { width: 34, height: 34, borderRadius: 17, alignItems: 'center', justifyContent: 'center' },
-  dur: {
+  wrap:     { flex: 1, paddingHorizontal: 22 },
+  title:    { fontSize: 24, fontWeight: '500', marginTop: 18, letterSpacing: -0.4 },
+  sub:      { fontSize: 13.5, marginTop: 5, marginBottom: 16 },
+  list:     { gap: 10, paddingBottom: 24 },
+  row:      { borderWidth: 1, borderRadius: 15, overflow: 'hidden' },
+  thumb:    { height: 90, alignItems: 'center', justifyContent: 'center' },
+  play:     { width: 34, height: 34, borderRadius: 17, alignItems: 'center', justifyContent: 'center' },
+  dur:      {
     position: 'absolute', right: 10, bottom: 8, color: '#fff', fontSize: 10, fontWeight: '600',
     backgroundColor: 'rgba(0,0,0,0.45)', paddingHorizontal: 7, paddingVertical: 2, borderRadius: 100,
   },
-  meta: { padding: 13 },
+  meta:     { padding: 13 },
   vidTitle: { fontSize: 14.5, fontWeight: '600' },
-  vidSub: { fontSize: 12, marginTop: 3 },
+  vidSub:   { fontSize: 12, marginTop: 3 },
+  badge:    { position: 'absolute', left: 10, top: 8, paddingHorizontal: 8, paddingVertical: 3, borderRadius: 100 },
+  badgeText: { fontSize: 9, fontWeight: '700', letterSpacing: 0.8 },
 });

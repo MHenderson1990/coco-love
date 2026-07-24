@@ -51,6 +51,18 @@ export default function ProfileScreen({ navigation }) {
 
         <Pressable
           style={[styles.card, { backgroundColor: colors.surface, borderColor: colors.line }]}
+          onPress={() => navigation.navigate('Upgrade')}
+        >
+          <Text style={[styles.label, { color: colors.ink }]}>
+            {user?.tier === 'paid' ? 'Member' : 'Become a member'}
+          </Text>
+          <Text style={{ fontSize: 12, color: colors.muted, marginTop: -8 }}>
+            {user?.tier === 'paid' ? 'You have the full library' : 'Unlock every session'}
+          </Text>
+        </Pressable>
+
+        <Pressable
+          style={[styles.card, { backgroundColor: colors.surface, borderColor: colors.line }]}
           onPress={() => navigation.navigate('Journal')}
         >
           <Text style={[styles.label, { color: colors.ink }]}>Your journal</Text>
