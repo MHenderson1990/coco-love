@@ -47,7 +47,11 @@ export default function WatchScreen({ navigation }) {
                 if (item.locked) {
                   navigation.navigate('Upgrade');
                 } else {
-                  Linking.openURL(item.videoUrl);
+                  navigation.navigate('VideoPlayer', {
+                    videoUrl: item.videoUrl,
+                    title: item.title,
+                    description: item.description,
+                  });
                 }
               }}
             >

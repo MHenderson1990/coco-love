@@ -31,7 +31,8 @@
         {
           "photosPermission": "House of Love needs access to your library so you can upload sessions."
         }
-      ]
+      ],
+      "expo-video"
     ]
   }
 }

@@ -12,6 +12,7 @@ import AdminScreen from './src/screens/AdminScreen';
 import AnnouncementsScreen from './src/screens/AnnouncementsScreen';
 import JournalScreen from './src/screens/JournalScreen';
 import UpgradeScreen from './src/screens/UpgradeScreen';
+import VideoPlayerScreen from './src/screens/VideoPlayerScreen';
 
 let Stack = createNativeStackNavigator();
 
@@ -37,6 +38,7 @@ function Root() {
             <Stack.Screen name="Announcements" component={AnnouncementsScreen} />
             <Stack.Screen name="Journal" component={JournalScreen} />
             <Stack.Screen name="Upgrade" component={UpgradeScreen} />
+            <Stack.Screen name="VideoPlayer" component={VideoPlayerScreen} />
           </>
         ) : (
           <>
