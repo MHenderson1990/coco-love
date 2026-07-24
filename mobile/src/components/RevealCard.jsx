@@ -2,7 +2,7 @@ import { useRef, useState } from 'react';
 import { View, Text, StyleSheet, Animated, PanResponder, Dimensions } from 'react-native';
 import { useTheme } from '../context/ThemeContext';
 
-export default function RevealCard({ text, revealed, onReveal }) {
+export default function RevealCard({ text, revealed, onReveal, compact }) {
   let { colors } = useTheme();
   let translateY = useRef(new Animated.Value(0)).current;
   let [height, setHeight] = useState(300);
@@ -33,7 +33,11 @@ export default function RevealCard({ text, revealed, onReveal }) {
 
   return (
     <View
-      style={[styles.card, { backgroundColor: colors.surface, borderColor: colors.line }]}
+      style={[
+        styles.card,
+        { backgroundColor: colors.surface, borderColor: colors.line },
+        compact && { flex: 0, minHeight: 120, paddingVertical: 20 },
+      ]}
       onLayout={(e) => setHeight(e.nativeEvent.layout.height)}
     >
       <Text style={[styles.affirm, { color: colors.ink }]}>{text}</Text>

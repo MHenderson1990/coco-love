@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, Pressable, ActivityIndicator, Share, Alert } from 'react-native';
+import { View, Text, StyleSheet, Pressable, ActivityIndicator, Share, Alert,Platform, KeyboardAvoidingView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTheme } from '../context/ThemeContext';
 import { useAuth } from '../context/AuthContext';
@@ -9,6 +9,7 @@ import * as affirmationsApi from '../api/affirmations';
 import * as userApi from '../api/user';
 import * as favoritesApi from '../api/favorites';
 import * as feedbackApi from '../api/feedback';
+import JournalDrawer from '../components/JournalDrawer';
 
 export default function TodayScreen() {
   let { colors } = useTheme();
@@ -20,6 +21,7 @@ export default function TodayScreen() {
   let [saved, setSaved] = useState(false);
   let [loading, setLoading] = useState(true);
   let [error, setError] = useState('');
+  let [journalOpen, setJournalOpen] = useState(false);
 
   useEffect(() => {
     async function load() {
@@ -83,7 +85,11 @@ export default function TodayScreen() {
 
   return (
     <SafeAreaView style={[styles.wrap, { backgroundColor: colors.bg }]} edges={['top']}>
-      <View style={styles.body}>
+      <KeyboardAvoidingView
+        style={styles.body}
+        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+        keyboardVerticalOffset={90}
+      >
         <StreakRing streak={streak} />
 
         <View style={styles.greet}>
@@ -104,39 +110,47 @@ export default function TodayScreen() {
             text={affirmation?.text}
             revealed={revealed}
             onReveal={() => setRevealed(true)}
+            compact={journalOpen}
           />
         )}
 
         {revealed && (
-          <View style={styles.actions}>
-            <Pressable
-              style={[
-                styles.act,
-                { backgroundColor: saved ? colors.accentSoft : colors.surface, borderColor: saved ? colors.accent : colors.line },
-              ]}
-              onPress={handleSave}
-            >
-              <Text style={[styles.actText, { color: saved ? colors.accent : colors.muted }]}>
-                {saved ? 'Saved' : 'Save'}
-              </Text>
-            </Pressable>
+          <>
+            <View style={styles.actions}>
+              <Pressable
+                style={[
+                  styles.act,
+                  { backgroundColor: saved ? colors.accentSoft : colors.surface, borderColor: saved ? colors.accent : colors.line },
+                ]}
+                onPress={handleSave}
+              >
+                <Text style={[styles.actText, { color: saved ? colors.accent : colors.muted }]}>
+                  {saved ? 'Saved' : 'Save'}
+                </Text>
+              </Pressable>
 
-            <Pressable
-              style={[styles.act, { backgroundColor: colors.surface, borderColor: colors.line }]}
-              onPress={handleShare}
-            >
-              <Text style={[styles.actText, { color: colors.muted }]}>Share</Text>
-            </Pressable>
+              <Pressable
+                style={[styles.act, { backgroundColor: colors.surface, borderColor: colors.line }]}
+                onPress={handleShare}
+              >
+                <Text style={[styles.actText, { color: colors.muted }]}>Share</Text>
+              </Pressable>
 
-            <Pressable
-              style={[styles.act, { backgroundColor: colors.surface, borderColor: colors.line }]}
-              onPress={() => handleFeedback('more')}
-            >
-              <Text style={[styles.actText, { color: colors.muted }]}>More like this</Text>
-            </Pressable>
-          </View>
+              <Pressable
+                style={[styles.act, { backgroundColor: colors.surface, borderColor: colors.line }]}
+                onPress={() => handleFeedback('more')}
+              >
+                <Text style={[styles.actText, { color: colors.muted }]}>More like this</Text>
+              </Pressable>
+            </View>
+
+            <JournalDrawer
+              affirmationId={affirmation?._id}
+              onOpenChange={setJournalOpen}
+            />
+          </>
         )}
-      </View>
+      </KeyboardAvoidingView>
     </SafeAreaView>
   );
 }

@@ -18,7 +18,7 @@ const userSchema = new mongoose.Schema({
   preferences: {
     theme:        { type: String, enum: ['light', 'dark'], default: 'light' },
     background:   { type: String, default: 'default' },
-    colorPalette: { type: String, enum: ['sage', 'monochrome-green', 'light-blue'], default: 'sage' },
+    colorPalette: { type: String, enum: ['green', 'blue', 'pink', 'purple'], default: 'purple' },
   },
 
   pushToken:            { type: String },
