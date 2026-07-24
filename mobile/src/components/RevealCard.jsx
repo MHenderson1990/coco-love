@@ -1,27 +1,10 @@
-import { useRef, useState } from 'react';
+import { useRef } from 'react';
 import { View, Text, StyleSheet, Animated, PanResponder, Dimensions } from 'react-native';
 import { useTheme } from '../context/ThemeContext';
 
 export default function RevealCard({ text, revealed, onReveal, compact }) {
   let { colors } = useTheme();
   let translateY = useRef(new Animated.Value(0)).current;
-  let [height, setHeight] = useState(300);
-
-  let panResponder = useRef(
-    PanResponder.create({
-      onMoveShouldSetPanResponder: (_, gesture) => Math.abs(gesture.dy) > 4,
-      onPanResponderMove: (_, gesture) => {
-        if (gesture.dy < 0) translateY.setValue(gesture.dy);
-      },
-      onPanResponderRelease: (_, gesture) => {
-        if (gesture.dy < -60) {
-          lift();
-        } else {
-          Animated.spring(translateY, { toValue: 0, useNativeDriver: true }).start();
-        }
-      },
-    })
-  ).current;
 
   function lift() {
     Animated.timing(translateY, {
@@ -31,14 +14,40 @@ export default function RevealCard({ text, revealed, onReveal, compact }) {
     }).start(() => onReveal());
   }
 
+  let panResponder = useRef(
+    PanResponder.create({
+      // claim the touch immediately so the ScrollView can't take it
+      onStartShouldSetPanResponder: () => true,
+      onStartShouldSetPanResponderCapture: () => true,
+      onMoveShouldSetPanResponder: () => true,
+      onMoveShouldSetPanResponderCapture: (_, gesture) => Math.abs(gesture.dy) > 2,
+      // never give the gesture back to a parent mid-drag
+      onPanResponderTerminationRequest: () => false,
+
+      onPanResponderMove: (_, gesture) => {
+        if (gesture.dy < 0) translateY.setValue(gesture.dy);
+      },
+
+      onPanResponderRelease: (_, gesture) => {
+        let swipedUp = gesture.dy < -60;
+        let tapped = Math.abs(gesture.dy) < 8 && Math.abs(gesture.dx) < 8;
+
+        if (swipedUp || tapped) {
+          lift();
+        } else {
+          Animated.spring(translateY, { toValue: 0, useNativeDriver: true }).start();
+        }
+      },
+    })
+  ).current;
+
   return (
     <View
       style={[
         styles.card,
         { backgroundColor: colors.surface, borderColor: colors.line },
-        compact && { flex: 0, minHeight: 120, paddingVertical: 20 },
+        compact && { minHeight: 130, paddingVertical: 20 },
       ]}
-      onLayout={(e) => setHeight(e.nativeEvent.layout.height)}
     >
       <Text style={[styles.affirm, { color: colors.ink }]}>{text}</Text>
 
@@ -49,7 +58,6 @@ export default function RevealCard({ text, revealed, onReveal, compact }) {
             styles.veil,
             { backgroundColor: colors.accentSoft, transform: [{ translateY }] },
           ]}
-          onTouchEnd={() => {}}
         >
           <Text style={[styles.chev, { color: colors.ink }]}>⌃</Text>
           <Text style={[styles.veilText, { color: colors.ink }]}>SWIPE UP TO REVEAL</Text>
@@ -62,7 +70,7 @@ export default function RevealCard({ text, revealed, onReveal, compact }) {
 
 let styles = StyleSheet.create({
   card: {
-    flex: 1, marginTop: 16, borderRadius: 22, borderWidth: 1,
+    minHeight: 280, marginTop: 16, borderRadius: 22, borderWidth: 1,
     overflow: 'hidden', alignItems: 'center', justifyContent: 'center',
     paddingHorizontal: 24, paddingVertical: 28,
   },

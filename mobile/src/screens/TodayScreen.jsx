@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, Pressable, ActivityIndicator, Share, Alert,Platform, KeyboardAvoidingView } from 'react-native';
+import { useEffect, useState, useRef } from 'react';
+import { View, Text, StyleSheet, Pressable, ActivityIndicator, Share, Alert,Platform, KeyboardAvoidingView, ScrollView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTheme } from '../context/ThemeContext';
 import { useAuth } from '../context/AuthContext';
@@ -12,6 +12,7 @@ import * as feedbackApi from '../api/feedback';
 import JournalDrawer from '../components/JournalDrawer';
 import AnnouncementBanner from '../components/AnnouncementBanner';
 
+
 export default function TodayScreen({ navigation }) {
   let { colors } = useTheme();
   let { user } = useAuth();
@@ -23,6 +24,7 @@ export default function TodayScreen({ navigation }) {
   let [loading, setLoading] = useState(true);
   let [error, setError] = useState('');
   let [journalOpen, setJournalOpen] = useState(false);
+  let scrollRef = useRef(null);
 
   useEffect(() => {
     async function load() {
@@ -86,11 +88,15 @@ export default function TodayScreen({ navigation }) {
 
   return (
     <SafeAreaView style={[styles.wrap, { backgroundColor: colors.bg }]} edges={['top']}>
-      <KeyboardAvoidingView
-        style={styles.body}
-        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-        keyboardVerticalOffset={90}
-      >
+      
+        <ScrollView
+          ref={scrollRef}
+          contentContainerStyle={styles.body}
+          keyboardShouldPersistTaps="handled"
+          automaticallyAdjustKeyboardInsets
+          showsVerticalScrollIndicator={false}
+        >
+
         <StreakRing streak={streak} />
         <AnnouncementBanner onPress={() => navigation.navigate('Announcements')} />
 
@@ -148,11 +154,17 @@ export default function TodayScreen({ navigation }) {
 
             <JournalDrawer
               affirmationId={affirmation?._id}
-              onOpenChange={setJournalOpen}
+              onOpenChange={(open) => {
+                setJournalOpen(open);
+                if (open) {
+                  setTimeout(() => scrollRef.current?.scrollToEnd({ animated: true }), 250);
+                }
+              }}
             />
           </>
         )}
-      </KeyboardAvoidingView>
+        </ScrollView>
+      
     </SafeAreaView>
   );
 }
@@ -160,11 +172,11 @@ export default function TodayScreen({ navigation }) {
 let styles = StyleSheet.create({
   wrap: { flex: 1 },
   center: { flex: 1, alignItems: 'center', justifyContent: 'center' },
-  body: { flex: 1, paddingHorizontal: 22, paddingBottom: 20 },
+  body: { flexGrow: 1, paddingHorizontal: 22, paddingBottom: 34 },
   greet: { marginTop: 22 },
   hello: { fontSize: 25, fontWeight: '500', letterSpacing: -0.4, marginBottom: 7 },
   sub: { fontSize: 14 },
-  errorBox: { flex: 1, marginTop: 16, borderRadius: 22, borderWidth: 1, alignItems: 'center', justifyContent: 'center', padding: 24 },
+  errorBox: { minHeight: 260, marginTop: 16, borderRadius: 22, borderWidth: 1, alignItems: 'center', justifyContent: 'center', padding: 24 },
   actions: { flexDirection: 'row', gap: 8, marginTop: 14 },
   act: { flex: 1, borderWidth: 1, borderRadius: 14, paddingVertical: 13, alignItems: 'center' },
   actText: { fontSize: 11, fontWeight: '600' },
