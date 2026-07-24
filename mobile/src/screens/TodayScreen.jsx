@@ -10,8 +10,9 @@ import * as userApi from '../api/user';
 import * as favoritesApi from '../api/favorites';
 import * as feedbackApi from '../api/feedback';
 import JournalDrawer from '../components/JournalDrawer';
+import AnnouncementBanner from '../components/AnnouncementBanner';
 
-export default function TodayScreen() {
+export default function TodayScreen({ navigation }) {
   let { colors } = useTheme();
   let { user } = useAuth();
 
@@ -91,6 +92,7 @@ export default function TodayScreen() {
         keyboardVerticalOffset={90}
       >
         <StreakRing streak={streak} />
+        <AnnouncementBanner onPress={() => navigation.navigate('Announcements')} />
 
         <View style={styles.greet}>
           <Text style={[styles.hello, { color: colors.ink }]}>

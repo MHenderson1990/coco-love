@@ -9,6 +9,7 @@ import LoginScreen from './src/screens/LoginScreen';
 import SignupScreen from './src/screens/SignupScreen';
 import TabNavigator from './src/navigation/TabNavigator';
 import AdminScreen from './src/screens/AdminScreen';
+import AnnouncementsScreen from './src/screens/AnnouncementsScreen';
 
 let Stack = createNativeStackNavigator();
 
@@ -31,6 +32,7 @@ function Root() {
           <>
             <Stack.Screen name="Main" component={TabNavigator} />
             <Stack.Screen name="Admin" component={AdminScreen} />
+            <Stack.Screen name="Announcements" component={AnnouncementsScreen} />
           </>
         ) : (
           <>

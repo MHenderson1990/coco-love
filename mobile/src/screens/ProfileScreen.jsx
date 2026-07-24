@@ -48,6 +48,17 @@ export default function ProfileScreen({ navigation }) {
             ))}
           </View>
         </View>
+
+        <Pressable
+          style={[styles.card, { backgroundColor: colors.surface, borderColor: colors.line }]}
+          onPress={() => navigation.navigate('Announcements')}
+        >
+          <Text style={[styles.label, { color: colors.ink }]}>From Coco</Text>
+          <Text style={{ fontSize: 12, color: colors.muted, marginTop: -8 }}>
+            News and notes
+          </Text>
+        </Pressable>
+
         {user?.role === 'admin' && (
           <Pressable
             style={[styles.card, { backgroundColor: colors.surface, borderColor: colors.line }]}
