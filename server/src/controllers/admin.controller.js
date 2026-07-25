@@ -1,6 +1,7 @@
 let User = require('../models/User');
 let Affirmation = require('../models/Affirmation');
 let dailyAffirmationJob = require('../jobs/dailyAffirmation.job');
+let Setting = require('../models/Setting');
 
 // GET /api/admin/stats
 exports.stats = async (req, res) => {
@@ -118,6 +119,34 @@ exports.uploadSignature = async (req, res) => {
       apiKey: cloudinaryApiKey,
       cloudName: cloudinaryCloudName,
     });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+// PUT /api/admin/promo  (admin) — set the shared reward code
+exports.setPromo = async (req, res) => {
+  try {
+    let { code } = req.body;
+    if (!code || !code.trim()) {
+      return res.status(400).json({ error: 'A code is required' });
+    }
+    let setting = await Setting.findOneAndUpdate(
+      { key: 'promoCode' },
+      { value: code.trim() },
+      { new: true, upsert: true, setDefaultsOnInsert: true }
+    );
+    res.json({ code: setting.value });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+// GET /api/admin/promo  (admin) — read current code for the dashboard
+exports.getPromo = async (req, res) => {
+  try {
+    let setting = await Setting.findOne({ key: 'promoCode' });
+    res.json({ code: setting?.value || '' });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }

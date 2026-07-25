@@ -9,6 +9,7 @@ const journalRoutes = require('./journal.routes');
 const announcementRoutes = require('./announcement.routes');
 const videoRoutes = require('./video.routes');
 const adminRoutes = require('./admin.routes');
+const promoRoutes = require('./promo.routes');
 
 router.use('/auth', authRoutes);
 router.use('/users', userRoutes);
@@ -19,5 +20,6 @@ router.use('/journal', journalRoutes);
 router.use('/announcements', announcementRoutes);
 router.use('/videos', videoRoutes);
 router.use('/admin', adminRoutes);
+router.use('/promo', promoRoutes);
 
 module.exports = router;
