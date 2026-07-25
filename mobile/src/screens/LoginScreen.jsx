@@ -3,6 +3,7 @@ import {
   View, Text, TextInput, Pressable, StyleSheet,
   KeyboardAvoidingView, Platform, Animated, Easing,
 } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
 
@@ -55,6 +56,7 @@ export default function LoginScreen({ navigation }) {
 
   let [email, setEmail] = useState('');
   let [password, setPassword] = useState('');
+  let [showPassword, setShowPassword] = useState(false);
   let [error, setError] = useState('');
   let [busy, setBusy] = useState(false);
   let [focused, setFocused] = useState(null);
@@ -139,23 +141,33 @@ export default function LoginScreen({ navigation }) {
           onBlur={() => setFocused(null)}
         />
 
-        <TextInput
-          style={[
-            styles.input,
-            {
-              backgroundColor: colors.surface,
-              color: colors.ink,
-              borderColor: focused === 'password' ? colors.accent : colors.line,
-            },
-          ]}
-          placeholder="Password"
-          placeholderTextColor={colors.muted}
-          secureTextEntry
-          value={password}
-          onChangeText={setPassword}
-          onFocus={() => setFocused('password')}
-          onBlur={() => setFocused(null)}
-        />
+        <View style={styles.passwordWrap}>
+          <TextInput
+            style={[
+              styles.input,
+              styles.passwordInput,
+              {
+                backgroundColor: colors.surface,
+                color: colors.ink,
+                borderColor: focused === 'password' ? colors.accent : colors.line,
+              },
+            ]}
+            placeholder="Password"
+            placeholderTextColor={colors.muted}
+            secureTextEntry={!showPassword}
+            value={password}
+            onChangeText={setPassword}
+            onFocus={() => setFocused('password')}
+            onBlur={() => setFocused(null)}
+          />
+          <Pressable style={styles.eyeButton} onPress={() => setShowPassword((v) => !v)}>
+            <Ionicons
+              name={showPassword ? 'eye-off-outline' : 'eye-outline'}
+              size={20}
+              color={colors.muted}
+            />
+          </Pressable>
+        </View>
 
         {error ? <Text style={[styles.error, { color: colors.accent }]}>{error}</Text> : null}
 
@@ -190,6 +202,9 @@ let styles = StyleSheet.create({
     borderWidth: 1.5, borderRadius: 14,
     paddingHorizontal: 16, paddingVertical: 14, fontSize: 15, marginBottom: 12,
   },
+  passwordWrap: { alignSelf: 'stretch', justifyContent: 'center' },
+  passwordInput: { paddingRight: 46 },
+  eyeButton: { position: 'absolute', right: 14, top: 0, bottom: 12, justifyContent: 'center' },
   error: { alignSelf: 'stretch', fontSize: 13, marginBottom: 12 },
   button: {
     alignSelf: 'stretch',

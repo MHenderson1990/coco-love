@@ -194,7 +194,7 @@ export default function ProfileScreen({ navigation }) {
           style={[styles.card, { backgroundColor: colors.surface, borderColor: colors.line }]}
           onPress={() => navigation.navigate('Announcements')}
         >
-          <Text style={[styles.label, { color: colors.ink }]}>From Coco</Text>
+          <Text style={[styles.label, { color: colors.ink }]}>From Coco Love</Text>
           <Text style={{ fontSize: 12, color: colors.muted, marginTop: -8 }}>
             News and notes
           </Text>

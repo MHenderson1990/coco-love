@@ -18,7 +18,7 @@ export default function TodayScreen({ navigation }) {
   let { user } = useAuth();
 
   let [affirmation, setAffirmation] = useState(null);
-  let [streak, setStreak] = useState(0);
+  let [streak, setStreak] = useState(user?.currentStreak ?? 0);
   let [revealed, setRevealed] = useState(false);
   let [saved, setSaved] = useState(false);
   let [loading, setLoading] = useState(true);
@@ -29,20 +29,7 @@ export default function TodayScreen({ navigation }) {
   useEffect(() => {
     async function load() {
       try {
-        let [checkin, today] = await Promise.all([
-          userApi.checkIn(),
-          affirmationsApi.getToday(),
-        ]);
-        setStreak(checkin.currentStreak);
-        if (checkin.promoJustUnlocked) {
-          setTimeout(() => {
-            Alert.alert(
-              '30 days ✨',
-              'You reached a 30-day streak. Your reward is waiting in the You tab.',
-              [{ text: 'See it', onPress: () => navigation.navigate('Reward') }, { text: 'Later' }]
-            );
-          }, 600);
-        }
+        let today = await affirmationsApi.getToday();
         setAffirmation(today);
       } catch (err) {
         setError(err.response?.data?.error || 'Could not load today\u2019s message.');
@@ -52,6 +39,25 @@ export default function TodayScreen({ navigation }) {
     }
     load();
   }, []);
+
+  async function handleReveal() {
+    setRevealed(true);
+    try {
+      let checkin = await userApi.checkIn();
+      setStreak(checkin.currentStreak);
+      if (checkin.promoJustUnlocked) {
+        setTimeout(() => {
+          Alert.alert(
+            '30 days ✨',
+            'You reached a 30-day streak. Your reward is waiting in the You tab.',
+            [{ text: 'See it', onPress: () => navigation.navigate('Reward') }, { text: 'Later' }]
+          );
+        }, 600);
+      }
+    } catch (err) {
+      // non-blocking — the message is still revealed even if the streak save fails
+    }
+  }
 
   async function handleSave() {
     if (!affirmation) return;
@@ -124,7 +130,7 @@ export default function TodayScreen({ navigation }) {
           <RevealCard
             text={affirmation?.text}
             revealed={revealed}
-            onReveal={() => setRevealed(true)}
+            onReveal={handleReveal}
             compact={journalOpen}
           />
         )}
