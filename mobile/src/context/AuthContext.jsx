@@ -1,5 +1,6 @@
 import { createContext, useContext, useEffect, useState } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as LocalAuthentication from 'expo-local-authentication';
 import * as authApi from '../api/auth';
 
 let AuthContext = createContext(null);
@@ -8,15 +9,24 @@ export function AuthProvider({ children }) {
   let [user, setUser] = useState(null);
   let [loading, setLoading] = useState(true);
 
-  // on launch, restore session if a token is stored
+  // on launch, restore session if a token is stored — gated behind Face ID when the device supports it
   useEffect(() => {
     async function restore() {
       try {
         let token = await AsyncStorage.getItem('token');
-        if (token) {
-          let me = await authApi.getMe();
-          setUser(me);
+        if (!token) return;
+
+        let hasHardware = await LocalAuthentication.hasHardwareAsync();
+        let isEnrolled = await LocalAuthentication.isEnrolledAsync();
+        if (hasHardware && isEnrolled) {
+          let result = await LocalAuthentication.authenticateAsync({
+            promptMessage: 'Unlock House of Love',
+          });
+          if (!result.success) return; // leave the token in place, just don't restore this launch
         }
+
+        let me = await authApi.getMe();
+        setUser(me);
       } catch (err) {
         await AsyncStorage.removeItem('token');
       } finally {

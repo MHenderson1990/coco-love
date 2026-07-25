@@ -39,7 +39,13 @@
           "photosPermission": "House of Love needs access to your library so you can upload sessions."
         }
       ],
-      "expo-video"
+      "expo-video",
+      [
+        "expo-local-authentication",
+        {
+          "faceIDPermission": "House of Love uses Face ID to securely unlock your account."
+        }
+      ]
     ],
     "extra": {
       "eas": {
