@@ -7,6 +7,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useFocusEffect } from '@react-navigation/native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { useTheme } from '../context/ThemeContext';
+import MonthFilter from '../components/MonthFilter';
 import * as adminApi from '../api/admin';
 
 export default function ManageAffirmationsScreen({ navigation }) {
@@ -14,6 +15,7 @@ export default function ManageAffirmationsScreen({ navigation }) {
   let [items, setItems] = useState([]);
   let [loading, setLoading] = useState(true);
   let [editing, setEditing] = useState(null);
+  let [month, setMonth] = useState(null);
 
   let load = useCallback(() => {
     let active = true;
@@ -25,6 +27,13 @@ export default function ManageAffirmationsScreen({ navigation }) {
   }, []);
 
   useFocusEffect(load);
+
+  let filtered = month
+    ? items.filter((a) => {
+        let d = new Date(a.scheduledDate);
+        return d.getFullYear() === month.getFullYear() && d.getMonth() === month.getMonth();
+      })
+    : items;
 
   function confirmDelete(a) {
     Alert.alert(
@@ -68,15 +77,19 @@ export default function ManageAffirmationsScreen({ navigation }) {
       <Text style={[styles.title, { color: colors.ink }]}>Manage messages</Text>
       <Text style={[styles.sub, { color: colors.muted }]}>Tap to edit, long-press to delete.</Text>
 
+      <MonthFilter value={month} onChange={setMonth} />
+
       {loading ? (
         <ActivityIndicator color={colors.accent} style={{ marginTop: 40 }} />
       ) : (
         <FlatList
-          data={items}
+          data={filtered}
           keyExtractor={(item) => item._id}
           contentContainerStyle={styles.list}
           ListEmptyComponent={
-            <Text style={[styles.empty, { color: colors.muted }]}>No messages yet.</Text>
+            <Text style={[styles.empty, { color: colors.muted }]}>
+              {month ? 'No messages this month.' : 'No messages yet.'}
+            </Text>
           }
           renderItem={({ item }) => (
             <Pressable

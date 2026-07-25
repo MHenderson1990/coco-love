@@ -6,6 +6,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useFocusEffect } from '@react-navigation/native';
 import { useTheme } from '../context/ThemeContext';
+import MonthFilter from '../components/MonthFilter';
 import * as videosApi from '../api/videos';
 
 export default function ManageVideosScreen({ navigation }) {
@@ -13,6 +14,7 @@ export default function ManageVideosScreen({ navigation }) {
   let [items, setItems] = useState([]);
   let [loading, setLoading] = useState(true);
   let [editing, setEditing] = useState(null);
+  let [month, setMonth] = useState(null);
 
   let load = useCallback(() => {
     let active = true;
@@ -24,6 +26,13 @@ export default function ManageVideosScreen({ navigation }) {
   }, []);
 
   useFocusEffect(load);
+
+  let filtered = month
+    ? items.filter((v) => {
+        let d = new Date(v.createdAt);
+        return d.getFullYear() === month.getFullYear() && d.getMonth() === month.getMonth();
+      })
+    : items;
 
   function confirmDelete(video) {
     Alert.alert(
@@ -56,15 +65,19 @@ export default function ManageVideosScreen({ navigation }) {
       <Text style={[styles.title, { color: colors.ink }]}>Manage videos</Text>
       <Text style={[styles.sub, { color: colors.muted }]}>Tap to edit, long-press to delete.</Text>
 
+      <MonthFilter value={month} onChange={setMonth} />
+
       {loading ? (
         <ActivityIndicator color={colors.accent} style={{ marginTop: 40 }} />
       ) : (
         <FlatList
-          data={items}
+          data={filtered}
           keyExtractor={(item) => item._id}
           contentContainerStyle={styles.list}
           ListEmptyComponent={
-            <Text style={[styles.empty, { color: colors.muted }]}>No videos yet.</Text>
+            <Text style={[styles.empty, { color: colors.muted }]}>
+              {month ? 'No videos this month.' : 'No videos yet.'}
+            </Text>
           }
           renderItem={({ item }) => (
             <Pressable
