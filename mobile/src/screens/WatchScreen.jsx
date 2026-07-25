@@ -24,7 +24,7 @@ export default function WatchScreen({ navigation }) {
   }
 
   return (
-    <SafeAreaView style={[styles.wrap, { backgroundColor: colors.bg }]} edges={['top']}>
+    <SafeAreaView style={[styles.wrap, { backgroundColor: 'transparent' }]} edges={['top']}>
       <Text style={[styles.title, { color: colors.ink }]}>Watch</Text>
       <Text style={[styles.sub, { color: colors.muted }]}>Longer sessions, whenever you want them.</Text>
 

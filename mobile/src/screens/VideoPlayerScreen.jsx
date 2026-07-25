@@ -12,7 +12,7 @@ export default function VideoPlayerScreen({ route, navigation }) {
   });
 
   return (
-    <SafeAreaView style={[styles.wrap, { backgroundColor: colors.bg }]} edges={['top']}>
+   <SafeAreaView style={[styles.wrap, { backgroundColor: 'transparent' }]} edges={['top']}>
       <Pressable onPress={() => navigation.goBack()} style={styles.back}>
         <Text style={[styles.backText, { color: colors.muted }]}>‹ Back</Text>
       </Pressable>

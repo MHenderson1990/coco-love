@@ -27,7 +27,7 @@ export default function HistoryScreen() {
   }
 
   return (
-    <SafeAreaView style={[styles.wrap, { backgroundColor: colors.bg }]} edges={['top']}>
+    <SafeAreaView style={[styles.wrap, { backgroundColor: 'transparent' }]} edges={['top']}>
       <Text style={[styles.title, { color: colors.ink }]}>Past messages</Text>
       <Text style={[styles.sub, { color: colors.muted }]}>Everything you've opened, newest first.</Text>
 

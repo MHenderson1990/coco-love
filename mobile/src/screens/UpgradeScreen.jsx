@@ -15,7 +15,7 @@ export default function UpgradeScreen({ navigation }) {
   let isMember = user?.tier === 'paid';
 
   return (
-    <SafeAreaView style={[styles.wrap, { backgroundColor: colors.bg }]} edges={['top']}>
+    <SafeAreaView style={[styles.wrap, { backgroundColor: 'transparent' }]} edges={['top']}>
       <ScrollView contentContainerStyle={styles.body}>
         <Pressable onPress={() => navigation.goBack()}>
           <Text style={[styles.back, { color: colors.muted }]}>‹ Back</Text>

@@ -18,3 +18,4 @@ export let PALETTES = {
 };
 
 export let PALETTE_KEYS = ['green', 'blue', 'pink', 'purple'];
+export let BACKGROUNDS = ['default', 'gradient', 'glow', 'veil'];

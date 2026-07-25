@@ -2,14 +2,14 @@ import { View, Text, StyleSheet, Pressable, ScrollView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTheme } from '../context/ThemeContext';
 import { useAuth } from '../context/AuthContext';
-import { PALETTES, PALETTE_KEYS } from '../theme/palettes';
+import { PALETTES, PALETTE_KEYS, BACKGROUNDS } from '../theme/palettes';
 
 export default function ProfileScreen({ navigation }) {
-  let { colors, palette, setPalette, mode, setMode } = useTheme();
+  let { colors, palette, setPalette, mode, setMode, background, setBackground } = useTheme();
   let { user, logout } = useAuth();
 
   return (
-    <SafeAreaView style={[styles.wrap, { backgroundColor: colors.bg }]} edges={['top']}>
+    <SafeAreaView style={[styles.wrap, { backgroundColor: 'transparent' }]} edges={['top']}>
       <ScrollView contentContainerStyle={styles.body}>
         <Text style={[styles.title, { color: colors.ink }]}>Make it yours</Text>
         <Text style={[styles.sub, { color: colors.muted }]}>{user?.name} · {user?.email}</Text>
@@ -48,6 +48,27 @@ export default function ProfileScreen({ navigation }) {
           </View>
         </View>
 
+        <View style={[styles.card, { backgroundColor: colors.surface, borderColor: colors.line }]}>
+          <Text style={[styles.label, { color: colors.ink }]}>Background</Text>
+          <View style={styles.swatches}>
+            {BACKGROUNDS.map((key) => (
+              <Pressable
+                key={key}
+                onPress={() => {
+                  console.log('tapped background:', key);
+                  setBackground(key);
+                }}
+                style={[
+                  styles.bgSwatch,
+                  { backgroundColor: key === 'gradient' ? colors.accentSoft : key === 'glow' ? colors.accent : colors.bg, borderColor: colors.line },
+                  background === key && { borderWidth: 3, borderColor: colors.ink },
+                ]}
+              >
+                <Text style={{ fontSize: 8, color: colors.muted, textAlign: 'center', marginTop: 20 }}>{key}</Text>
+              </Pressable>
+            ))}
+          </View>
+        </View>
 
         <Pressable
           style={[styles.card, { backgroundColor: colors.surface, borderColor: colors.line }]}
@@ -106,4 +127,5 @@ let styles = StyleSheet.create({
   swatch: { width: 40, height: 40, borderRadius: 20 },
   signout: { borderWidth: 1, borderRadius: 14, paddingVertical: 15, alignItems: 'center', marginTop: 12 },
   signoutText: { fontSize: 14, fontWeight: '700' },
+  bgSwatch: { width: 44, height: 56, borderRadius: 10, borderWidth: 1 },
 });

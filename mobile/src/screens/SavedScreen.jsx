@@ -23,7 +23,7 @@ export default function SavedScreen() {
   );
 
   return (
-    <SafeAreaView style={[styles.wrap, { backgroundColor: colors.bg }]} edges={['top']}>
+    <SafeAreaView style={[styles.wrap, { backgroundColor: 'transparent' }]} edges={['top']}>
       <Text style={[styles.title, { color: colors.ink }]}>Saved messages</Text>
       <Text style={[styles.sub, { color: colors.muted }]}>The ones you keep coming back to.</Text>
 

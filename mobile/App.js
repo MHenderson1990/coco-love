@@ -15,6 +15,7 @@ import UpgradeScreen from './src/screens/UpgradeScreen';
 import VideoPlayerScreen from './src/screens/VideoPlayerScreen';
 import ManageVideosScreen from './src/screens/ManageVideosScreen';
 import ManageAffirmationsScreen from './src/screens/ManageAffirmationsScreen';
+import ThemedBackground from './src/components/ThemedBackground';
 
 let Stack = createNativeStackNavigator();
 
@@ -31,27 +32,29 @@ function Root() {
   }
 
   return (
-    <NavigationContainer>
-      <Stack.Navigator screenOptions={{ headerShown: false }}>
-        {user ? (
-          <>
-            <Stack.Screen name="Main" component={TabNavigator} />
-            <Stack.Screen name="Admin" component={AdminScreen} />
-            <Stack.Screen name="Announcements" component={AnnouncementsScreen} />
-            <Stack.Screen name="Journal" component={JournalScreen} />
-            <Stack.Screen name="Upgrade" component={UpgradeScreen} />
-            <Stack.Screen name="VideoPlayer" component={VideoPlayerScreen} />
-            <Stack.Screen name="ManageVideos" component={ManageVideosScreen} />
-            <Stack.Screen name="ManageAffirmations" component={ManageAffirmationsScreen} />
-          </>
-        ) : (
-          <>
-            <Stack.Screen name="Login" component={LoginScreen} />
-            <Stack.Screen name="Signup" component={SignupScreen} />
-          </>
-        )}
-      </Stack.Navigator>
-    </NavigationContainer>
+    <ThemedBackground>
+      <NavigationContainer>
+        <Stack.Navigator screenOptions={{ headerShown: false, contentStyle: { backgroundColor: 'transparent' } }}>
+          {user ? (
+            <>
+              <Stack.Screen name="Main" component={TabNavigator} />
+              <Stack.Screen name="Admin" component={AdminScreen} />
+              <Stack.Screen name="Announcements" component={AnnouncementsScreen} />
+              <Stack.Screen name="Journal" component={JournalScreen} />
+              <Stack.Screen name="Upgrade" component={UpgradeScreen} />
+              <Stack.Screen name="VideoPlayer" component={VideoPlayerScreen} />
+              <Stack.Screen name="ManageVideos" component={ManageVideosScreen} />
+              <Stack.Screen name="ManageAffirmations" component={ManageAffirmationsScreen} />
+            </>
+          ) : (
+            <>
+              <Stack.Screen name="Login" component={LoginScreen} />
+              <Stack.Screen name="Signup" component={SignupScreen} />
+            </>
+          )}
+        </Stack.Navigator>
+      </NavigationContainer>
+    </ThemedBackground>
   );
 }
 

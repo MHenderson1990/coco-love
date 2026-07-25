@@ -9,7 +9,7 @@ export function ThemeProvider({ children }) {
   let { user } = useAuth();
   let [palette, setPaletteState] = useState('purple');
   let [mode, setModeState] = useState('light');
-  
+  let [background, setBackgroundState] = useState('default');
 
   // adopt the user's saved preferences on login
   useEffect(() => {
@@ -17,6 +17,7 @@ export function ThemeProvider({ children }) {
       let saved = user.preferences.colorPalette;
       if (saved && PALETTES[saved]) setPaletteState(saved);
       if (user.preferences.theme) setModeState(user.preferences.theme);
+      if (user.preferences.background) setBackgroundState(user.preferences.background);
     }
   }, [user?._id]);
 
@@ -38,10 +39,19 @@ export function ThemeProvider({ children }) {
     }
   }
 
+  async function setBackground(next) {
+    setBackgroundState(next);
+    try {
+      await userApi.updateMe({ preferences: { background: next } });
+    } catch (err) {
+      // keep local change even if save fails
+    }
+  }
+
   let colors = (PALETTES[palette] || PALETTES.purple)[mode] || PALETTES.purple.light;
 
   return (
-    <ThemeContext.Provider value={{ colors, palette, setPalette, mode, setMode }}>
+    <ThemeContext.Provider value={{ colors, palette, setPalette, mode, setMode, background, setBackground }}>
       {children}
     </ThemeContext.Provider>
   );
@@ -50,3 +60,4 @@ export function ThemeProvider({ children }) {
 export function useTheme() {
   return useContext(ThemeContext);
 }
+

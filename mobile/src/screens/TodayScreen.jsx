@@ -12,8 +12,9 @@ import * as feedbackApi from '../api/feedback';
 import JournalDrawer from '../components/JournalDrawer';
 import AnnouncementBanner from '../components/AnnouncementBanner';
 
+
 export default function TodayScreen({ navigation }) {
-  let { colors } = useTheme();
+  let { colors, background } = useTheme();
   let { user } = useAuth();
 
   let [affirmation, setAffirmation] = useState(null);
@@ -79,14 +80,14 @@ export default function TodayScreen({ navigation }) {
 
   if (loading) {
     return (
-      <View style={[styles.center, { backgroundColor: colors.bg }]}>
+      <View style={[styles.center, { backgroundColor: 'transparent' }]}>
         <ActivityIndicator color={colors.accent} />
       </View>
     );
   }
 
   return (
-    <SafeAreaView style={[styles.wrap, { backgroundColor: colors.bg }]} edges={['top']}>
+    <SafeAreaView style={[styles.wrap, { backgroundColor: 'transparent' }]} edges={['top']}>
       <ScrollView
         ref={scrollRef}
         contentContainerStyle={styles.body}
@@ -99,7 +100,7 @@ export default function TodayScreen({ navigation }) {
 
         <View style={styles.greet}>
           <Text style={[styles.hello, { color: colors.ink }]}>
-            Peace and love, {user?.name}
+            Peace and love test, {user?.name}
           </Text>
           <Text style={[styles.sub, { color: colors.muted }]}>
             {revealed ? 'Take it with you today.' : 'Are you ready for today\u2019s message?'}

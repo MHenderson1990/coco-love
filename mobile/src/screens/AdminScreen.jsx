@@ -42,7 +42,7 @@ export default function AdminScreen({ navigation }) {
   let maxScore = top.length ? Math.max(...top.map((a) => a.score), 1) : 1;
 
   return (
-    <SafeAreaView style={[styles.wrap, { backgroundColor: colors.bg }]} edges={['top']}>
+    <SafeAreaView style={[styles.wrap, { backgroundColor: 'transparent' }]} edges={['top']}>
       <ScrollView contentContainerStyle={styles.body}>
         <Pressable onPress={() => navigation.goBack()}>
           <Text style={[styles.back, { color: colors.muted }]}>‹ Back</Text>

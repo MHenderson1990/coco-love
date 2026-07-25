@@ -22,8 +22,12 @@ export default function TabNavigator() {
 
   return (
     <Tab.Navigator
-      screenOptions={({ route }) => ({
+        screenOptions={({ route }) => ({
+        sceneStyle: { backgroundColor: 'transparent' },
         headerShown: false,
+        // ...the rest of your existing options (tabBarStyle, etc.) unchanged
+        headerShown: false,
+        // ...rest of your existing options unchanged
         tabBarActiveTintColor: colors.accent,
         tabBarInactiveTintColor: colors.muted,
         tabBarStyle: {
