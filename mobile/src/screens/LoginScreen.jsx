@@ -1,19 +1,83 @@
-import { useState } from 'react';
-import { View, Text, TextInput, Pressable, StyleSheet, KeyboardAvoidingView, Platform } from 'react-native';
+import { useEffect, useRef, useState, useMemo } from 'react';
+import {
+  View, Text, TextInput, Pressable, StyleSheet,
+  KeyboardAvoidingView, Platform, Animated, Easing,
+} from 'react-native';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
+
+// a scatter of stars — generated once
+function useStars(count = 34) {
+  return useMemo(
+    () =>
+      Array.from({ length: count }, () => ({
+        top: `${Math.random() * 62}%`,
+        left: `${Math.random() * 92 + 2}%`,
+        size: Math.random() * 2 + 1,
+        delay: Math.random() * 2200,
+        duration: 1400 + Math.random() * 1800,
+      })),
+    []
+  );
+}
+
+function Star({ top, left, size, delay, duration }) {
+  let twinkle = useRef(new Animated.Value(Math.random())).current;
+
+  useEffect(() => {
+    let loop = Animated.loop(
+      Animated.sequence([
+        Animated.timing(twinkle, { toValue: 1, duration, delay, easing: Easing.inOut(Easing.quad), useNativeDriver: true }),
+        Animated.timing(twinkle, { toValue: 0.2, duration, easing: Easing.inOut(Easing.quad), useNativeDriver: true }),
+      ])
+    );
+    loop.start();
+    return () => loop.stop();
+  }, []);
+
+  return (
+    <Animated.View
+      style={{
+        position: 'absolute',
+        top, left,
+        width: size, height: size, borderRadius: size,
+        backgroundColor: '#F0EBF7',
+        opacity: twinkle,
+      }}
+    />
+  );
+}
 
 export default function LoginScreen({ navigation }) {
   let { colors } = useTheme();
   let { login } = useAuth();
+  let stars = useStars();
 
   let [email, setEmail] = useState('');
   let [password, setPassword] = useState('');
   let [error, setError] = useState('');
   let [busy, setBusy] = useState(false);
+  let [focused, setFocused] = useState(null);
+
+  let fade = useRef(new Animated.Value(0)).current;
+  let rise = useRef(new Animated.Value(20)).current;
+  let moonGlow = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    Animated.parallel([
+      Animated.timing(fade, { toValue: 1, duration: 800, useNativeDriver: true }),
+      Animated.timing(rise, { toValue: 0, duration: 800, easing: Easing.out(Easing.cubic), useNativeDriver: true }),
+    ]).start();
+
+    Animated.loop(
+      Animated.sequence([
+        Animated.timing(moonGlow, { toValue: 1, duration: 3200, easing: Easing.inOut(Easing.quad), useNativeDriver: true }),
+        Animated.timing(moonGlow, { toValue: 0, duration: 3200, easing: Easing.inOut(Easing.quad), useNativeDriver: true }),
+      ])
+    ).start();
+  }, []);
 
   async function handleLogin() {
-    console.log('API URL:', process.env.EXPO_PUBLIC_API_URL);
     setError('');
     setBusy(true);
     try {
@@ -25,61 +89,112 @@ export default function LoginScreen({ navigation }) {
     }
   }
 
+  let glowScale = moonGlow.interpolate({ inputRange: [0, 1], outputRange: [1, 1.25] });
+  let glowOpacity = moonGlow.interpolate({ inputRange: [0, 1], outputRange: [0.2, 0.4] });
+
+  // deep celestial base tuned to the active accent
+  let sky = colors.bg;
+
   return (
     <KeyboardAvoidingView
-      style={[styles.wrap, { backgroundColor: colors.bg }]}
+      style={[styles.wrap, { backgroundColor: sky }]}
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
     >
-      <Text style={[styles.title, { color: colors.ink }]}>House of Love</Text>
-      <Text style={[styles.sub, { color: colors.muted }]}>Peace and love, friend. Sign in to begin.</Text>
+      {/* starfield */}
+      <View style={StyleSheet.absoluteFill} pointerEvents="none">
+        {stars.map((s, i) => <Star key={i} {...s} />)}
+      </View>
 
-      <TextInput
-        style={[styles.input, { backgroundColor: colors.surface, color: colors.ink, borderColor: colors.line }]}
-        placeholder="Email"
-        placeholderTextColor={colors.muted}
-        autoCapitalize="none"
-        keyboardType="email-address"
-        value={email}
-        onChangeText={setEmail}
-      />
+      <Animated.View style={[styles.content, { opacity: fade, transform: [{ translateY: rise }] }]}>
+        {/* moon with breathing glow */}
+        <View style={styles.moonWrap}>
+          <Animated.View
+            style={[
+              styles.moonGlow,
+              { backgroundColor: colors.accent, opacity: glowOpacity, transform: [{ scale: glowScale }] },
+            ]}
+          />
+          <Text style={[styles.moon, { color: colors.accentSoft }]}>☾</Text>
+        </View>
 
-      <TextInput
-        style={[styles.input, { backgroundColor: colors.surface, color: colors.ink, borderColor: colors.line }]}
-        placeholder="Password"
-        placeholderTextColor={colors.muted}
-        secureTextEntry
-        value={password}
-        onChangeText={setPassword}
-      />
+        <Text style={[styles.title, { color: colors.ink }]}>House of Love</Text>
+        <Text style={[styles.tagline, { color: colors.muted }]}>Peace and love,friend. Sign in to begin.</Text>
 
-      {error ? <Text style={[styles.error, { color: colors.accent }]}>{error}</Text> : null}
+        <TextInput
+          style={[
+            styles.input,
+            {
+              backgroundColor: colors.surface,
+              color: colors.ink,
+              borderColor: focused === 'email' ? colors.accent : colors.line,
+            },
+          ]}
+          placeholder="Email"
+          placeholderTextColor={colors.muted}
+          autoCapitalize="none"
+          keyboardType="email-address"
+          value={email}
+          onChangeText={setEmail}
+          onFocus={() => setFocused('email')}
+          onBlur={() => setFocused(null)}
+        />
 
-      <Pressable
-        style={[styles.button, { backgroundColor: colors.accent, opacity: busy ? 0.6 : 1 }]}
-        onPress={handleLogin}
-        disabled={busy}
-      >
-        <Text style={[styles.buttonText, { color: colors.surface }]}>
-          {busy ? 'Signing in…' : 'Sign in'}
-        </Text>
-      </Pressable>
+        <TextInput
+          style={[
+            styles.input,
+            {
+              backgroundColor: colors.surface,
+              color: colors.ink,
+              borderColor: focused === 'password' ? colors.accent : colors.line,
+            },
+          ]}
+          placeholder="Password"
+          placeholderTextColor={colors.muted}
+          secureTextEntry
+          value={password}
+          onChangeText={setPassword}
+          onFocus={() => setFocused('password')}
+          onBlur={() => setFocused(null)}
+        />
 
-      <Pressable onPress={() => navigation.navigate('Signup')}>
-        <Text style={[styles.link, { color: colors.muted }]}>
-          New here? Create an account
-        </Text>
-      </Pressable>
+        {error ? <Text style={[styles.error, { color: colors.accent }]}>{error}</Text> : null}
+
+        <Pressable
+          style={[styles.button, { backgroundColor: colors.accent, opacity: busy ? 0.6 : 1 }]}
+          onPress={handleLogin}
+          disabled={busy}
+        >
+          <Text style={[styles.buttonText, { color: colors.surface }]}>
+            {busy ? 'Entering…' : 'Enter'}
+          </Text>
+        </Pressable>
+
+        <Pressable onPress={() => navigation.navigate('Signup')}>
+          <Text style={[styles.link, { color: colors.muted }]}>New here? Create an account</Text>
+        </Pressable>
+      </Animated.View>
     </KeyboardAvoidingView>
   );
 }
 
 let styles = StyleSheet.create({
   wrap: { flex: 1, justifyContent: 'center', paddingHorizontal: 28 },
-  title: { fontSize: 34, fontWeight: '500', marginBottom: 8, letterSpacing: -0.5 },
-  sub: { fontSize: 15, marginBottom: 32 },
-  input: { borderWidth: 1, borderRadius: 14, paddingHorizontal: 16, paddingVertical: 14, fontSize: 15, marginBottom: 12 },
-  error: { fontSize: 13, marginBottom: 12 },
-  button: { borderRadius: 14, paddingVertical: 16, alignItems: 'center', marginTop: 8 },
+  content: { alignItems: 'center' },
+  moonWrap: { alignItems: 'center', justifyContent: 'center', marginBottom: 14 },
+  moonGlow: { position: 'absolute', width: 70, height: 70, borderRadius: 35 },
+  moon: { fontSize: 40 },
+  title: { fontSize: 30, fontWeight: '600', letterSpacing: -0.5, marginBottom: 6 },
+  tagline: { fontSize: 10.5, letterSpacing: 2, marginBottom: 34 },
+  input: {
+    alignSelf: 'stretch',
+    borderWidth: 1.5, borderRadius: 14,
+    paddingHorizontal: 16, paddingVertical: 14, fontSize: 15, marginBottom: 12,
+  },
+  error: { alignSelf: 'stretch', fontSize: 13, marginBottom: 12 },
+  button: {
+    alignSelf: 'stretch',
+    borderRadius: 14, paddingVertical: 16, alignItems: 'center', marginTop: 8,
+  },
   buttonText: { fontSize: 15, fontWeight: '700' },
   link: { textAlign: 'center', fontSize: 14, marginTop: 20 },
 });
