@@ -1,9 +1,9 @@
-const User = require('../models/User');
+let User = require('../models/User');
 
-const PROMO_MILESTONE = 30;
+let PROMO_MILESTONE = 30;
 
 function startOfDay(date) {
-  const d = new Date(date);
+  let d = new Date(date);
   d.setHours(0, 0, 0, 0);
   return d;
 }
@@ -13,15 +13,15 @@ function daysBetween(a, b) {
 }
 
 async function checkIn(userId) {
-  const user = await User.findById(userId);
+  let user = await User.findById(userId);
   if (!user) throw new Error('User not found');
 
-  const now = new Date();
+  let now = new Date();
 
   if (!user.lastOpenedDate) {
     user.currentStreak = 1;
   } else {
-    const gap = daysBetween(user.lastOpenedDate, now);
+    let gap = daysBetween(user.lastOpenedDate, now);
     if (gap === 0) {
       // already opened today — no change
     } else if (gap === 1) {
