@@ -163,14 +163,8 @@ export default function ProfileScreen({ navigation }) {
             </>
           )}
 
-          {expoPushToken ? (
-            <Text selectable style={{ fontSize: 11, color: colors.muted }}>
-              {expoPushToken}
-            </Text>
-          ) : (
-            <Text style={{ fontSize: 12, color: colors.muted }}>
-              {pushError ?? 'Requesting permission…'}
-            </Text>
+          {!expoPushToken && pushError && (
+            <Text style={{ fontSize: 12, color: colors.muted }}>{pushError}</Text>
           )}
         </View>
 
