@@ -13,7 +13,6 @@ export default function ProfileScreen({ navigation }) {
       <ScrollView contentContainerStyle={styles.body}>
         <Text style={[styles.title, { color: colors.ink }]}>Make it yours</Text>
         <Text style={[styles.sub, { color: colors.muted }]}>{user?.name} · {user?.email}</Text>
-       
 
         <View style={[styles.card, { backgroundColor: colors.surface, borderColor: colors.line }]}>
           <Text style={[styles.label, { color: colors.ink }]}>Appearance</Text>
@@ -92,6 +91,7 @@ export default function ProfileScreen({ navigation }) {
             </Text>
           </Pressable>
         )}
+
         <Pressable
           style={[styles.signout, { borderColor: colors.line, backgroundColor: colors.surface }]}
           onPress={logout}

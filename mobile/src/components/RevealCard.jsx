@@ -16,22 +16,17 @@ export default function RevealCard({ text, revealed, onReveal, compact }) {
 
   let panResponder = useRef(
     PanResponder.create({
-      // claim the touch immediately so the ScrollView can't take it
       onStartShouldSetPanResponder: () => true,
       onStartShouldSetPanResponderCapture: () => true,
       onMoveShouldSetPanResponder: () => true,
       onMoveShouldSetPanResponderCapture: (_, gesture) => Math.abs(gesture.dy) > 2,
-      // never give the gesture back to a parent mid-drag
       onPanResponderTerminationRequest: () => false,
-
       onPanResponderMove: (_, gesture) => {
         if (gesture.dy < 0) translateY.setValue(gesture.dy);
       },
-
       onPanResponderRelease: (_, gesture) => {
         let swipedUp = gesture.dy < -60;
         let tapped = Math.abs(gesture.dy) < 8 && Math.abs(gesture.dx) < 8;
-
         if (swipedUp || tapped) {
           lift();
         } else {

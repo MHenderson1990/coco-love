@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef } from 'react';
-import { View, Text, StyleSheet, Pressable, ActivityIndicator, Share, Alert,Platform, KeyboardAvoidingView, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, Pressable, ActivityIndicator, Share, Alert, Platform, KeyboardAvoidingView, ScrollView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTheme } from '../context/ThemeContext';
 import { useAuth } from '../context/AuthContext';
@@ -11,7 +11,6 @@ import * as favoritesApi from '../api/favorites';
 import * as feedbackApi from '../api/feedback';
 import JournalDrawer from '../components/JournalDrawer';
 import AnnouncementBanner from '../components/AnnouncementBanner';
-
 
 export default function TodayScreen({ navigation }) {
   let { colors } = useTheme();
@@ -36,7 +35,7 @@ export default function TodayScreen({ navigation }) {
         setStreak(checkin.currentStreak);
         setAffirmation(today);
       } catch (err) {
-        setError(err.response?.data?.error || 'Could not load today’s message.');
+        setError(err.response?.data?.error || 'Could not load today\u2019s message.');
       } finally {
         setLoading(false);
       }
@@ -64,7 +63,7 @@ export default function TodayScreen({ navigation }) {
     try {
       await Share.share({ message: affirmation.text });
     } catch (err) {
-      // user cancelled
+      // cancelled
     }
   }
 
@@ -72,7 +71,7 @@ export default function TodayScreen({ navigation }) {
     if (!affirmation) return;
     try {
       await feedbackApi.sendFeedback(affirmation._id, signal);
-      Alert.alert('Thanks', 'We’ll keep that in mind.');
+      Alert.alert('Thanks', 'We\u2019ll keep that in mind.');
     } catch (err) {
       // non-blocking
     }
@@ -88,15 +87,13 @@ export default function TodayScreen({ navigation }) {
 
   return (
     <SafeAreaView style={[styles.wrap, { backgroundColor: colors.bg }]} edges={['top']}>
-      
-        <ScrollView
-          ref={scrollRef}
-          contentContainerStyle={styles.body}
-          keyboardShouldPersistTaps="handled"
-          automaticallyAdjustKeyboardInsets
-          showsVerticalScrollIndicator={false}
-        >
-
+      <ScrollView
+        ref={scrollRef}
+        contentContainerStyle={styles.body}
+        keyboardShouldPersistTaps="handled"
+        automaticallyAdjustKeyboardInsets
+        showsVerticalScrollIndicator={false}
+      >
         <StreakRing streak={streak} />
         <AnnouncementBanner onPress={() => navigation.navigate('Announcements')} />
 
@@ -105,7 +102,7 @@ export default function TodayScreen({ navigation }) {
             Peace and love, {user?.name}
           </Text>
           <Text style={[styles.sub, { color: colors.muted }]}>
-            {revealed ? 'Take it with you today.' : 'Are you ready for today’s message?'}
+            {revealed ? 'Take it with you today.' : 'Are you ready for today\u2019s message?'}
           </Text>
         </View>
 
@@ -163,8 +160,7 @@ export default function TodayScreen({ navigation }) {
             />
           </>
         )}
-        </ScrollView>
-      
+      </ScrollView>
     </SafeAreaView>
   );
 }
