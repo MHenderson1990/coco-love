@@ -117,6 +117,19 @@ export default function AdminScreen({ navigation }) {
               >
                 <Text style={[styles.btnText, { color: colors.ink }]}>Open booking calendar</Text>
               </Pressable>
+              <Pressable
+                style={[styles.btn, styles.ghost, { backgroundColor: colors.surface, borderColor: colors.line }]}
+                onPress={() => navigation.navigate('ManageAffirmations')}
+              >
+                <Text style={[styles.btnText, { color: colors.ink }]}>Manage messages</Text>
+              </Pressable>
+
+              <Pressable
+                style={[styles.btn, styles.ghost, { backgroundColor: colors.surface, borderColor: colors.line }]}
+                onPress={() => navigation.navigate('ManageVideos')}
+              >
+                <Text style={[styles.btnText, { color: colors.ink }]}>Manage videos</Text>
+              </Pressable>
             </View>
           </>
         )}

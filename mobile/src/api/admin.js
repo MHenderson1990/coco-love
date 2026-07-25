@@ -45,3 +45,17 @@ export async function uploadVideo(fileUri, onProgress) {
     thumbnailUrl: data.secure_url.replace(/\.\w+$/, '.jpg'),
   };
 }
+
+export async function listAllAffirmations() {
+  let res = await client.get('/affirmations/all');
+  return res.data.affirmations;
+}
+
+export async function updateAffirmation(id, text, scheduledDate) {
+  let res = await client.patch(`/affirmations/${id}`, { text, scheduledDate });
+  return res.data.affirmation;
+}
+
+export async function deleteAffirmation(id) {
+  await client.delete(`/affirmations/${id}`);
+}

@@ -13,6 +13,8 @@ import AnnouncementsScreen from './src/screens/AnnouncementsScreen';
 import JournalScreen from './src/screens/JournalScreen';
 import UpgradeScreen from './src/screens/UpgradeScreen';
 import VideoPlayerScreen from './src/screens/VideoPlayerScreen';
+import ManageVideosScreen from './src/screens/ManageVideosScreen';
+import ManageAffirmationsScreen from './src/screens/ManageAffirmationsScreen';
 
 let Stack = createNativeStackNavigator();
 
@@ -39,6 +41,8 @@ function Root() {
             <Stack.Screen name="Journal" component={JournalScreen} />
             <Stack.Screen name="Upgrade" component={UpgradeScreen} />
             <Stack.Screen name="VideoPlayer" component={VideoPlayerScreen} />
+            <Stack.Screen name="ManageVideos" component={ManageVideosScreen} />
+            <Stack.Screen name="ManageAffirmations" component={ManageAffirmationsScreen} />
           </>
         ) : (
           <>

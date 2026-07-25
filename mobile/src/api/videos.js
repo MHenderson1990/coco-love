@@ -13,3 +13,8 @@ export async function createVideo(payload) {
 export async function deleteVideo(id) {
   await client.delete(`/videos/${id}`);
 }
+
+export async function updateVideo(id, updates) {
+  let res = await client.patch(`/videos/${id}`, updates);
+  return res.data.video;
+}
