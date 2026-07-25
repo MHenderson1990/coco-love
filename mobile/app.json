@@ -14,7 +14,7 @@
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.anonymous.house-of-love"
+      "bundleIdentifier": "com.coco.houseoflove"
     },
     "android": {
       "adaptiveIcon": {
@@ -37,6 +37,11 @@
         }
       ],
       "expo-video"
-    ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "d70c1ebb-cfaa-406b-b627-8402c396e584"
+      }
+    }
   }
 }
