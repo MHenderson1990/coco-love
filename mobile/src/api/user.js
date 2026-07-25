@@ -9,3 +9,8 @@ export async function updateMe(updates) {
   let res = await client.patch('/users/me', updates);
   return res.data.user;
 }
+
+export async function getMyPromo() {
+  let res = await client.get('/promo');
+  return res.data; // { code, unlockedAt }
+}

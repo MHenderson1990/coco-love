@@ -59,3 +59,13 @@ export async function updateAffirmation(id, text, scheduledDate) {
 export async function deleteAffirmation(id) {
   await client.delete(`/affirmations/${id}`);
 }
+
+export async function getPromo() {
+  let res = await client.get('/admin/promo');
+  return res.data.code;
+}
+
+export async function setPromo(code) {
+  let res = await client.put('/admin/promo', { code });
+  return res.data.code;
+}

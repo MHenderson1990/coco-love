@@ -70,6 +70,18 @@ export default function ProfileScreen({ navigation }) {
           </View>
         </View>
 
+        {user?.promoUnlockedAt && (
+          <Pressable
+            style={[styles.card, { backgroundColor: colors.surface, borderColor: colors.accent }]}
+            onPress={() => navigation.navigate('Reward')}
+          >
+            <Text style={[styles.label, { color: colors.ink }]}>✨ Your reward</Text>
+            <Text style={{ fontSize: 12, color: colors.muted, marginTop: -8 }}>
+              You reached 30 days — tap to reveal
+            </Text>
+          </Pressable>
+        )}
+
         <Pressable
           style={[styles.card, { backgroundColor: colors.surface, borderColor: colors.line }]}
           onPress={() => navigation.navigate('Journal')}

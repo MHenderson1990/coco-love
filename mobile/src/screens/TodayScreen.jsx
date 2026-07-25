@@ -34,6 +34,15 @@ export default function TodayScreen({ navigation }) {
           affirmationsApi.getToday(),
         ]);
         setStreak(checkin.currentStreak);
+        if (checkin.promoJustUnlocked) {
+          setTimeout(() => {
+            Alert.alert(
+              '30 days ✨',
+              'You reached a 30-day streak. Your reward is waiting in the You tab.',
+              [{ text: 'See it', onPress: () => navigation.navigate('Reward') }, { text: 'Later' }]
+            );
+          }, 600);
+        }
         setAffirmation(today);
       } catch (err) {
         setError(err.response?.data?.error || 'Could not load today\u2019s message.');
@@ -100,7 +109,7 @@ export default function TodayScreen({ navigation }) {
 
         <View style={styles.greet}>
           <Text style={[styles.hello, { color: colors.ink }]}>
-            Peace and love test, {user?.name}
+            Peace and love, {user?.name}
           </Text>
           <Text style={[styles.sub, { color: colors.muted }]}>
             {revealed ? 'Take it with you today.' : 'Are you ready for today\u2019s message?'}

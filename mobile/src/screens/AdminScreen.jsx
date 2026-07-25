@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useState, useEffect } from 'react';
 import {
   View, Text, StyleSheet, ScrollView, Pressable, TextInput,
   ActivityIndicator, Modal, Linking, Platform, KeyboardAvoidingView, Alert,
@@ -23,6 +23,7 @@ export default function AdminScreen({ navigation }) {
   let [showAffirmation, setShowAffirmation] = useState(false);
   let [showAnnouncement, setShowAnnouncement] = useState(false);
   let [showVideo, setShowVideo] = useState(false);
+  let [showPromo, setShowPromo] = useState(false);
 
   let load = useCallback(() => {
     let active = true;
@@ -130,6 +131,13 @@ export default function AdminScreen({ navigation }) {
               >
                 <Text style={[styles.btnText, { color: colors.ink }]}>Manage videos</Text>
               </Pressable>
+
+              <Pressable
+                style={[styles.btn, styles.ghost, { backgroundColor: colors.surface, borderColor: colors.line }]}
+                onPress={() => setShowPromo(true)}
+              >
+                <Text style={[styles.btnText, { color: colors.ink }]}>Set reward code</Text>
+              </Pressable>
             </View>
           </>
         )}
@@ -151,6 +159,12 @@ export default function AdminScreen({ navigation }) {
       <VideoModal
         visible={showVideo}
         onClose={() => setShowVideo(false)}
+        colors={colors}
+      />
+
+      <PromoModal
+        visible={showPromo}
+        onClose={() => setShowPromo(false)}
         colors={colors}
       />
     </SafeAreaView>
@@ -444,6 +458,57 @@ function VideoModal({ visible, onClose, colors }) {
         <Text style={[styles.btnText, { color: colors.surface }]}>
           {busy ? 'Working…' : 'Upload'}
         </Text>
+      </Pressable>
+    </Sheet>
+  );
+}
+
+function PromoModal({ visible, onClose, colors }) {
+  let [code, setCode] = useState('');
+  let [busy, setBusy] = useState(false);
+
+  useEffect(() => {
+    if (visible) {
+      adminApi.getPromo().then((c) => setCode(c || '')).catch(() => {});
+    }
+  }, [visible]);
+
+  async function save() {
+    if (!code.trim()) {
+      Alert.alert('Code required', 'Enter a reward code.');
+      return;
+    }
+    setBusy(true);
+    try {
+      await adminApi.setPromo(code.trim());
+      onClose();
+      Alert.alert('Saved', 'Your reward code is set.');
+    } catch (err) {
+      Alert.alert('Could not save', 'Try again in a moment.');
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  return (
+    <Sheet visible={visible} onClose={onClose} title="Reward code" colors={colors}>
+      <Text style={{ color: colors.muted, fontSize: 13, lineHeight: 19, marginBottom: 14 }}>
+        Members who reach a 30-day streak can reveal this code.
+      </Text>
+      <TextInput
+        style={[styles.input, { backgroundColor: colors.bg, color: colors.ink }]}
+        placeholder="e.g. HOL30LOVE"
+        placeholderTextColor={colors.muted}
+        autoCapitalize="characters"
+        value={code}
+        onChangeText={setCode}
+      />
+      <Pressable
+        style={[styles.btn, { backgroundColor: colors.accent, opacity: busy ? 0.6 : 1 }]}
+        onPress={save}
+        disabled={busy}
+      >
+        <Text style={[styles.btnText, { color: colors.surface }]}>{busy ? 'Saving…' : 'Save code'}</Text>
       </Pressable>
     </Sheet>
   );
