@@ -1,4 +1,6 @@
 let Announcement = require('../models/Announcement');
+let User = require('../models/User');
+let { sendPush, buildMessage } = require('../services/notification.service');
 
 // POST /api/announcements  (admin)  { title, body }
 exports.create = async (req, res) => {
@@ -12,6 +14,13 @@ exports.create = async (req, res) => {
       body,
       createdBy: req.user.id,
     });
+
+    let recipients = await User.find({ notificationsEnabled: true, pushToken: { $ne: null } });
+    let messages = recipients.map((user) =>
+      buildMessage(user.pushToken, title, body, { type: 'announcement' })
+    );
+    await sendPush(messages);
+
     res.status(201).json({ announcement });
   } catch (err) {
     res.status(500).json({ error: err.message });

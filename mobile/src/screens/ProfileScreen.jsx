@@ -3,10 +3,12 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTheme } from '../context/ThemeContext';
 import { useAuth } from '../context/AuthContext';
 import { PALETTES, PALETTE_KEYS, BACKGROUNDS } from '../theme/palettes';
+import { usePushToken } from '../hooks/usePushToken';
 
 export default function ProfileScreen({ navigation }) {
   let { colors, palette, setPalette, mode, setMode, background, setBackground } = useTheme();
   let { user, logout } = useAuth();
+  let { expoPushToken, error: pushError } = usePushToken();
 
   return (
     <SafeAreaView style={[styles.wrap, { backgroundColor: 'transparent' }]} edges={['top']}>
@@ -68,6 +70,19 @@ export default function ProfileScreen({ navigation }) {
               </Pressable>
             ))}
           </View>
+        </View>
+
+        <View style={[styles.card, { backgroundColor: colors.surface, borderColor: colors.line }]}>
+          <Text style={[styles.label, { color: colors.ink }]}>Push notifications</Text>
+          {expoPushToken ? (
+            <Text selectable style={{ fontSize: 11, color: colors.muted }}>
+              {expoPushToken}
+            </Text>
+          ) : (
+            <Text style={{ fontSize: 12, color: colors.muted }}>
+              {pushError ?? 'Requesting permission…'}
+            </Text>
+          )}
         </View>
 
         {user?.promoUnlockedAt && (

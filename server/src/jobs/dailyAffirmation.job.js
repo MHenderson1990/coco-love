@@ -46,8 +46,8 @@ async function runDailyNotifications() {
   let messages = due.map((user) =>
     buildMessage(
       user.pushToken,
-      'Your message is ready',
-      `Good morning ${user.name} — are you ready for today's message?`,
+      'Peace and love, friend.',
+      "Ready for today's message?",
       { type: 'daily' }
     )
   );
