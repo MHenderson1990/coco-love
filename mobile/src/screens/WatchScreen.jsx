@@ -44,31 +44,21 @@ export default function WatchScreen({ navigation }) {
             <Pressable
               style={[styles.row, { backgroundColor: colors.surface, borderColor: colors.line }]}
               onPress={() => {
-                if (item.locked) {
-                  navigation.navigate('Upgrade');
-                } else {
-                  navigation.navigate('VideoPlayer', {
-                    videoUrl: item.videoUrl,
-                    title: item.title,
-                    description: item.description,
-                  });
-                }
+                navigation.navigate('VideoPlayer', {
+                  videoUrl: item.videoUrl,
+                  title: item.title,
+                  description: item.description,
+                });
               }}
             >
               <View style={[styles.thumb, { backgroundColor: colors.accentSoft }]}>
                 <View style={[styles.play, { backgroundColor: colors.surface }]}>
-                  <Text style={{ color: colors.accent, fontSize: 13 }}>
-                    {item.locked ? '🔒' : '▶'}
-                  </Text>
+                  <Text style={{ color: colors.accent, fontSize: 13 }}>▶</Text>
                 </View>
                 {item.duration ? (
                   <Text style={styles.dur}>{formatDuration(item.duration)}</Text>
                 ) : null}
-                {item.locked ? (
-                  <View style={[styles.badge, { backgroundColor: colors.accent }]}>
-                    <Text style={[styles.badgeText, { color: colors.surface }]}>MEMBERS</Text>
-                  </View>
-                ) : null}
+               
               </View>
               <View style={styles.meta}>
                 <Text style={[styles.vidTitle, { color: colors.ink }]}>{item.title}</Text>
