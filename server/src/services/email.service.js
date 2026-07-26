@@ -5,7 +5,7 @@ let resend = new Resend(resendApiKey);
 
 async function sendResetCode(to, code) {
   await resend.emails.send({
-    from: 'House of Love <onboarding@resend.dev>', // swap for your verified domain later
+    from: 'House of Love <noreply@mail.consoulstudios.com>',
     to,
     subject: 'Your reset code',
     html: `

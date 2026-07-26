@@ -3,7 +3,8 @@ import {
   View, Text, TextInput, Pressable, StyleSheet,
   KeyboardAvoidingView, Platform, Animated, Easing,ScrollView
 } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
+import * as LocalAuthentication from 'expo-local-authentication';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
 
@@ -51,7 +52,7 @@ function Star({ top, left, size, delay, duration }) {
 
 export default function LoginScreen({ navigation }) {
   let { colors } = useTheme();
-  let { login } = useAuth();
+  let { login, restoreSession, hasStoredSession } = useAuth();
   let stars = useStars();
 
   let [email, setEmail] = useState('');
@@ -60,6 +61,30 @@ export default function LoginScreen({ navigation }) {
   let [error, setError] = useState('');
   let [busy, setBusy] = useState(false);
   let [focused, setFocused] = useState(null);
+  let [showFaceID, setShowFaceID] = useState(false);
+  let [faceIDBusy, setFaceIDBusy] = useState(false);
+
+  useEffect(() => {
+    async function checkFaceIDAvailable() {
+      let hasSession = await hasStoredSession();
+      if (!hasSession) return;
+      let hasHardware = await LocalAuthentication.hasHardwareAsync();
+      let isEnrolled = await LocalAuthentication.isEnrolledAsync();
+      setShowFaceID(hasHardware && isEnrolled);
+    }
+    checkFaceIDAvailable();
+  }, []);
+
+  async function handleFaceIDLogin() {
+    setError('');
+    setFaceIDBusy(true);
+    try {
+      let success = await restoreSession();
+      if (!success) setError('Face ID didn’t match. Enter your password instead.');
+    } finally {
+      setFaceIDBusy(false);
+    }
+  }
 
   let fade = useRef(new Animated.Value(0)).current;
   let rise = useRef(new Animated.Value(20)).current;
@@ -175,6 +200,16 @@ export default function LoginScreen({ navigation }) {
           </Pressable>
         </View>
 
+        {showFaceID && (
+          <Pressable
+            style={[styles.faceIDButton, { backgroundColor: colors.surface, borderColor: colors.line }]}
+            onPress={handleFaceIDLogin}
+            disabled={faceIDBusy}
+          >
+            <MaterialCommunityIcons name="face-recognition" size={22} color={colors.accent} />
+          </Pressable>
+        )}
+
         {error ? <Text style={[styles.error, { color: colors.accent }]}>{error}</Text> : null}
 
         <Pressable
@@ -218,6 +253,10 @@ let styles = StyleSheet.create({
   passwordWrap: { alignSelf: 'stretch', justifyContent: 'center' },
   passwordInput: { paddingRight: 46 },
   eyeButton: { position: 'absolute', right: 14, top: 0, bottom: 12, justifyContent: 'center' },
+  faceIDButton: {
+    alignSelf: 'center', width: 42, height: 42, borderRadius: 21,
+    borderWidth: 1, alignItems: 'center', justifyContent: 'center', marginBottom: 12,
+  },
   error: { alignSelf: 'stretch', fontSize: 13, marginBottom: 12 },
   button: {
     alignSelf: 'stretch',

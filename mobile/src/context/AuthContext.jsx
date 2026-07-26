@@ -9,31 +9,34 @@ export function AuthProvider({ children }) {
   let [user, setUser] = useState(null);
   let [loading, setLoading] = useState(true);
 
-  // on launch, restore session if a token is stored — gated behind Face ID when the device supports it
-  useEffect(() => {
-    async function restore() {
-      try {
-        let token = await AsyncStorage.getItem('token');
-        if (!token) return;
+  // restores the session for a token already in storage — gated behind Face ID when the device supports it.
+  // returns true if a session was restored, false otherwise (no token, cancelled, or unavailable).
+  async function restoreSession() {
+    try {
+      let token = await AsyncStorage.getItem('token');
+      if (!token) return false;
 
-        let hasHardware = await LocalAuthentication.hasHardwareAsync();
-        let isEnrolled = await LocalAuthentication.isEnrolledAsync();
-        if (hasHardware && isEnrolled) {
-          let result = await LocalAuthentication.authenticateAsync({
-            promptMessage: 'Unlock House of Love',
-          });
-          if (!result.success) return; // leave the token in place, just don't restore this launch
-        }
-
-        let me = await authApi.getMe();
-        setUser(me);
-      } catch (err) {
-        await AsyncStorage.removeItem('token');
-      } finally {
-        setLoading(false);
+      let hasHardware = await LocalAuthentication.hasHardwareAsync();
+      let isEnrolled = await LocalAuthentication.isEnrolledAsync();
+      if (hasHardware && isEnrolled) {
+        let result = await LocalAuthentication.authenticateAsync({
+          promptMessage: 'Unlock House of Love',
+        });
+        if (!result.success) return false; // leave the token in place, just don't restore this time
       }
+
+      let me = await authApi.getMe();
+      setUser(me);
+      return true;
+    } catch (err) {
+      await AsyncStorage.removeItem('token');
+      return false;
     }
-    restore();
+  }
+
+  // on launch, try to restore automatically
+  useEffect(() => {
+    restoreSession().finally(() => setLoading(false));
   }, []);
 
   async function login(email, password) {
@@ -55,8 +58,14 @@ export function AuthProvider({ children }) {
     setUser(null);
   }
 
+  async function hasStoredSession() {
+    return !!(await AsyncStorage.getItem('token'));
+  }
+
   return (
-    <AuthContext.Provider value={{ user, loading, login, signup, logout }}>
+    <AuthContext.Provider
+      value={{ user, loading, login, signup, logout, restoreSession, hasStoredSession }}
+    >
       {children}
     </AuthContext.Provider>
   );
