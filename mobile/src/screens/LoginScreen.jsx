@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState, useMemo } from 'react';
 import {
   View, Text, TextInput, Pressable, StyleSheet,
-  KeyboardAvoidingView, Platform, Animated, Easing,
+  KeyboardAvoidingView, Platform, Animated, Easing,ScrollView
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '../context/AuthContext';
@@ -107,6 +107,12 @@ export default function LoginScreen({ navigation }) {
         {stars.map((s, i) => <Star key={i} {...s} />)}
       </View>
 
+    <ScrollView
+        contentContainerStyle={{ flexGrow: 1, justifyContent: 'center' }}
+        keyboardShouldPersistTaps="handled"
+        showsVerticalScrollIndicator={false}
+      >
+
       <Animated.View style={[styles.content, { opacity: fade, transform: [{ translateY: rise }] }]}>
         {/* moon with breathing glow */}
         <View style={styles.moonWrap}>
@@ -181,10 +187,17 @@ export default function LoginScreen({ navigation }) {
           </Text>
         </Pressable>
 
-        <Pressable onPress={() => navigation.navigate('Signup')}>
-          <Text style={[styles.link, { color: colors.muted }]}>New here? Create an account</Text>
-        </Pressable>
+        <View style={styles.linkRow}>
+          <Pressable onPress={() => navigation.navigate('Signup')}>
+            <Text style={[styles.link, { color: colors.muted }]}>Create an account</Text>
+          </Pressable>
+          <Text style={{ color: colors.muted }}>  ·  </Text>
+          <Pressable onPress={() => navigation.navigate('ResetPassword')}>
+            <Text style={[styles.link, { color: colors.muted }]}>Forgot password?</Text>
+          </Pressable>
+        </View>
       </Animated.View>
+      </ScrollView>
     </KeyboardAvoidingView>
   );
 }
@@ -212,4 +225,5 @@ let styles = StyleSheet.create({
   },
   buttonText: { fontSize: 15, fontWeight: '700' },
   link: { textAlign: 'center', fontSize: 14, marginTop: 20 },
+  linkRow: { flexDirection: 'row', justifyContent: 'center', alignItems: 'center', marginTop: 20, flexWrap: 'wrap' },
 });

@@ -18,6 +18,7 @@ import ManageVideosScreen from './src/screens/ManageVideosScreen';
 import ManageAffirmationsScreen from './src/screens/ManageAffirmationsScreen';
 import ThemedBackground from './src/components/ThemedBackground';
 import RewardScreen from './src/screens/RewardScreen';
+import ResetPasswordScreen from './src/screens/ResetPasswordScreen';
 
 let Stack = createNativeStackNavigator();
 
@@ -62,6 +63,7 @@ function Root() {
             <>
               <Stack.Screen name="Login" component={LoginScreen} />
               <Stack.Screen name="Signup" component={SignupScreen} />
+              <Stack.Screen name="ResetPassword" component={ResetPasswordScreen} />
             </>
           )}
         </Stack.Navigator>
