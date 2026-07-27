@@ -24,7 +24,7 @@ const userSchema = new mongoose.Schema({
 
   pushToken:            { type: String },
   notificationsEnabled: { type: Boolean, default: true },
-  notificationTime:     { type: String, default: '08:00' },
+  notificationTime:     { type: String, default: '11:11' },
   resetCodeHash:        { type: String },
   resetCodeExpires:     { type: Date },
 }, { timestamps: true });
