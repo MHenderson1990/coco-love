@@ -54,7 +54,7 @@ export function AuthProvider({ children }) {
   }
 
   async function logout() {
-    await AsyncStorage.removeItem('token');
+    // keep the token so Face ID can unlock straight back into this account from the Login screen
     setUser(null);
   }
 

@@ -9,7 +9,7 @@ import { usePushToken } from '../hooks/usePushToken';
 import { updateMe } from '../api/user';
 
 function timeStringToDate(hhmm) {
-  let [h, m] = (hhmm || '08:00').split(':').map(Number);
+  let [h, m] = (hhmm || '11:11').split(':').map(Number);
   let d = new Date();
   d.setHours(h, m, 0, 0);
   return d;
@@ -31,13 +31,13 @@ export default function ProfileScreen({ navigation }) {
   let { expoPushToken, error: pushError } = usePushToken();
 
   let [notificationsEnabled, setNotificationsEnabled] = useState(true);
-  let [notificationTime, setNotificationTime] = useState('08:00');
+  let [notificationTime, setNotificationTime] = useState('11:11');
   let [showTimePicker, setShowTimePicker] = useState(false);
 
   useEffect(() => {
     if (user) {
       setNotificationsEnabled(user.notificationsEnabled ?? true);
-      setNotificationTime(user.notificationTime ?? '08:00');
+      setNotificationTime(user.notificationTime ?? '11:11');
     }
   }, [user?._id]);
 

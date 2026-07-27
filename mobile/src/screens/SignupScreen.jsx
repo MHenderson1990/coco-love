@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { View, Text, TextInput, Pressable, StyleSheet, KeyboardAvoidingView, Platform, ScrollView } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
+import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
 
@@ -11,6 +12,7 @@ export default function SignupScreen({ navigation }) {
   let [name, setName] = useState('');
   let [email, setEmail] = useState('');
   let [password, setPassword] = useState('');
+  let [showPassword, setShowPassword] = useState(false);
   let [birthday, setBirthday] = useState(null);
   let [showPicker, setShowPicker] = useState(false);
   let [error, setError] = useState('');
@@ -76,14 +78,23 @@ export default function SignupScreen({ navigation }) {
           onChangeText={setEmail}
         />
 
-        <TextInput
-          style={[styles.input, { backgroundColor: colors.surface, color: colors.ink, borderColor: colors.line }]}
-          placeholder="Password"
-          placeholderTextColor={colors.muted}
-          secureTextEntry
-          value={password}
-          onChangeText={setPassword}
-        />
+        <View style={styles.passwordWrap}>
+          <TextInput
+            style={[styles.input, styles.passwordInput, { backgroundColor: colors.surface, color: colors.ink, borderColor: colors.line }]}
+            placeholder="Password"
+            placeholderTextColor={colors.muted}
+            secureTextEntry={!showPassword}
+            value={password}
+            onChangeText={setPassword}
+          />
+          <Pressable style={styles.eyeButton} onPress={() => setShowPassword((v) => !v)}>
+            <Ionicons
+              name={showPassword ? 'eye-off-outline' : 'eye-outline'}
+              size={20}
+              color={colors.muted}
+            />
+          </Pressable>
+        </View>
 
         <Pressable
           style={[styles.input, styles.dateField, { backgroundColor: colors.surface, borderColor: colors.line }]}
@@ -137,6 +148,9 @@ let styles = StyleSheet.create({
   title: { fontSize: 30, fontWeight: '500', marginBottom: 8, letterSpacing: -0.5 },
   sub: { fontSize: 15, marginBottom: 28 },
   input: { borderWidth: 1, borderRadius: 14, paddingHorizontal: 16, paddingVertical: 14, fontSize: 15, marginBottom: 12 },
+  passwordWrap: { justifyContent: 'center' },
+  passwordInput: { paddingRight: 46 },
+  eyeButton: { position: 'absolute', right: 14, top: 0, bottom: 12, justifyContent: 'center' },
   dateField: { justifyContent: 'center' },
   pickerWrap: { borderWidth: 1, borderRadius: 14, marginBottom: 12, overflow: 'hidden' },
   doneBtn: { alignItems: 'center', paddingVertical: 12 },
