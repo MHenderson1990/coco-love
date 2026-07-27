@@ -70,7 +70,11 @@ export default function LoginScreen({ navigation }) {
       if (!hasSession) return;
       let hasHardware = await LocalAuthentication.hasHardwareAsync();
       let isEnrolled = await LocalAuthentication.isEnrolledAsync();
-      setShowFaceID(hasHardware && isEnrolled);
+      if (hasHardware && isEnrolled) {
+        setShowFaceID(true);
+        // let the stars/moon settle in first, then prompt — so Face ID happens over this screen, not before it
+        setTimeout(handleFaceIDLogin, 500);
+      }
     }
     checkFaceIDAvailable();
   }, []);

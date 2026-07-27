@@ -34,9 +34,18 @@ export function AuthProvider({ children }) {
     }
   }
 
-  // on launch, try to restore automatically
+  // on launch: devices without Face ID/Touch ID restore silently (no biometric gate to show).
+  // devices with biometrics skip straight to the Login screen instead, so the unlock prompt
+  // happens over the actual login UI rather than a blank loading screen.
   useEffect(() => {
-    restoreSession().finally(() => setLoading(false));
+    async function bootstrap() {
+      let hasHardware = await LocalAuthentication.hasHardwareAsync();
+      let isEnrolled = await LocalAuthentication.isEnrolledAsync();
+      if (!hasHardware || !isEnrolled) {
+        await restoreSession();
+      }
+    }
+    bootstrap().finally(() => setLoading(false));
   }, []);
 
   async function login(email, password) {
