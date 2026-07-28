@@ -2,9 +2,10 @@ let mongoose = require('mongoose');
 
 let journalEntrySchema = new mongoose.Schema({
   user:        { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
-  affirmation: { type: mongoose.Schema.Types.ObjectId, ref: 'Affirmation', required: true },
+  affirmation: { type: mongoose.Schema.Types.ObjectId, ref: 'Affirmation' },
   mood:        { type: String, trim: true },   // emoji
   text:        { type: String, trim: true },   // written entry
+  type:        { type: String, enum: ['daily', 'freeform'], default: 'daily' },
 }, { timestamps: true });
 
 module.exports = mongoose.model('JournalEntry', journalEntrySchema);

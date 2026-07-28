@@ -1,10 +1,14 @@
 let JournalEntry = require('../models/JournalEntry');
 
 // POST /api/journal  { affirmationId, mood, text }
+// POST /api/journal  { affirmationId?, mood, text, type }
 exports.create = async (req, res) => {
   try {
-    let { affirmationId, mood, text } = req.body;
-    if (!affirmationId) {
+    let { affirmationId, mood, text, type } = req.body;
+
+    let entryType = type === 'freeform' ? 'freeform' : 'daily';
+
+    if (entryType === 'daily' && !affirmationId) {
       return res.status(400).json({ error: 'affirmationId is required' });
     }
     if (!mood && !text) {
@@ -13,9 +17,10 @@ exports.create = async (req, res) => {
 
     let entry = await JournalEntry.create({
       user: req.user.id,
-      affirmation: affirmationId,
+      affirmation: entryType === 'daily' ? affirmationId : undefined,
       mood,
       text,
+      type: entryType,
     });
 
     res.status(201).json({ entry });
@@ -25,9 +30,17 @@ exports.create = async (req, res) => {
 };
 
 // GET /api/journal — this user's entries, newest first
+// GET /api/journal?type=freeform|daily — this user's entries, newest first
 exports.list = async (req, res) => {
   try {
-    let entries = await JournalEntry.find({ user: req.user.id })
+    let filter = { user: req.user.id };
+    if (req.query.type === 'freeform') {
+      filter.type = 'freeform';
+    } else if (req.query.type === 'daily') {
+      filter.type = { $ne: 'freeform' };   // includes legacy entries with no type
+    }
+
+    let entries = await JournalEntry.find(filter)
       .populate('affirmation')
       .sort({ createdAt: -1 });
     res.json({ entries });
