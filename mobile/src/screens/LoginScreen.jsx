@@ -72,8 +72,6 @@ export default function LoginScreen({ navigation }) {
       let isEnrolled = await LocalAuthentication.isEnrolledAsync();
       if (hasHardware && isEnrolled) {
         setShowFaceID(true);
-        // let the stars/moon settle in first, then prompt — so Face ID happens over this screen, not before it
-        setTimeout(handleFaceIDLogin, 500);
       }
     }
     checkFaceIDAvailable();
