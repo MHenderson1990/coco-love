@@ -30,7 +30,12 @@ exports.updateMe = async (req, res) => {
     if (name !== undefined) updates.name = name;
     if (birthday !== undefined) updates.birthday = birthday;
     if (timezone !== undefined) updates.timezone = timezone;
-    if (pushToken !== undefined) updates.pushToken = pushToken;
+    if (pushToken) {
+      await User.updateMany(
+        { pushToken, _id: { $ne: req.user.id } },
+        { $unset: { pushToken: '' } }
+      );
+    }
     if (notificationsEnabled !== undefined) updates.notificationsEnabled = notificationsEnabled;
 
     if (notificationTime !== undefined) {

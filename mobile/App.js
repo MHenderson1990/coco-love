@@ -19,6 +19,7 @@ import ManageAffirmationsScreen from './src/screens/ManageAffirmationsScreen';
 import ThemedBackground from './src/components/ThemedBackground';
 import RewardScreen from './src/screens/RewardScreen';
 import ResetPasswordScreen from './src/screens/ResetPasswordScreen';
+import LoadingScreen from './src/screens/LoadingScreen';
 
 let Stack = createNativeStackNavigator();
 
@@ -36,12 +37,7 @@ function Root() {
   let { colors } = useTheme();
 
   if (loading) {
-    return (
-      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', gap: 12, backgroundColor: colors.bg }}>
-        <ActivityIndicator color={colors.accent} />
-        <Text style={{ color: colors.muted, fontSize: 13 }}>Love loading…</Text>
-      </View>
-    );
+    return <LoadingScreen />;
   }
 
   return (

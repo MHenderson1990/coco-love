@@ -81,7 +81,7 @@ export default function LoginScreen({ navigation }) {
     setError('');
     setFaceIDBusy(true);
     try {
-      let success = await restoreSession();
+    let success = await restoreSession({ requireBiometric: true });
       if (!success) setError('Face ID didn’t match. Enter your password instead.');
     } finally {
       setFaceIDBusy(false);

@@ -12,12 +12,10 @@ function localTime(timezone) {
   }).format(new Date());
 }
 
-function sameDay(a, b) {
-  return (
-    a.getFullYear() === b.getFullYear() &&
-    a.getMonth() === b.getMonth() &&
-    a.getDate() === b.getDate()
-  );
+function startOfToday() {
+  let d = new Date();
+  d.setHours(0, 0, 0, 0);
+  return d;
 }
 
 async function runDailyNotifications() {
@@ -28,22 +26,40 @@ async function runDailyNotifications() {
     pushToken: { $ne: null },
   });
 
-  let due = users.filter((user) => {
+  // who is due this minute, in their own timezone
+  let candidates = users.filter((user) => {
     let tz = user.timezone || 'America/Chicago';
-    let current;
     try {
-      current = localTime(tz);
+      return localTime(tz) === user.notificationTime;
     } catch {
       return false; // bad timezone string, skip
     }
-    if (current !== user.notificationTime) return false;
-    if (user.lastNotifiedAt && sameDay(user.lastNotifiedAt, now)) return false;
-    return true;
   });
 
-  if (!due.length) return;
+  if (!candidates.length) return;
 
-  let messages = due.map((user) =>
+  // claim each user atomically BEFORE sending. if another run (or another instance)
+  // already claimed them today, this update matches nothing and we skip — that's what
+  // kills the duplicates even if the job fires several times in the same minute.
+  let toSend = [];
+  for (let user of candidates) {
+    let claimed = await User.findOneAndUpdate(
+      {
+        _id: user._id,
+        $or: [
+          { lastNotifiedAt: null },
+          { lastNotifiedAt: { $exists: false } },
+          { lastNotifiedAt: { $lt: startOfToday() } },
+        ],
+      },
+      { $set: { lastNotifiedAt: now } }
+    );
+    if (claimed) toSend.push(user);
+  }
+
+  if (!toSend.length) return;
+
+  let messages = toSend.map((user) =>
     buildMessage(
       user.pushToken,
       'Peace and love, friend.',
@@ -53,13 +69,7 @@ async function runDailyNotifications() {
   );
 
   await sendPush(messages);
-
-  await User.updateMany(
-    { _id: { $in: due.map((u) => u._id) } },
-    { $set: { lastNotifiedAt: now } }
-  );
-
-  console.log(`Sent ${due.length} daily notifications`);
+  console.log(`Sent ${toSend.length} daily notifications`);
 }
 
 // every minute — matches each user's chosen HH:mm in their own timezone

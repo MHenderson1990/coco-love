@@ -9,20 +9,22 @@ export function AuthProvider({ children }) {
   let [user, setUser] = useState(null);
   let [loading, setLoading] = useState(true);
 
-  // restores the session for a token already in storage — gated behind Face ID when the device supports it.
-  // returns true if a session was restored, false otherwise (no token, cancelled, or unavailable).
-  async function restoreSession() {
+  // restores a stored session. requireBiometric=true gates it behind Face ID
+  // (used by the manual Face ID button); default is a silent restore (used on launch).
+  async function restoreSession({ requireBiometric = false } = {}) {
     try {
       let token = await AsyncStorage.getItem('token');
       if (!token) return false;
 
-      let hasHardware = await LocalAuthentication.hasHardwareAsync();
-      let isEnrolled = await LocalAuthentication.isEnrolledAsync();
-      if (hasHardware && isEnrolled) {
-        let result = await LocalAuthentication.authenticateAsync({
-          promptMessage: 'Unlock House of Love',
-        });
-        if (!result.success) return false; // leave the token in place, just don't restore this time
+      if (requireBiometric) {
+        let hasHardware = await LocalAuthentication.hasHardwareAsync();
+        let isEnrolled = await LocalAuthentication.isEnrolledAsync();
+        if (hasHardware && isEnrolled) {
+          let result = await LocalAuthentication.authenticateAsync({
+            promptMessage: 'Unlock House of Love',
+          });
+          if (!result.success) return false;
+        }
       }
 
       let me = await authApi.getMe();
@@ -34,20 +36,11 @@ export function AuthProvider({ children }) {
     }
   }
 
-  // on launch: devices without Face ID/Touch ID restore silently (no biometric gate to show).
-  // devices with biometrics skip straight to the Login screen instead, so the unlock prompt
-  // happens over the actual login UI rather than a blank loading screen.
+  // on launch: silently restore any stored session so returning users skip the login screen.
   useEffect(() => {
-    async function bootstrap() {
-      let hasHardware = await LocalAuthentication.hasHardwareAsync();
-      let isEnrolled = await LocalAuthentication.isEnrolledAsync();
-      if (!hasHardware || !isEnrolled) {
-        await restoreSession();
-      }
-    }
-    bootstrap().finally(() => setLoading(false));
+    restoreSession().finally(() => setLoading(false));
   }, []);
-
+  
   async function login(email, password) {
     let data = await authApi.login(email, password);
     await AsyncStorage.setItem('token', data.token);
