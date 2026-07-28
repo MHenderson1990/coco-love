@@ -182,11 +182,11 @@ export default function ProfileScreen({ navigation }) {
 
         <Pressable
           style={[styles.card, { backgroundColor: colors.surface, borderColor: colors.line }]}
-          onPress={() => navigation.navigate('Journal')}
+          onPress={() => navigation.navigate('History')}
         >
-          <Text style={[styles.label, { color: colors.ink }]}>Your journal</Text>
+          <Text style={[styles.label, { color: colors.ink }]}>Message history</Text>
           <Text style={{ fontSize: 12, color: colors.muted, marginTop: -8 }}>
-            Everything you've written
+            Past daily messages
           </Text>
         </Pressable>
 

@@ -3,7 +3,6 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import * as Notifications from 'expo-notifications';
-
 import { AuthProvider, useAuth } from './src/context/AuthContext';
 import { ThemeProvider, useTheme } from './src/context/ThemeContext';
 import LoginScreen from './src/screens/LoginScreen';
@@ -11,7 +10,7 @@ import SignupScreen from './src/screens/SignupScreen';
 import TabNavigator from './src/navigation/TabNavigator';
 import AdminScreen from './src/screens/AdminScreen';
 import AnnouncementsScreen from './src/screens/AnnouncementsScreen';
-import JournalScreen from './src/screens/JournalScreen';
+import HistoryScreen from './src/screens/HistoryScreen';
 import UpgradeScreen from './src/screens/UpgradeScreen';
 import VideoPlayerScreen from './src/screens/VideoPlayerScreen';
 import ManageVideosScreen from './src/screens/ManageVideosScreen';
@@ -49,7 +48,7 @@ function Root() {
               <Stack.Screen name="Main" component={TabNavigator} />
               <Stack.Screen name="Admin" component={AdminScreen} />
               <Stack.Screen name="Announcements" component={AnnouncementsScreen} />
-              <Stack.Screen name="Journal" component={JournalScreen} />
+              <Stack.Screen name="History" component={HistoryScreen} />
               <Stack.Screen name="Upgrade" component={UpgradeScreen} />
               <Stack.Screen name="VideoPlayer" component={VideoPlayerScreen} />
               <Stack.Screen name="ManageVideos" component={ManageVideosScreen} />
