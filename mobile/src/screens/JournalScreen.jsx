@@ -7,6 +7,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useFocusEffect } from '@react-navigation/native';
 import { useTheme } from '../context/ThemeContext';
 import * as journalApi from '../api/journal';
+import { Ionicons } from '@expo/vector-icons';
 
 let MOODS = ['🌤', '😌', '😐', '😔', '🔥'];
 
@@ -87,11 +88,19 @@ export default function JournalScreen({ navigation }) {
               onLongPress={() => confirmDelete(item)}
             >
               <View style={styles.head}>
-                <Text style={[styles.date, { color: colors.accent }]}>
-                  {formatDate(item.createdAt).toUpperCase()}
-                </Text>
+              <Text style={[styles.date, { color: colors.accent }]}>
+                {formatDate(item.createdAt).toUpperCase()}
+              </Text>
+              <View style={styles.actions}>
                 {item.mood ? <Text style={styles.mood}>{item.mood}</Text> : null}
-              </View>
+          <Pressable hitSlop={8} style={styles.iconBtn} onPress={() => setEditing(item)}>
+            <Ionicons name="pencil" size={16} color={colors.muted} />
+          </Pressable>
+          <Pressable hitSlop={8} style={styles.iconBtn} onPress={() => confirmDelete(item)}>
+            <Ionicons name="trash-outline" size={16} color={colors.muted} />
+          </Pressable>
+        </View>
+      </View>
 
               {item.text ? (
                 <Text style={[styles.text, { color: colors.ink }]}>{item.text}</Text>
@@ -245,4 +254,6 @@ let styles = StyleSheet.create({
   btnText: { fontSize: 13, fontWeight: '700' },
   deleteBtn: { alignItems: 'center', paddingVertical: 14 },
   deleteText: { fontSize: 13, fontWeight: '600' },
+  actions: { flexDirection: 'row', alignItems: 'center', gap: 14 },
+  iconBtn: { padding: 2 },
 });
