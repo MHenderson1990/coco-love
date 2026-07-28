@@ -10,15 +10,15 @@ import * as journalApi from '../api/journal';
 
 let MOODS = ['🌤', '😌', '😐', '😔', '🔥'];
 
-export default function JournalScreen({ navigation }) {
+export default function JournalScreen() {
   let { colors } = useTheme();
   let [items, setItems] = useState([]);
   let [loading, setLoading] = useState(true);
-  let [editing, setEditing] = useState(null);
+  let [sheet, setSheet] = useState(null); // null | 'new' | entryObject
 
   let load = useCallback(() => {
     let active = true;
-    journalApi.listEntries('daily')
+    journalApi.listEntries('freeform')
       .then((data) => { if (active) setItems(data); })
       .catch(() => { if (active) setItems([]); })
       .finally(() => { if (active) setLoading(false); });
@@ -59,14 +59,24 @@ export default function JournalScreen({ navigation }) {
     return date.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
   }
 
+  let visible = sheet !== null;
+  let mode = sheet === 'new' ? 'create' : 'edit';
+  let editingEntry = mode === 'edit' ? sheet : null;
+
   return (
     <SafeAreaView style={[styles.wrap, { backgroundColor: 'transparent' }]} edges={['top']}>
-      <Pressable onPress={() => navigation.goBack()}>
-        <Text style={[styles.back, { color: colors.muted }]}>‹ Back</Text>
-      </Pressable>
-
-      <Text style={[styles.title, { color: colors.ink }]}>Your journal</Text>
-      <Text style={[styles.sub, { color: colors.muted }]}>Tap an entry to edit it.</Text>
+      <View style={styles.headerRow}>
+        <View style={{ flex: 1 }}>
+          <Text style={[styles.title, { color: colors.ink }]}>Your journal</Text>
+          <Text style={[styles.sub, { color: colors.muted }]}>A space just for you.</Text>
+        </View>
+        <Pressable
+          style={[styles.newBtn, { backgroundColor: colors.accent }]}
+          onPress={() => setSheet('new')}
+        >
+          <Text style={[styles.newBtnText, { color: colors.surface }]}>+ New</Text>
+        </Pressable>
+      </View>
 
       {loading ? (
         <ActivityIndicator color={colors.accent} style={{ marginTop: 40 }} />
@@ -77,13 +87,13 @@ export default function JournalScreen({ navigation }) {
           contentContainerStyle={styles.list}
           ListEmptyComponent={
             <Text style={[styles.empty, { color: colors.muted }]}>
-              Open today's message and tap "Add to your journal" to start.
+              Tap + New to write your first entry.
             </Text>
           }
           renderItem={({ item }) => (
             <Pressable
               style={[styles.row, { backgroundColor: colors.surface, borderColor: colors.line }]}
-              onPress={() => setEditing(item)}
+              onPress={() => setSheet(item)}
               onLongPress={() => confirmDelete(item)}
             >
               <View style={styles.head}>
@@ -92,33 +102,28 @@ export default function JournalScreen({ navigation }) {
                 </Text>
                 {item.mood ? <Text style={styles.mood}>{item.mood}</Text> : null}
               </View>
-
               {item.text ? (
                 <Text style={[styles.text, { color: colors.ink }]}>{item.text}</Text>
-              ) : null}
-
-              {item.affirmation?.text ? (
-                <View style={[styles.quote, { borderLeftColor: colors.accentSoft }]}>
-                  <Text style={[styles.quoteText, { color: colors.muted }]} numberOfLines={2}>
-                    {item.affirmation.text}
-                  </Text>
-                </View>
               ) : null}
             </Pressable>
           )}
         />
       )}
 
-      <EditModal
-        entry={editing}
+      <EntryModal
+        key={sheet === 'new' ? 'new' : editingEntry?._id || 'none'}
+        visible={visible}
+        mode={mode}
+        entry={editingEntry}
         colors={colors}
-        onClose={() => setEditing(null)}
+        onClose={() => setSheet(null)}
+        onCreated={(entry) => { setItems((prev) => [entry, ...prev]); setSheet(null); }}
         onSaved={(updated) => {
           setItems((prev) => prev.map((e) => (e._id === updated._id ? updated : e)));
-          setEditing(null);
+          setSheet(null);
         }}
         onDelete={(entry) => {
-          setEditing(null);
+          setSheet(null);
           setTimeout(() => confirmDelete(entry), 300);
         }}
       />
@@ -126,19 +131,10 @@ export default function JournalScreen({ navigation }) {
   );
 }
 
-function EditModal({ entry, colors, onClose, onSaved, onDelete }) {
-  let [mood, setMood] = useState(null);
-  let [text, setText] = useState('');
+function EntryModal({ visible, mode, entry, colors, onClose, onCreated, onSaved, onDelete }) {
+  let [mood, setMood] = useState(entry?.mood || null);
+  let [text, setText] = useState(entry?.text || '');
   let [busy, setBusy] = useState(false);
-  let [ready, setReady] = useState(false);
-
-  // seed the fields the first render after an entry is passed in
-  if (entry && !ready) {
-    setMood(entry.mood || null);
-    setText(entry.text || '');
-    setReady(true);
-  }
-  if (!entry && ready) setReady(false);
 
   async function save() {
     if (!mood && !text.trim()) {
@@ -147,8 +143,13 @@ function EditModal({ entry, colors, onClose, onSaved, onDelete }) {
     }
     setBusy(true);
     try {
-      let updated = await journalApi.updateEntry(entry._id, mood, text.trim());
-      onSaved(updated);
+      if (mode === 'create') {
+        let created = await journalApi.createFreeform(mood, text.trim());
+        onCreated(created);
+      } else {
+        let updated = await journalApi.updateEntry(entry._id, mood, text.trim());
+        onSaved(updated);
+      }
     } catch (err) {
       Alert.alert('Could not save', 'Try again in a moment.');
     } finally {
@@ -157,7 +158,7 @@ function EditModal({ entry, colors, onClose, onSaved, onDelete }) {
   }
 
   return (
-    <Modal visible={!!entry} animationType="slide" transparent onRequestClose={onClose}>
+    <Modal visible={visible} animationType="slide" transparent onRequestClose={onClose}>
       <KeyboardAvoidingView
         style={styles.sheetWrap}
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
@@ -165,13 +166,15 @@ function EditModal({ entry, colors, onClose, onSaved, onDelete }) {
         <Pressable style={styles.backdrop} onPress={onClose} />
         <View style={[styles.sheet, { backgroundColor: colors.surface }]}>
           <View style={styles.sheetHead}>
-            <Text style={[styles.sheetTitle, { color: colors.ink }]}>Edit entry</Text>
+            <Text style={[styles.sheetTitle, { color: colors.ink }]}>
+              {mode === 'create' ? 'New entry' : 'Edit entry'}
+            </Text>
             <Pressable onPress={onClose}>
               <Text style={{ color: colors.muted, fontSize: 20 }}>✕</Text>
             </Pressable>
           </View>
 
-          <Text style={[styles.label, { color: colors.muted }]}>HOW WERE YOU FEELING?</Text>
+          <Text style={[styles.label, { color: colors.muted }]}>HOW ARE YOU FEELING?</Text>
           <View style={styles.moods}>
             {MOODS.map((m) => (
               <Pressable
@@ -188,7 +191,7 @@ function EditModal({ entry, colors, onClose, onSaved, onDelete }) {
             ))}
           </View>
 
-          <Text style={[styles.label, { color: colors.muted }]}>WHAT YOU WROTE</Text>
+          <Text style={[styles.label, { color: colors.muted }]}>WRITE IT OUT</Text>
           <TextInput
             style={[styles.input, { backgroundColor: colors.bg, color: colors.ink }]}
             placeholder="What's on your mind?"
@@ -204,13 +207,15 @@ function EditModal({ entry, colors, onClose, onSaved, onDelete }) {
             disabled={busy}
           >
             <Text style={[styles.btnText, { color: colors.surface }]}>
-              {busy ? 'Saving…' : 'Save changes'}
+              {busy ? 'Saving…' : mode === 'create' ? 'Save entry' : 'Save changes'}
             </Text>
           </Pressable>
 
-          <Pressable style={styles.deleteBtn} onPress={() => onDelete(entry)}>
-            <Text style={[styles.deleteText, { color: colors.muted }]}>Delete this entry</Text>
-          </Pressable>
+          {mode === 'edit' ? (
+            <Pressable style={styles.deleteBtn} onPress={() => onDelete(entry)}>
+              <Text style={[styles.deleteText, { color: colors.muted }]}>Delete this entry</Text>
+            </Pressable>
+          ) : null}
         </View>
       </KeyboardAvoidingView>
     </Modal>
@@ -219,17 +224,17 @@ function EditModal({ entry, colors, onClose, onSaved, onDelete }) {
 
 let styles = StyleSheet.create({
   wrap: { flex: 1, paddingHorizontal: 22 },
-  back: { fontSize: 15, marginTop: 12, marginBottom: 6 },
+  headerRow: { flexDirection: 'row', alignItems: 'flex-start', marginTop: 12, marginBottom: 16 },
   title: { fontSize: 24, fontWeight: '500', letterSpacing: -0.4 },
-  sub: { fontSize: 13.5, marginTop: 5, marginBottom: 16 },
+  sub: { fontSize: 13.5, marginTop: 5 },
+  newBtn: { paddingHorizontal: 16, paddingVertical: 9, borderRadius: 20, marginTop: 4 },
+  newBtnText: { fontSize: 13, fontWeight: '700' },
   list: { gap: 9, paddingBottom: 24 },
   row: { borderWidth: 1, borderRadius: 15, padding: 15 },
   head: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 9 },
   date: { fontSize: 10, fontWeight: '700', letterSpacing: 1.2 },
   mood: { fontSize: 18 },
   text: { fontSize: 14.5, lineHeight: 21 },
-  quote: { borderLeftWidth: 3, paddingLeft: 11, marginTop: 12 },
-  quoteText: { fontSize: 12.5, lineHeight: 18, fontStyle: 'italic' },
   empty: { textAlign: 'center', marginTop: 40, fontSize: 14, lineHeight: 21 },
 
   sheetWrap: { flex: 1, justifyContent: 'flex-end' },

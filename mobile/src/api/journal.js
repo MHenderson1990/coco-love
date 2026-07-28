@@ -5,9 +5,14 @@ export async function createEntry(affirmationId, mood, text) {
   return res.data.entry;
 }
 
-export async function listEntries() {
-  let res = await client.get('/journal');
+export async function listEntries(type) {
+  let res = await client.get('/journal', { params: type ? { type } : {} });
   return res.data.entries;
+}
+
+export async function createFreeform(mood, text) {
+  let res = await client.post('/journal', { mood, text, type: 'freeform' });
+  return res.data.entry;
 }
 
 export async function updateEntry(id, mood, text) {
