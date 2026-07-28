@@ -8,6 +8,7 @@ import { useFocusEffect } from '@react-navigation/native';
 import { useTheme } from '../context/ThemeContext';
 import * as journalApi from '../api/journal';
 import { Ionicons } from '@expo/vector-icons';
+import MonthFilter from '../components/MonthFilter';
 
 let MOODS = ['🌤', '😌', '😐', '😔', '🔥'];
 
@@ -16,6 +17,7 @@ export default function JournalScreen() {
   let [items, setItems] = useState([]);
   let [loading, setLoading] = useState(true);
   let [sheet, setSheet] = useState(null); // null | 'new' | entryObject
+  let [month, setMonth] = useState(null); // null = all time
 
   let load = useCallback(() => {
     let active = true;
@@ -64,6 +66,13 @@ export default function JournalScreen() {
   let mode = sheet === 'new' ? 'create' : 'edit';
   let editingEntry = mode === 'edit' ? sheet : null;
 
+  let shown = month
+    ? items.filter((e) => {
+        let d = new Date(e.createdAt);
+        return d.getFullYear() === month.getFullYear() && d.getMonth() === month.getMonth();
+      })
+    : items;
+
   return (
     <SafeAreaView style={[styles.wrap, { backgroundColor: 'transparent' }]} edges={['top']}>
       <View style={styles.headerRow}>
@@ -79,11 +88,14 @@ export default function JournalScreen() {
         </Pressable>
       </View>
 
+      <MonthFilter value={month} onChange={setMonth} />
+
       {loading ? (
         <ActivityIndicator color={colors.accent} style={{ marginTop: 40 }} />
       ) : (
+        
         <FlatList
-          data={items}
+          data={shown}
           keyExtractor={(item) => item._id}
           contentContainerStyle={styles.list}
           ListEmptyComponent={
