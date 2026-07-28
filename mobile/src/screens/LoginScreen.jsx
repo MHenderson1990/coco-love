@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState, useMemo } from 'react';
 import {
   View, Text, TextInput, Pressable, StyleSheet,
-  KeyboardAvoidingView, Platform, Animated, Easing,ScrollView
+  KeyboardAvoidingView, Platform, Animated, Easing,ScrollView, ActivityIndicator
 } from 'react-native';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import * as LocalAuthentication from 'expo-local-authentication';
@@ -153,7 +153,7 @@ export default function LoginScreen({ navigation }) {
         </View>
 
         <Text style={[styles.title, { color: colors.ink }]}>House of Love</Text>
-        <Text style={[styles.tagline, { color: colors.muted }]}>Peace and love,friend. Sign in to begin.</Text>
+        <Text style={[styles.tagline, { color: colors.muted }]}>Peace and love, friend. Sign in to begin.</Text>
 
         <TextInput
           style={[
@@ -235,6 +235,14 @@ export default function LoginScreen({ navigation }) {
         </View>
       </Animated.View>
       </ScrollView>
+
+      {(busy || faceIDBusy) && (
+        <View style={[styles.loadingOverlay, { backgroundColor: sky }]}>
+          <Text style={[styles.loadingMoon, { color: colors.accentSoft }]}>☾</Text>
+          <ActivityIndicator size="large" color={colors.accent} style={{ marginBottom: 18 }} />
+          <Text style={[styles.loadingText, { color: colors.ink }]}>Love loading…</Text>
+        </View>
+      )}
     </KeyboardAvoidingView>
   );
 }
@@ -267,4 +275,12 @@ let styles = StyleSheet.create({
   buttonText: { fontSize: 15, fontWeight: '700' },
   link: { textAlign: 'center', fontSize: 14, marginTop: 20 },
   linkRow: { flexDirection: 'row', justifyContent: 'center', alignItems: 'center', marginTop: 20, flexWrap: 'wrap' },
+  loadingOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    alignItems: 'center',
+    justifyContent: 'center',
+    zIndex: 10,
+  },
+  loadingMoon: { fontSize: 44, marginBottom: 20 },
+  loadingText: { fontSize: 15, fontWeight: '600', letterSpacing: 1 },
 });
