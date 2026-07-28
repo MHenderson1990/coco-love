@@ -6,7 +6,7 @@ import HistoryScreen from '../screens/HistoryScreen';
 import SavedScreen from '../screens/SavedScreen';
 import WatchScreen from '../screens/WatchScreen';
 import ProfileScreen from '../screens/ProfileScreen';
-import JournalScreen from '../screens/FreeJournalScreen';
+import FreeJournalScreen from '../screens/FreeJournalScreen';
 
 let Tab = createBottomTabNavigator();
 
@@ -15,7 +15,7 @@ let ICONS = {
   History: 'time-outline',
   Saved: 'heart-outline',
   Watch: 'play-circle-outline',
-  Journal: 'book-outline',
+  MyJournal: 'book-outline',
   You: 'person-outline',
   
 };
@@ -49,7 +49,7 @@ export default function TabNavigator() {
       <Tab.Screen name="History" component={HistoryScreen} />
       <Tab.Screen name="Saved" component={SavedScreen} />
       <Tab.Screen name="Watch" component={WatchScreen} />
-      <Tab.Screen name="Journal" component={JournalScreen} />
+      <Tab.Screen name="MyJournal" component={FreeJournalScreen} options={{ tabBarLabel: 'Journal' }}/>
       <Tab.Screen name="You" component={ProfileScreen} />
     </Tab.Navigator>
   );

@@ -19,7 +19,7 @@ export default function JournalScreen() {
 
   let load = useCallback(() => {
     let active = true;
-    journalApi.listEntries('freeform')
+    journalApi.listEntries()
       .then((data) => { if (active) setItems(data); })
       .catch(() => { if (active) setItems([]); })
       .finally(() => { if (active) setLoading(false); });
@@ -114,6 +114,14 @@ export default function JournalScreen() {
 
               {item.text ? (
                 <Text style={[styles.text, { color: colors.ink }]}>{item.text}</Text>
+              ) : null}
+
+              {item.affirmation?.text ? (
+                <View style={[styles.quote, { borderLeftColor: colors.accentSoft }]}>
+                  <Text style={[styles.quoteText, { color: colors.muted }]} numberOfLines={2}>
+                    {item.affirmation.text}
+                  </Text>
+                </View>
               ) : null}
             </Pressable>
           )}
@@ -262,4 +270,6 @@ let styles = StyleSheet.create({
   deleteText: { fontSize: 13, fontWeight: '600' },
   actions: { flexDirection: 'row', alignItems: 'center', gap: 14 },
   iconBtn: { padding: 2 },
+  quote: { borderLeftWidth: 3, paddingLeft: 11, marginTop: 12 },
+  quoteText: { fontSize: 12.5, lineHeight: 18, fontStyle: 'italic' },
 });
