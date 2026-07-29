@@ -1,6 +1,7 @@
 import { useRef } from 'react';
 import { View, Text, StyleSheet, Animated, PanResponder, Dimensions } from 'react-native';
 import { useTheme } from '../context/ThemeContext';
+import RichText from './RichText';
 
 export default function RevealCard({ text, revealed, onReveal, compact }) {
   let { colors } = useTheme();
@@ -44,7 +45,11 @@ export default function RevealCard({ text, revealed, onReveal, compact }) {
         compact && { minHeight: 130, paddingVertical: 20 },
       ]}
     >
-      <Text style={[styles.affirm, { color: colors.accent }]}>{text}</Text>
+      <RichText
+        text={text}
+        style={[styles.affirm, { color: colors.accent }]}
+        fonts={{ bold: 'Lora_700Bold', italic: 'Lora_400Regular_Italic' }}
+      />
 
       {!revealed && (
         <Animated.View

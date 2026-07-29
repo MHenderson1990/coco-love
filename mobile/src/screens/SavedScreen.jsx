@@ -4,6 +4,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useFocusEffect } from '@react-navigation/native';
 import { useTheme } from '../context/ThemeContext';
 import * as favoritesApi from '../api/favorites';
+import RichText from '../components/RichText';
 
 export default function SavedScreen({ navigation }) {
   let { colors } = useTheme();
@@ -44,7 +45,7 @@ export default function SavedScreen({ navigation }) {
           }
           renderItem={({ item }) => (
             <View style={[styles.row, { backgroundColor: colors.surface, borderColor: colors.line }]}>
-              <Text style={[styles.text, { color: colors.ink }]}>{item.affirmation?.text}</Text>
+              <RichText style={[styles.text, { color: colors.ink }]} text={item.affirmation?.text} />
               <Text style={[styles.meta, { color: colors.muted }]}>
                 Saved {new Date(item.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
               </Text>

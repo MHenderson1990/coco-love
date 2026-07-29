@@ -12,6 +12,7 @@ import MonthFilter from '../components/MonthFilter';
 import VoiceRecorder from '../components/VoiceRecorder';
 import { useAuth } from '../context/AuthContext';
 import * as ImagePicker from 'expo-image-picker';
+import RichText from '../components/RichText';
 
 
 let MOODS = ['🌤', '😌', '😐', '😔', '🔥'];
@@ -139,9 +140,7 @@ export default function JournalScreen() {
 
               {item.affirmation?.text ? (
                 <View style={[styles.quote, { borderLeftColor: colors.accentSoft }]}>
-                  <Text style={[styles.quoteText, { color: colors.muted }]} numberOfLines={2}>
-                    {item.affirmation.text}
-                  </Text>
+                  <RichText style={[styles.quoteText, { color: colors.muted }]} numberOfLines={2} text={item.affirmation.text} />
                 </View>
               ) : null}
             </Pressable>

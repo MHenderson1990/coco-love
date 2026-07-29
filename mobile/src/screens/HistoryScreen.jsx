@@ -10,6 +10,7 @@ import * as affirmationsApi from '../api/affirmations';
 import * as favoritesApi from '../api/favorites';
 import * as journalApi from '../api/journal';
 import MonthFilter from '../components/MonthFilter';
+import RichText from '../components/RichText';
 
 let MOODS = ['🌤', '😌', '😐', '😔', '🔥'];
 
@@ -79,7 +80,7 @@ export default function HistoryScreen({ navigation }) {
               <Text style={[styles.date, { color: colors.accent }]}>
                 {formatDate(item.scheduledDate).toUpperCase()}
               </Text>
-              <Text style={[styles.text, { color: colors.ink }]}>{item.text}</Text>
+              <RichText style={[styles.text, { color: colors.ink }]} text={item.text} />
             </Pressable>
           )}
         />
@@ -148,7 +149,7 @@ function MessageSheet({ affirmation, colors, onClose }) {
             </Pressable>
           </View>
 
-          <Text style={[styles.message, { color: colors.ink }]}>{affirmation?.text}</Text>
+          <RichText style={[styles.message, { color: colors.ink }]} text={affirmation?.text} />
 
           <Pressable
             style={[

@@ -12,6 +12,7 @@ import * as adminApi from '../api/admin';
 import * as announcementsApi from '../api/announcements';
 import * as ImagePicker from 'expo-image-picker';
 import * as videosApi from '../api/videos';
+import RichText from '../components/RichText';
 
 export default function AdminScreen({ navigation }) {
   let { colors } = useTheme();
@@ -186,6 +187,14 @@ function AffirmationModal({ visible, onClose, onSaved, colors }) {
   let [showPicker, setShowPicker] = useState(false);
   let [busy, setBusy] = useState(false);
   let [error, setError] = useState('');
+  let [selection, setSelection] = useState({ start: 0, end: 0 });
+
+  function wrap(marker) {
+    let { start, end } = selection;
+    if (start === end) return; // nothing selected — select text first
+    let next = text.slice(0, start) + marker + text.slice(start, end) + marker + text.slice(end);
+    setText(next);
+  }
 
   async function save() {
     if (!text.trim()) {
@@ -210,6 +219,19 @@ function AffirmationModal({ visible, onClose, onSaved, colors }) {
 
   return (
     <Sheet visible={visible} onClose={onClose} title="Write a message" colors={colors}>
+      <View style={styles.fmtBar}>
+        <Pressable style={[styles.fmtBtn, { borderColor: colors.line }]} onPress={() => wrap('**')}>
+          <Text style={[styles.fmtB, { color: colors.ink }]}>B</Text>
+        </Pressable>
+        <Pressable style={[styles.fmtBtn, { borderColor: colors.line }]} onPress={() => wrap('*')}>
+          <Text style={[styles.fmtI, { color: colors.ink }]}>I</Text>
+        </Pressable>
+        <Pressable style={[styles.fmtBtn, { borderColor: colors.line }]} onPress={() => wrap('__')}>
+          <Text style={[styles.fmtU, { color: colors.ink }]}>U</Text>
+        </Pressable>
+        <Text style={[styles.fmtHint, { color: colors.muted }]}>Select text, then tap</Text>
+      </View>
+
       <TextInput
         style={[styles.input, styles.textarea, { backgroundColor: colors.bg, color: colors.ink }]}
         placeholder="Your peace is a priority, not a luxury."
@@ -217,7 +239,15 @@ function AffirmationModal({ visible, onClose, onSaved, colors }) {
         multiline
         value={text}
         onChangeText={setText}
+        onSelectionChange={(e) => setSelection(e.nativeEvent.selection)}
       />
+
+      {text ? (
+        <View style={[styles.preview, { borderColor: colors.line }]}>
+          <Text style={[styles.previewLabel, { color: colors.muted }]}>PREVIEW</Text>
+          <RichText style={{ color: colors.ink, fontSize: 15, lineHeight: 22 }} text={text} />
+        </View>
+      ) : null}
 
       <Pressable
         style={[styles.input, { backgroundColor: colors.bg, justifyContent: 'center' }]}
@@ -549,4 +579,12 @@ let styles = StyleSheet.create({
   error: { fontSize: 13, marginBottom: 10 },
   tierToggle: { flexDirection: 'row', borderWidth: 1, borderRadius: 100, overflow: 'hidden', marginBottom: 14 },
   tierBtn: { flex: 1, paddingVertical: 10, alignItems: 'center' },
+  fmtBar: { flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 10 },
+  fmtBtn: { width: 38, height: 34, borderWidth: 1, borderRadius: 8, alignItems: 'center', justifyContent: 'center' },
+  fmtB: { fontSize: 15, fontWeight: '800' },
+  fmtI: { fontSize: 15, fontStyle: 'italic', fontWeight: '600' },
+  fmtU: { fontSize: 15, fontWeight: '600', textDecorationLine: 'underline' },
+  fmtHint: { fontSize: 11, marginLeft: 4 },
+  preview: { borderWidth: 1, borderRadius: 12, padding: 12, marginBottom: 12 },
+  previewLabel: { fontSize: 9.5, fontWeight: '700', letterSpacing: 1.2, marginBottom: 6 },
 });
