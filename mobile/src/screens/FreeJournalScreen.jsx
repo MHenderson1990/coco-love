@@ -9,6 +9,7 @@ import { useTheme } from '../context/ThemeContext';
 import * as journalApi from '../api/journal';
 import { Ionicons } from '@expo/vector-icons';
 import MonthFilter from '../components/MonthFilter';
+import VoiceRecorder from '../components/VoiceRecorder';
 
 let MOODS = ['🌤', '😌', '😐', '😔', '🔥'];
 
@@ -87,6 +88,8 @@ export default function JournalScreen() {
           <Text style={[styles.newBtnText, { color: colors.surface }]}>+ New</Text>
         </Pressable>
       </View>
+
+    <VoiceRecorder onSave={(uri) => console.log('recording uri:', uri)} />
 
       <MonthFilter value={month} onChange={setMonth} />
 
