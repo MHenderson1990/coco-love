@@ -69,7 +69,7 @@ let styles = StyleSheet.create({
     overflow: 'hidden', alignItems: 'center', justifyContent: 'center',
     paddingHorizontal: 24, paddingVertical: 28,
   },
-  affirm: { fontSize: 22, lineHeight: 31, textAlign: 'center', fontWeight: '400', letterSpacing: -0.3 },
+  affirm: { fontSize: 22, lineHeight: 31, textAlign: 'center', letterSpacing: -0.3, fontFamily: 'Lora_400Regular' },
   veil: {
     ...StyleSheet.absoluteFillObject,
     alignItems: 'center', justifyContent: 'center', gap: 12,

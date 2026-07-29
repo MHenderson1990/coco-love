@@ -115,7 +115,7 @@ export default function TodayScreen({ navigation }) {
 
         <View style={styles.greet}>
           <Text style={[styles.hello, { color: colors.ink }]}>
-            Peace and love, {user?.name}
+            Peace and love, <Text style={{ fontFamily: 'Lora_400Regular_Italic' }}>{user?.name}</Text>
           </Text>
           <Text style={[styles.sub, { color: colors.muted }]}>
             {revealed ? 'Take it with you today.' : 'Are you ready for today\u2019s message?'}

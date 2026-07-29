@@ -20,6 +20,7 @@ import RewardScreen from './src/screens/RewardScreen';
 import ResetPasswordScreen from './src/screens/ResetPasswordScreen';
 import LoadingScreen from './src/screens/LoadingScreen';
 import SavedScreen from './src/screens/SavedScreen';
+import { useFonts, Lora_400Regular, Lora_400Regular_Italic } from '@expo-google-fonts/lora';
 
 let Stack = createNativeStackNavigator();
 
@@ -35,8 +36,9 @@ Notifications.setNotificationHandler({
 function Root() {
   let { user, loading } = useAuth();
   let { colors } = useTheme();
+  let [fontsLoaded] = useFonts({ Lora_400Regular, Lora_400Regular_Italic });
 
-  if (loading) {
+  if (loading || !fontsLoaded) {
     return <LoadingScreen />;
   }
 
