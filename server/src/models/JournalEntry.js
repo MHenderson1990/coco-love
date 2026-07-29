@@ -6,6 +6,11 @@ let journalEntrySchema = new mongoose.Schema({
   mood:        { type: String, trim: true },   // emoji
   text:        { type: String, trim: true },   // written entry
   type:        { type: String, enum: ['daily', 'freeform'], default: 'daily' },
+  media: [{
+    url:      { type: String, required: true },
+    publicId: { type: String },
+    type:     { type: String, enum: ['image', 'video'], required: true },
+  }],
 }, { timestamps: true });
 
 module.exports = mongoose.model('JournalEntry', journalEntrySchema);

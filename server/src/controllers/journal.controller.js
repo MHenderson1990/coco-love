@@ -1,18 +1,21 @@
 let JournalEntry = require('../models/JournalEntry');
+let crypto = require('crypto');
+let User = require('../models/User');
+let { cloudinaryCloudName, cloudinaryApiKey, cloudinaryApiSecret } = require('../config/env');
 
 // POST /api/journal  { affirmationId, mood, text }
 // POST /api/journal  { affirmationId?, mood, text, type }
 exports.create = async (req, res) => {
   try {
-    let { affirmationId, mood, text, type } = req.body;
+    let { affirmationId, mood, text, type, media } = req.body;
 
     let entryType = type === 'freeform' ? 'freeform' : 'daily';
 
     if (entryType === 'daily' && !affirmationId) {
       return res.status(400).json({ error: 'affirmationId is required' });
     }
-    if (!mood && !text) {
-      return res.status(400).json({ error: 'Provide a mood, text, or both' });
+    if (!mood && !text && (!Array.isArray(media) || media.length === 0)) {
+      return res.status(400).json({ error: 'Provide a mood, text, or media' });
     }
 
     let entry = await JournalEntry.create({
@@ -21,6 +24,7 @@ exports.create = async (req, res) => {
       mood,
       text,
       type: entryType,
+      media: Array.isArray(media) ? media : [],
     });
 
     res.status(201).json({ entry });
@@ -86,6 +90,28 @@ exports.remove = async (req, res) => {
       return res.status(404).json({ error: 'Entry not found' });
     }
     res.json({ success: true });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+// GET /api/journal/upload-signature  (paid users only)
+exports.uploadSignature = async (req, res) => {
+  try {
+    let user = await User.findById(req.user.id).select('tier');
+    if (!user || user.tier !== 'paid') {
+      return res.status(403).json({ error: 'Media journaling is a members feature' });
+    }
+    if (!cloudinaryCloudName || !cloudinaryApiKey || !cloudinaryApiSecret) {
+      return res.status(500).json({ error: 'Cloudinary is not configured' });
+    }
+
+    let timestamp = Math.round(Date.now() / 1000);
+    let folder = 'house-of-love/journal';
+    let toSign = `folder=${folder}&timestamp=${timestamp}${cloudinaryApiSecret}`;
+    let signature = crypto.createHash('sha1').update(toSign).digest('hex');
+
+    res.json({ signature, timestamp, folder, apiKey: cloudinaryApiKey, cloudName: cloudinaryCloudName });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
