@@ -48,12 +48,12 @@
         }
       ],
       [
-    "expo-audio",
+        "expo-audio",
         {
           "microphonePermission": "House of Love uses the microphone so you can record voice journal entries."
         }
-      ]
-      
+      ],
+      "expo-asset"
     ],
     "extra": {
       "eas": {
