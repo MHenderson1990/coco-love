@@ -10,11 +10,14 @@ import * as journalApi from '../api/journal';
 import { Ionicons } from '@expo/vector-icons';
 import MonthFilter from '../components/MonthFilter';
 import VoiceRecorder from '../components/VoiceRecorder';
+import { useAuth } from '../context/AuthContext';
 
 let MOODS = ['🌤', '😌', '😐', '😔', '🔥'];
 
 export default function JournalScreen() {
   let { colors } = useTheme();
+  let { user } = useAuth();
+  let isPaid = user?.tier === 'paid';
   let [items, setItems] = useState([]);
   let [loading, setLoading] = useState(true);
   let [sheet, setSheet] = useState(null); // null | 'new' | entryObject
@@ -89,7 +92,6 @@ export default function JournalScreen() {
         </Pressable>
       </View>
 
-    <VoiceRecorder onSave={(uri) => console.log('recording uri:', uri)} />
 
       <MonthFilter value={month} onChange={setMonth} />
 
@@ -149,6 +151,7 @@ export default function JournalScreen() {
         mode={mode}
         entry={editingEntry}
         colors={colors}
+        isPaid={isPaid}
         onClose={() => setSheet(null)}
         onCreated={(entry) => { setItems((prev) => [entry, ...prev]); setSheet(null); }}
         onSaved={(updated) => {
@@ -164,10 +167,11 @@ export default function JournalScreen() {
   );
 }
 
-function EntryModal({ visible, mode, entry, colors, onClose, onCreated, onSaved, onDelete }) {
+function EntryModal({ visible, mode, entry, colors, isPaid, onClose, onCreated, onSaved, onDelete }) {
   let [mood, setMood] = useState(entry?.mood || null);
   let [text, setText] = useState(entry?.text || '');
   let [busy, setBusy] = useState(false);
+  let [audioUri, setAudioUri] = useState(null);
 
   async function save() {
     if (!mood && !text.trim()) {
@@ -234,6 +238,22 @@ function EntryModal({ visible, mode, entry, colors, onClose, onCreated, onSaved,
             onChangeText={setText}
           />
 
+        {isPaid ? (
+            <>
+              <Text style={[styles.label, { color: colors.muted }]}>VOICE NOTE</Text>
+              {audioUri ? (
+                <View style={[styles.voiceChip, { backgroundColor: colors.bg, borderColor: colors.accent }]}>
+                  <Text style={{ color: colors.ink, fontSize: 13, fontWeight: '600' }}>🎙 Voice note attached</Text>
+                  <Pressable onPress={() => setAudioUri(null)} hitSlop={8}>
+                    <Text style={{ color: colors.muted, fontSize: 13, fontWeight: '600' }}>Remove</Text>
+                  </Pressable>
+                </View>
+              ) : (
+                <VoiceRecorder onSave={(uri) => setAudioUri(uri)} onDiscard={() => setAudioUri(null)} />
+              )}
+            </>
+          ) : null}
+
           <Pressable
             style={[styles.btn, { backgroundColor: colors.accent, opacity: busy ? 0.6 : 1 }]}
             onPress={save}
@@ -287,4 +307,5 @@ let styles = StyleSheet.create({
   iconBtn: { padding: 2 },
   quote: { borderLeftWidth: 3, paddingLeft: 11, marginTop: 12 },
   quoteText: { fontSize: 12.5, lineHeight: 18, fontStyle: 'italic' },
+  voiceChip: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', borderWidth: 1, borderRadius: 12, padding: 14, marginBottom: 16 },
 });
