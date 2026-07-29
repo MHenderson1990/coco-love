@@ -15,6 +15,7 @@ import * as ImagePicker from 'expo-image-picker';
 
 
 let MOODS = ['🌤', '😌', '😐', '😔', '🔥'];
+let MEDIA_ATTACHMENTS_ENABLED = false;
 
 export default function JournalScreen() {
   let { colors } = useTheme();
@@ -295,7 +296,7 @@ function EntryModal({ visible, mode, entry, colors, isPaid, onClose, onCreated, 
                 <VoiceRecorder onSave={(uri) => setAudioUri(uri)} onDiscard={() => setAudioUri(null)} />
               )}
 
-              <Text style={[styles.label, { color: colors.muted }]}>PHOTOS & VIDEO</Text>
+              {MEDIA_ATTACHMENTS_ENABLED ? <Text style={[styles.label, { color: colors.muted }]}>PHOTOS & VIDEO</Text> : null}
               <View style={styles.mediaRow}>
                 {media.map((m, i) => (
                   <View key={i} style={styles.thumbWrap}>
@@ -311,9 +312,11 @@ function EntryModal({ visible, mode, entry, colors, isPaid, onClose, onCreated, 
                     </Pressable>
                   </View>
                 ))}
-                <Pressable style={[styles.addMedia, { borderColor: colors.line }]} onPress={addMedia} disabled={uploading}>
-                  {uploading ? <ActivityIndicator color={colors.accent} /> : <Ionicons name="add" size={24} color={colors.muted} />}
-                </Pressable>
+                {MEDIA_ATTACHMENTS_ENABLED ? (
+                  <Pressable style={[styles.addMedia, { borderColor: colors.line }]} onPress={addMedia} disabled={uploading}>
+                    {uploading ? <ActivityIndicator color={colors.accent} /> : <Ionicons name="add" size={24} color={colors.muted} />}
+                  </Pressable>
+                ) : null}
               </View>
             </>
           ) : null}
