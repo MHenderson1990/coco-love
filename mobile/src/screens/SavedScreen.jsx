@@ -1,11 +1,11 @@
 import { useCallback, useState } from 'react';
-import { View, Text, FlatList, StyleSheet, ActivityIndicator } from 'react-native';
+import { View, Text, FlatList, StyleSheet, ActivityIndicator, Pressable } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useFocusEffect } from '@react-navigation/native';
 import { useTheme } from '../context/ThemeContext';
 import * as favoritesApi from '../api/favorites';
 
-export default function SavedScreen() {
+export default function SavedScreen({ navigation }) {
   let { colors } = useTheme();
   let [items, setItems] = useState([]);
   let [loading, setLoading] = useState(true);
@@ -24,6 +24,9 @@ export default function SavedScreen() {
 
   return (
     <SafeAreaView style={[styles.wrap, { backgroundColor: 'transparent' }]} edges={['top']}>
+      <Pressable onPress={() => navigation.goBack()}>
+        <Text style={[styles.back, { color: colors.muted }]}>‹ Back</Text>
+      </Pressable>
       <Text style={[styles.title, { color: colors.ink }]}>Saved messages</Text>
       <Text style={[styles.sub, { color: colors.muted }]}>The ones you keep coming back to.</Text>
 
@@ -55,7 +58,8 @@ export default function SavedScreen() {
 
 let styles = StyleSheet.create({
   wrap: { flex: 1, paddingHorizontal: 22 },
-  title: { fontSize: 24, fontWeight: '500', marginTop: 18, letterSpacing: -0.4 },
+  back: { fontSize: 15, marginTop: 12, marginBottom: 6 },
+  title: { fontSize: 24, fontWeight: '500', letterSpacing: -0.4 },
   sub: { fontSize: 13.5, marginTop: 5, marginBottom: 16 },
   list: { gap: 9, paddingBottom: 24 },
   row: { borderWidth: 1, borderRadius: 15, padding: 15 },

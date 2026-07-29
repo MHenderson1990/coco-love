@@ -2,7 +2,6 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '../context/ThemeContext';
 import TodayScreen from '../screens/TodayScreen';
-import SavedScreen from '../screens/SavedScreen';
 import WatchScreen from '../screens/WatchScreen';
 import ProfileScreen from '../screens/ProfileScreen';
 import FreeJournalScreen from '../screens/FreeJournalScreen';
@@ -11,9 +10,8 @@ let Tab = createBottomTabNavigator();
 
 let ICONS = {
   Today: 'sunny-outline',
-  Saved: 'heart-outline',
-  Watch: 'play-circle-outline',
   MyJournal: 'book-outline',
+  Watch: 'play-circle-outline',
   You: 'person-outline',
   
 };
@@ -44,9 +42,8 @@ export default function TabNavigator() {
       })}
     >
       <Tab.Screen name="Today" component={TodayScreen} />
-      <Tab.Screen name="Saved" component={SavedScreen} />
-      <Tab.Screen name="Watch" component={WatchScreen} />
       <Tab.Screen name="MyJournal" component={FreeJournalScreen} options={{ tabBarLabel: 'Journal' }}/>
+      <Tab.Screen name="Watch" component={WatchScreen} />
       <Tab.Screen name="You" component={ProfileScreen} />
     </Tab.Navigator>
   );
