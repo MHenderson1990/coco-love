@@ -44,7 +44,7 @@ export default function RevealCard({ text, revealed, onReveal, compact }) {
         compact && { minHeight: 130, paddingVertical: 20 },
       ]}
     >
-      <Text style={[styles.affirm, { color: colors.ink }]}>{text}</Text>
+      <Text style={[styles.affirm, { color: colors.accent }]}>{text}</Text>
 
       {!revealed && (
         <Animated.View
