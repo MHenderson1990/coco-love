@@ -6,6 +6,7 @@ let journalController = require('../controllers/journal.controller');
 router.post('/', auth, journalController.create);
 router.get('/', auth, journalController.list);
 router.get('/upload-signature', auth, journalController.uploadSignature);
+router.post('/media/destroy', auth, journalController.destroyMedia);
 router.patch('/:id', auth, journalController.update);
 router.delete('/:id', auth, journalController.remove);
 

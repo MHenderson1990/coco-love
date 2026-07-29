@@ -2,6 +2,7 @@ let JournalEntry = require('../models/JournalEntry');
 let crypto = require('crypto');
 let User = require('../models/User');
 let { cloudinaryCloudName, cloudinaryApiKey, cloudinaryApiSecret } = require('../config/env');
+let cloudinaryService = require('../services/cloudinary.service');
 
 // POST /api/journal  { affirmationId, mood, text }
 // POST /api/journal  { affirmationId?, mood, text, type }
@@ -89,7 +90,9 @@ exports.remove = async (req, res) => {
     if (!entry) {
       return res.status(404).json({ error: 'Entry not found' });
     }
+    if (entry.media?.length) cloudinaryService.destroyMany(entry.media).catch(() => {});
     res.json({ success: true });
+
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -112,6 +115,26 @@ exports.uploadSignature = async (req, res) => {
     let signature = crypto.createHash('sha1').update(toSign).digest('hex');
 
     res.json({ signature, timestamp, folder, apiKey: cloudinaryApiKey, cloudName: cloudinaryCloudName });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+// POST /api/journal/media/destroy  (paid) — remove one uploaded asset from Cloudinary
+exports.destroyMedia = async (req, res) => {
+  try {
+    let user = await User.findById(req.user.id).select('tier');
+    if (!user || user.tier !== 'paid') {
+      return res.status(403).json({ error: 'Members feature' });
+    }
+    let { publicId, type } = req.body;
+    if (!publicId) return res.status(400).json({ error: 'publicId is required' });
+    // guard: only journal assets can be destroyed here (not admin videos or anything else)
+    if (!publicId.startsWith('house-of-love/journal')) {
+      return res.status(400).json({ error: 'Invalid asset' });
+    }
+    let result = await cloudinaryService.destroy(publicId, type);
+    res.json({ result: result?.result || 'ok' });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }

@@ -1,6 +1,6 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useRef, useState } from 'react';
 import {
-  View, Text, FlatList, StyleSheet, ActivityIndicator, Pressable,
+  View, Text, Image, FlatList, StyleSheet, ActivityIndicator, Pressable,
   Modal, TextInput, Alert, Platform, KeyboardAvoidingView,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -11,6 +11,8 @@ import { Ionicons } from '@expo/vector-icons';
 import MonthFilter from '../components/MonthFilter';
 import VoiceRecorder from '../components/VoiceRecorder';
 import { useAuth } from '../context/AuthContext';
+import * as ImagePicker from 'expo-image-picker';
+
 
 let MOODS = ['🌤', '😌', '😐', '😔', '🔥'];
 
@@ -22,6 +24,7 @@ export default function JournalScreen() {
   let [loading, setLoading] = useState(true);
   let [sheet, setSheet] = useState(null); // null | 'new' | entryObject
   let [month, setMonth] = useState(null); // null = all time
+  
 
   let load = useCallback(() => {
     let active = true;
@@ -172,21 +175,27 @@ function EntryModal({ visible, mode, entry, colors, isPaid, onClose, onCreated, 
   let [text, setText] = useState(entry?.text || '');
   let [busy, setBusy] = useState(false);
   let [audioUri, setAudioUri] = useState(null);
+  let [media, setMedia] = useState([]);
+  let [uploading, setUploading] = useState(false);
+  let savedRef = useRef(false);
 
   async function save() {
-    if (!mood && !text.trim()) {
-      Alert.alert('Nothing to save', 'Add a mood or write something.');
+    if (!mood && !text.trim() && media.length === 0) {
+      Alert.alert('Nothing to save', 'Add a mood, write something, or attach media.');
       return;
     }
     setBusy(true);
     try {
       if (mode === 'create') {
-        let created = await journalApi.createFreeform(mood, text.trim());
+        let created = await journalApi.createFreeform(mood, text.trim(), media);
+        savedRef.current = true;
         onCreated(created);
       } else {
         let updated = await journalApi.updateEntry(entry._id, mood, text.trim());
+        savedRef.current = true;
         onSaved(updated);
       }
+
     } catch (err) {
       Alert.alert('Could not save', 'Try again in a moment.');
     } finally {
@@ -194,19 +203,53 @@ function EntryModal({ visible, mode, entry, colors, isPaid, onClose, onCreated, 
     }
   }
 
+
+  async function addMedia() {
+    let perm = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (!perm.granted) { Alert.alert('Allow access', 'Enable photo access to attach media.'); return; }
+
+    let result = await ImagePicker.launchImageLibraryAsync({ mediaTypes: ImagePicker.MediaTypeOptions.All, quality: 0.8 });
+    if (result.canceled || !result.assets?.length) return;
+
+    let asset = result.assets[0];
+    let isVideo = asset.type === 'video';
+    let cap = isVideo ? 100 * 1048576 : 10 * 1048576;
+    if (asset.fileSize && asset.fileSize > cap) {
+      Alert.alert('Too large', `${isVideo ? 'Videos' : 'Photos'} must be under ${isVideo ? '100MB' : '10MB'}.`);
+      return;
+    }
+
+    setUploading(true);
+    try {
+      let uploaded = await journalApi.uploadJournalMedia(asset);
+      setMedia((prev) => [...prev, uploaded]);
+    } catch (err) {
+      Alert.alert('Upload failed', err.message || 'Try again in a moment.');
+    } finally {
+      setUploading(false);
+    }
+  }
+
+  function handleClose() {
+    if (!savedRef.current) {
+      media.forEach((m) => journalApi.destroyMedia(m.publicId, m.type));
+    }
+    onClose();
+  }
+
   return (
-    <Modal visible={visible} animationType="slide" transparent onRequestClose={onClose}>
+    <Modal visible={visible} animationType="slide" transparent onRequestClose={handleClose}>
       <KeyboardAvoidingView
         style={styles.sheetWrap}
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       >
-        <Pressable style={styles.backdrop} onPress={onClose} />
+        <Pressable style={styles.backdrop} onPress={handleClose} />
         <View style={[styles.sheet, { backgroundColor: colors.surface }]}>
           <View style={styles.sheetHead}>
             <Text style={[styles.sheetTitle, { color: colors.ink }]}>
               {mode === 'create' ? 'New entry' : 'Edit entry'}
             </Text>
-            <Pressable onPress={onClose}>
+            <Pressable onPress={handleClose}>
               <Text style={{ color: colors.muted, fontSize: 20 }}>✕</Text>
             </Pressable>
           </View>
@@ -251,6 +294,27 @@ function EntryModal({ visible, mode, entry, colors, isPaid, onClose, onCreated, 
               ) : (
                 <VoiceRecorder onSave={(uri) => setAudioUri(uri)} onDiscard={() => setAudioUri(null)} />
               )}
+
+              <Text style={[styles.label, { color: colors.muted }]}>PHOTOS & VIDEO</Text>
+              <View style={styles.mediaRow}>
+                {media.map((m, i) => (
+                  <View key={i} style={styles.thumbWrap}>
+                    {m.type === 'video' ? (
+                      <View style={[styles.thumb, styles.thumbCenter, { backgroundColor: colors.bg }]}>
+                        <Ionicons name="videocam" size={20} color={colors.accent} />
+                      </View>
+                    ) : (
+                      <Image source={{ uri: m.url }} style={styles.thumb} />
+                    )}
+                    <Pressable style={styles.thumbX} onPress={() => { journalApi.destroyMedia(m.publicId, m.type); setMedia((prev) => prev.filter((_, j) => j !== i)); }}>
+                      <Text style={styles.thumbXText}>✕</Text>
+                    </Pressable>
+                  </View>
+                ))}
+                <Pressable style={[styles.addMedia, { borderColor: colors.line }]} onPress={addMedia} disabled={uploading}>
+                  {uploading ? <ActivityIndicator color={colors.accent} /> : <Ionicons name="add" size={24} color={colors.muted} />}
+                </Pressable>
+              </View>
             </>
           ) : null}
 
@@ -308,4 +372,11 @@ let styles = StyleSheet.create({
   quote: { borderLeftWidth: 3, paddingLeft: 11, marginTop: 12 },
   quoteText: { fontSize: 12.5, lineHeight: 18, fontStyle: 'italic' },
   voiceChip: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', borderWidth: 1, borderRadius: 12, padding: 14, marginBottom: 16 },
+  mediaRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginBottom: 16 },
+  thumbWrap: { position: 'relative' },
+  thumb: { width: 60, height: 60, borderRadius: 10 },
+  thumbCenter: { alignItems: 'center', justifyContent: 'center' },
+  thumbX: { position: 'absolute', top: -6, right: -6, width: 20, height: 20, borderRadius: 10, backgroundColor: 'rgba(0,0,0,0.7)', alignItems: 'center', justifyContent: 'center' },
+  thumbXText: { color: '#fff', fontSize: 12, fontWeight: '700' },
+  addMedia: { width: 60, height: 60, borderRadius: 10, borderWidth: 1, borderStyle: 'dashed', alignItems: 'center', justifyContent: 'center' },
 });
