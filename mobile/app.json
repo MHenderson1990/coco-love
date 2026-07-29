@@ -46,7 +46,14 @@
         {
           "faceIDPermission": "House of Love uses Face ID to securely unlock your account."
         }
+      ],
+      [
+    "expo-audio",
+        {
+          "microphonePermission": "House of Love uses the microphone so you can record voice journal entries."
+        }
       ]
+      
     ],
     "extra": {
       "eas": {
