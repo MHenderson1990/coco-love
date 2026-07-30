@@ -3,20 +3,21 @@ let crypto = require('crypto');
 let User = require('../models/User');
 let { cloudinaryCloudName, cloudinaryApiKey, cloudinaryApiSecret } = require('../config/env');
 let cloudinaryService = require('../services/cloudinary.service');
+let r2 = require('../services/r2.service');
 
 // POST /api/journal  { affirmationId, mood, text }
 // POST /api/journal  { affirmationId?, mood, text, type }
 exports.create = async (req, res) => {
   try {
-    let { affirmationId, mood, text, type, media } = req.body;
+    let { affirmationId, mood, text, type, media, voiceNote } = req.body;
 
     let entryType = type === 'freeform' ? 'freeform' : 'daily';
 
     if (entryType === 'daily' && !affirmationId) {
       return res.status(400).json({ error: 'affirmationId is required' });
     }
-    if (!mood && !text && (!Array.isArray(media) || media.length === 0)) {
-      return res.status(400).json({ error: 'Provide a mood, text, or media' });
+    if (!mood && !text && (!Array.isArray(media) || media.length === 0) && !voiceNote?.key) {
+      return res.status(400).json({ error: 'Provide a mood, text, media, or a voice note' });
     }
 
     let entry = await JournalEntry.create({
@@ -26,6 +27,7 @@ exports.create = async (req, res) => {
       text,
       type: entryType,
       media: Array.isArray(media) ? media : [],
+      voiceNote: voiceNote?.key ? voiceNote : undefined,
     });
 
     res.status(201).json({ entry });
@@ -91,6 +93,7 @@ exports.remove = async (req, res) => {
       return res.status(404).json({ error: 'Entry not found' });
     }
     if (entry.media?.length) cloudinaryService.destroyMany(entry.media).catch(() => {});
+    if (entry.voiceNote?.key) r2.deleteObject(entry.voiceNote.key).catch(() => {});
     res.json({ success: true });
 
   } catch (err) {
@@ -135,6 +138,32 @@ exports.destroyMedia = async (req, res) => {
     }
     let result = await cloudinaryService.destroy(publicId, type);
     res.json({ result: result?.result || 'ok' });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+// POST /api/journal/voice/presign-upload  (paid) — get a presigned PUT URL
+exports.presignVoiceUpload = async (req, res) => {
+  try {
+    let user = await User.findById(req.user.id).select('tier');
+    if (!user || user.tier !== 'paid') return res.status(403).json({ error: 'Members feature' });
+    let key = `voice/${req.user.id}/${crypto.randomUUID()}.m4a`;
+    let { url } = await r2.presignUpload(key);
+    res.json({ url, key });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+// GET /api/journal/voice/play?key=...  — presigned GET, scoped to your own recordings
+exports.presignVoicePlay = async (req, res) => {
+  try {
+    let key = req.query.key;
+    if (!key) return res.status(400).json({ error: 'key is required' });
+    if (!key.startsWith(`voice/${req.user.id}/`)) return res.status(403).json({ error: 'Not allowed' });
+    let url = await r2.presignDownload(key);
+    res.json({ url });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }

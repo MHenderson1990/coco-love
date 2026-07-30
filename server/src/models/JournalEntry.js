@@ -11,6 +11,10 @@ let journalEntrySchema = new mongoose.Schema({
     publicId: { type: String },
     type:     { type: String, enum: ['image', 'video'], required: true },
   }],
+  voiceNote: {
+    key: { type: String },
+    durationMillis: { type: Number },
+  },
 }, { timestamps: true });
 
 module.exports = mongoose.model('JournalEntry', journalEntrySchema);
