@@ -238,6 +238,7 @@ function EntryModal({ visible, mode, entry, colors, isPaid, onClose, onCreated, 
   function handleClose() {
     if (!savedRef.current) {
       media.forEach((m) => journalApi.destroyMedia(m.publicId, m.type));
+      if (voiceNote?.key) journalApi.destroyVoice(voiceNote.key);
     }
     onClose();
   }
@@ -292,7 +293,7 @@ function EntryModal({ visible, mode, entry, colors, isPaid, onClose, onCreated, 
               {voiceNote ? (
                 <View style={[styles.voiceChip, { backgroundColor: colors.bg, borderColor: colors.accent }]}>
                   <Text style={{ color: colors.ink, fontSize: 13, fontWeight: '600' }}>🎙 Voice note attached</Text>
-                  <Pressable onPress={() => setVoiceNote(null)} hitSlop={8}>
+                  <Pressable onPress={() => { journalApi.destroyVoice(voiceNote.key); setVoiceNote(null); }} hitSlop={8}>
                     <Text style={{ color: colors.muted, fontSize: 13, fontWeight: '600' }}>Remove</Text>
                   </Pressable>
                 </View>

@@ -79,3 +79,11 @@ export async function getVoicePlayUrl(key) {
   let res = await client.get('/journal/voice/play', { params: { key } });
   return res.data.url;
 }
+
+export async function destroyVoice(key) {
+  try {
+    await client.post('/journal/voice/destroy', { key });
+  } catch (err) {
+    // best-effort cleanup
+  }
+}

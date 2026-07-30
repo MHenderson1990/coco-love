@@ -168,3 +168,16 @@ exports.presignVoicePlay = async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 };
+
+// POST /api/journal/voice/destroy — remove a voice object from R2 (own recordings only)
+exports.destroyVoice = async (req, res) => {
+  try {
+    let { key } = req.body;
+    if (!key) return res.status(400).json({ error: 'key is required' });
+    if (!key.startsWith(`voice/${req.user.id}/`)) return res.status(403).json({ error: 'Not allowed' });
+    await r2.deleteObject(key);
+    res.json({ success: true });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
