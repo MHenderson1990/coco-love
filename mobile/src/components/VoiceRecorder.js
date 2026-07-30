@@ -7,6 +7,7 @@ import {
   AudioModule, setAudioModeAsync,
 } from 'expo-audio';
 import { useTheme } from '../context/ThemeContext';
+import ShareVoiceButton from './ShareVoiceButton';
 
 function fmt(ms) {
   let s = Math.floor((ms || 0) / 1000);
@@ -144,8 +145,9 @@ function Playback({ uri, colors, onRerecord, onDiscard, onSave }) {
         </Pressable>
 
         <Pressable onPress={onRerecord} hitSlop={8}>
-          <Text style={[styles.reRec, { color: colors.muted }]}>Re-record</Text>
+          <Text style={[styles.reRec, { color: colors.accent }]}>Re-record</Text>
         </Pressable>
+        <ShareVoiceButton source={{ uri }} label="Save" />
 
         <Pressable style={[styles.useBtn, { backgroundColor: colors.accent }]} onPress={() => onSave(Math.round(dur * 1000))}>
           <Text style={[styles.useText, { color: colors.surface }]}>Use recording</Text>

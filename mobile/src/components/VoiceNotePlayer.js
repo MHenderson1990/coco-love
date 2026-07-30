@@ -4,6 +4,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useAudioPlayer, useAudioPlayerStatus, setAudioModeAsync } from 'expo-audio';
 import { useTheme } from '../context/ThemeContext';
 import * as journalApi from '../api/journal';
+import ShareVoiceButton from './ShareVoiceButton';
 
 function fmt(s) {
   let m = Math.floor((s || 0) / 60);
@@ -31,16 +32,20 @@ export default function VoiceNotePlayer({ voiceKey }) {
 
   if (!url) {
     return (
-      <Pressable style={[styles.bar, { backgroundColor: colors.bg, borderColor: colors.line }]} onPress={start} disabled={loading}>
-        {loading ? <ActivityIndicator color={colors.accent} /> : <Ionicons name="play" size={16} color={colors.accent} />}
-        <Text style={[styles.label, { color: colors.muted }]}>{loading ? 'Loading…' : 'Voice note'}</Text>
-      </Pressable>
+      <View style={[styles.bar, { backgroundColor: colors.bg, borderColor: colors.line }]}>
+        <Pressable onPress={start} disabled={loading} style={styles.playRow} hitSlop={8}>
+          {loading ? <ActivityIndicator color={colors.accent} /> : <Ionicons name="play" size={16} color={colors.accent} />}
+          <Text style={[styles.label, { color: colors.muted }]}>{loading ? 'Loading…' : 'Voice note'}</Text>
+        </Pressable>
+        <ShareVoiceButton source={{ key: voiceKey }} label="" />
+      </View>
     );
   }
-  return <LoadedPlayer url={url} colors={colors} />;
+
+  return <LoadedPlayer url={url} colors={colors} voiceKey={voiceKey} />;
 }
 
-function LoadedPlayer({ url, colors }) {
+function LoadedPlayer({ url, colors, voiceKey }) {
   let player = useAudioPlayer(url);
   let status = useAudioPlayerStatus(player);
   let playing = status?.playing ?? status?.isPlaying;
@@ -68,6 +73,7 @@ function LoadedPlayer({ url, colors }) {
         <View style={[styles.fill, { backgroundColor: colors.accent, width: `${pct}%` }]} />
       </View>
       <Text style={[styles.time, { color: colors.muted }]}>{fmt(cur)} / {fmt(dur)}</Text>
+      <ShareVoiceButton source={{ key: voiceKey }} label="" />
     </View>
   );
 }
@@ -78,4 +84,5 @@ let styles = StyleSheet.create({
   track: { flex: 1, height: 4, borderRadius: 100, overflow: 'hidden' },
   fill: { height: '100%', borderRadius: 100 },
   time: { fontSize: 11, fontVariant: ['tabular-nums'] },
+  playRow: { flexDirection: 'row', alignItems: 'center', gap: 10, flex: 1 },
 });

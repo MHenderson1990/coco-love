@@ -87,3 +87,10 @@ export async function destroyVoice(key) {
     // best-effort cleanup
   }
 }
+
+export async function downloadVoiceNote(key) {
+  let url = await getVoicePlayUrl(key);
+  let target = FileSystem.cacheDirectory + key.split('/').pop();
+  let res = await FileSystem.downloadAsync(url, target);
+  return res.uri;
+}
