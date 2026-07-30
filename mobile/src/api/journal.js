@@ -1,4 +1,5 @@
 import client from './client';
+import * as FileSystem from 'expo-file-system/legacy';
 
 export async function createEntry(affirmationId, mood, text) {
   let res = await client.post('/journal', { affirmationId, mood, text });
@@ -10,8 +11,8 @@ export async function listEntries(type) {
   return res.data.entries;
 }
 
-export async function createFreeform(mood, text, media) {
-  let res = await client.post('/journal', { mood, text, type: 'freeform', media });
+export async function createFreeform(mood, text, media, voiceNote) {
+  let res = await client.post('/journal', { mood, text, type: 'freeform', media, voiceNote });
   return res.data.entry;
 }
 
@@ -57,4 +58,24 @@ export async function destroyMedia(publicId, type) {
   } catch (err) {
     // best-effort cleanup
   }
+}
+
+export async function presignVoiceUpload() {
+  let res = await client.post('/journal/voice/presign-upload', {});
+  return res.data; // { url, key }
+}
+
+export async function uploadVoiceNote(uri) {
+  let { url, key } = await presignVoiceUpload();
+  let res = await FileSystem.uploadAsync(url, uri, {
+    httpMethod: 'PUT',
+    uploadType: FileSystem.FileSystemUploadType.BINARY_CONTENT,
+  });
+  if (res.status < 200 || res.status >= 300) throw new Error('Voice upload failed: ' + res.status);
+  return { key };
+}
+
+export async function getVoicePlayUrl(key) {
+  let res = await client.get('/journal/voice/play', { params: { key } });
+  return res.data.url;
 }

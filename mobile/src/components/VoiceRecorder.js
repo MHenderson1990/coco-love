@@ -69,7 +69,7 @@ export default function VoiceRecorder({ onSave, onDiscard }) {
         colors={colors}
         onRerecord={() => { setLevels([]); setUri(null); }}
         onDiscard={() => { setLevels([]); setUri(null); onDiscard?.(); }}
-        onSave={() => onSave?.(uri)}
+        onSave={(durMs) => onSave?.(uri, durMs)}
       />
     );
   }
@@ -142,10 +142,12 @@ function Playback({ uri, colors, onRerecord, onDiscard, onSave }) {
         <Pressable onPress={onDiscard} hitSlop={8}>
           <Text style={[styles.discard, { color: colors.muted }]}>Discard</Text>
         </Pressable>
+
         <Pressable onPress={onRerecord} hitSlop={8}>
           <Text style={[styles.reRec, { color: colors.muted }]}>Re-record</Text>
         </Pressable>
-        <Pressable style={[styles.useBtn, { backgroundColor: colors.accent }]} onPress={onSave}>
+
+        <Pressable style={[styles.useBtn, { backgroundColor: colors.accent }]} onPress={() => onSave(Math.round(dur * 1000))}>
           <Text style={[styles.useText, { color: colors.surface }]}>Use recording</Text>
         </Pressable>
       </View>

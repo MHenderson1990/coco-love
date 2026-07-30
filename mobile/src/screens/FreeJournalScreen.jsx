@@ -13,6 +13,7 @@ import VoiceRecorder from '../components/VoiceRecorder';
 import { useAuth } from '../context/AuthContext';
 import * as ImagePicker from 'expo-image-picker';
 import RichText from '../components/RichText';
+import VoiceNotePlayer from '../components/VoiceNotePlayer';
 
 
 let MOODS = ['🌤', '😌', '😐', '😔', '🔥'];
@@ -143,6 +144,8 @@ export default function JournalScreen() {
                   <RichText style={[styles.quoteText, { color: colors.muted }]} numberOfLines={2} text={item.affirmation.text} />
                 </View>
               ) : null}
+
+              {item.voiceNote?.key ? <VoiceNotePlayer voiceKey={item.voiceNote.key} /> : null}
             </Pressable>
           )}
         />
@@ -174,20 +177,22 @@ function EntryModal({ visible, mode, entry, colors, isPaid, onClose, onCreated, 
   let [mood, setMood] = useState(entry?.mood || null);
   let [text, setText] = useState(entry?.text || '');
   let [busy, setBusy] = useState(false);
-  let [audioUri, setAudioUri] = useState(null);
+  let [voiceNote, setVoiceNote] = useState(null); // { key, durationMillis }
+  let [voiceBusy, setVoiceBusy] = useState(false);
   let [media, setMedia] = useState([]);
   let [uploading, setUploading] = useState(false);
   let savedRef = useRef(false);
 
   async function save() {
-    if (!mood && !text.trim() && media.length === 0) {
-      Alert.alert('Nothing to save', 'Add a mood, write something, or attach media.');
+    if (!mood && !text.trim() && media.length === 0 && !voiceNote) {
+      Alert.alert('Nothing to save', 'Add a mood, write something, or record a voice note.');
       return;
     }
+
     setBusy(true);
     try {
       if (mode === 'create') {
-        let created = await journalApi.createFreeform(mood, text.trim(), media);
+        let created = await journalApi.createFreeform(mood, text.trim(), media, voiceNote || undefined);
         savedRef.current = true;
         onCreated(created);
       } else {
@@ -284,15 +289,33 @@ function EntryModal({ visible, mode, entry, colors, isPaid, onClose, onCreated, 
         {isPaid ? (
             <>
               <Text style={[styles.label, { color: colors.muted }]}>VOICE NOTE</Text>
-              {audioUri ? (
+              {voiceNote ? (
                 <View style={[styles.voiceChip, { backgroundColor: colors.bg, borderColor: colors.accent }]}>
                   <Text style={{ color: colors.ink, fontSize: 13, fontWeight: '600' }}>🎙 Voice note attached</Text>
-                  <Pressable onPress={() => setAudioUri(null)} hitSlop={8}>
+                  <Pressable onPress={() => setVoiceNote(null)} hitSlop={8}>
                     <Text style={{ color: colors.muted, fontSize: 13, fontWeight: '600' }}>Remove</Text>
                   </Pressable>
                 </View>
+              ) : voiceBusy ? (
+                <View style={[styles.voiceChip, { backgroundColor: colors.bg, borderColor: colors.line }]}>
+                  <ActivityIndicator color={colors.accent} />
+                  <Text style={{ color: colors.muted, fontSize: 13 }}>Saving voice…</Text>
+                </View>
               ) : (
-                <VoiceRecorder onSave={(uri) => setAudioUri(uri)} onDiscard={() => setAudioUri(null)} />
+                <VoiceRecorder
+                  onSave={async (uri) => {
+                    setVoiceBusy(true);
+                    try {
+                      let saved = await journalApi.uploadVoiceNote(uri);
+                      setVoiceNote({ key: saved.key, durationMillis: 0 });
+                    } catch (err) {
+                      Alert.alert('Voice upload failed', String(err?.message || err));
+                    } finally {
+                      setVoiceBusy(false);
+                    }
+                  }}
+                  onDiscard={() => {}}
+                />
               )}
 
               {MEDIA_ATTACHMENTS_ENABLED ? <Text style={[styles.label, { color: colors.muted }]}>PHOTOS & VIDEO</Text> : null}
