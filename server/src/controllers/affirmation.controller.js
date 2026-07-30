@@ -1,5 +1,5 @@
 const Affirmation = require('../models/Affirmation');
-const Affirmation = require('../models/Affirmation');
+
 
 // "Today's message" is anchored to the app's home timezone (Central) so it's the same for
 // everyone and flips at Central midnight, not UTC. Maps any instant to the UTC-midnight Date
