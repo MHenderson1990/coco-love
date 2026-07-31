@@ -119,7 +119,6 @@ export default function ProfileScreen({ navigation }) {
                   background === key && { borderWidth: 3, borderColor: colors.ink },
                 ]}
               >
-                <Text style={{ fontSize: 8, color: colors.muted, textAlign: 'center', marginTop: 20 }}>{key}</Text>
               </Pressable>
             ))}
           </View>
