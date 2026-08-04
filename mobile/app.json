@@ -35,7 +35,7 @@
     },
     "plugins": [
       [
-        "expo-image-picker",
+      "expo-image-picker",
         {
           "photosPermission": "House of Love needs access to your library so you can upload sessions."
         }
@@ -48,13 +48,12 @@
         }
       ],
       [
-        "expo-audio",
+    "expo-audio",
         {
           "microphonePermission": "House of Love uses the microphone so you can record voice journal entries."
         }
-      ],
-      "expo-asset",
-      "expo-font"
+      ]
+      
     ],
     "extra": {
       "eas": {

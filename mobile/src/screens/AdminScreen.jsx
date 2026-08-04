@@ -218,20 +218,26 @@ function AffirmationModal({ visible, onClose, onSaved, colors }) {
   }
 
   return (
-    <Sheet visible={visible} onClose={onClose} title="Write a message" colors={colors}>
-      <View style={styles.fmtBar}>
-        <Pressable style={[styles.fmtBtn, { borderColor: colors.line }]} onPress={() => wrap('**')}>
-          <Text style={[styles.fmtB, { color: colors.ink }]}>B</Text>
-        </Pressable>
-        <Pressable style={[styles.fmtBtn, { borderColor: colors.line }]} onPress={() => wrap('*')}>
-          <Text style={[styles.fmtI, { color: colors.ink }]}>I</Text>
-        </Pressable>
-        <Pressable style={[styles.fmtBtn, { borderColor: colors.line }]} onPress={() => wrap('__')}>
-          <Text style={[styles.fmtU, { color: colors.ink }]}>U</Text>
-        </Pressable>
-        <Text style={[styles.fmtHint, { color: colors.muted }]}>Select text, then tap</Text>
-      </View>
-
+    <Sheet
+      visible={visible}
+      onClose={onClose}
+      title="Write a message"
+      colors={colors}
+      pinned={
+        <View style={styles.fmtBar}>
+          <Pressable style={[styles.fmtBtn, { borderColor: colors.line }]} onPress={() => wrap('**')}>
+            <Text style={[styles.fmtB, { color: colors.ink }]}>B</Text>
+          </Pressable>
+          <Pressable style={[styles.fmtBtn, { borderColor: colors.line }]} onPress={() => wrap('*')}>
+            <Text style={[styles.fmtI, { color: colors.ink }]}>I</Text>
+          </Pressable>
+          <Pressable style={[styles.fmtBtn, { borderColor: colors.line }]} onPress={() => wrap('__')}>
+            <Text style={[styles.fmtU, { color: colors.ink }]}>U</Text>
+          </Pressable>
+          <Text style={[styles.fmtHint, { color: colors.muted }]}>Select text, then tap</Text>
+        </View>
+      }
+    >
       <TextInput
         style={[styles.input, styles.textarea, { backgroundColor: colors.bg, color: colors.ink }]}
         placeholder="Your peace is a priority, not a luxury."
@@ -347,7 +353,7 @@ function AnnouncementModal({ visible, onClose, colors }) {
   );
 }
 
-function Sheet({ visible, onClose, title, colors, children }) {
+function Sheet({ visible, onClose, title, colors, children, pinned }) {
   return (
     <Modal visible={visible} animationType="slide" transparent onRequestClose={onClose}>
       <KeyboardAvoidingView
@@ -362,7 +368,10 @@ function Sheet({ visible, onClose, title, colors, children }) {
               <Text style={{ color: colors.muted, fontSize: 20 }}>✕</Text>
             </Pressable>
           </View>
-          {children}
+          {pinned}
+          <ScrollView keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
+            {children}
+          </ScrollView>
         </View>
       </KeyboardAvoidingView>
     </Modal>
@@ -571,7 +580,7 @@ let styles = StyleSheet.create({
 
   sheetWrap: { flex: 1, justifyContent: 'flex-end' },
   backdrop: { ...StyleSheet.absoluteFillObject, backgroundColor: 'rgba(0,0,0,0.35)' },
-  sheet: { borderTopLeftRadius: 24, borderTopRightRadius: 24, padding: 22, paddingBottom: 34 },
+  sheet: { borderTopLeftRadius: 24, borderTopRightRadius: 24, padding: 22, paddingBottom: 34, maxHeight: '88%' },
   sheetHead: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 18 },
   sheetTitle: { fontSize: 18, fontWeight: '600' },
   input: { borderRadius: 12, padding: 14, fontSize: 14, marginBottom: 12 },

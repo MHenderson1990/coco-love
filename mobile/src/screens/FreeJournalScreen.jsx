@@ -1,7 +1,7 @@
 import { useCallback, useRef, useState } from 'react';
 import {
   View, Text, Image, FlatList, StyleSheet, ActivityIndicator, Pressable,
-  Modal, TextInput, Alert, Platform, KeyboardAvoidingView,
+  Modal, TextInput, Alert, Platform, KeyboardAvoidingView, ScrollView
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useFocusEffect } from '@react-navigation/native';
@@ -259,7 +259,8 @@ function EntryModal({ visible, mode, entry, colors, isPaid, onClose, onCreated, 
               <Text style={{ color: colors.muted, fontSize: 20 }}>✕</Text>
             </Pressable>
           </View>
-
+          
+          <ScrollView keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
           <Text style={[styles.label, { color: colors.muted }]}>HOW ARE YOU FEELING?</Text>
           <View style={styles.moods}>
             {MOODS.map((m) => (
@@ -359,6 +360,7 @@ function EntryModal({ visible, mode, entry, colors, isPaid, onClose, onCreated, 
               <Text style={[styles.deleteText, { color: colors.muted }]}>Delete this entry</Text>
             </Pressable>
           ) : null}
+          </ScrollView>
         </View>
       </KeyboardAvoidingView>
     </Modal>
@@ -382,7 +384,7 @@ let styles = StyleSheet.create({
 
   sheetWrap: { flex: 1, justifyContent: 'flex-end' },
   backdrop: { ...StyleSheet.absoluteFillObject, backgroundColor: 'rgba(0,0,0,0.35)' },
-  sheet: { borderTopLeftRadius: 24, borderTopRightRadius: 24, padding: 22, paddingBottom: 34 },
+  sheet: { borderTopLeftRadius: 24, borderTopRightRadius: 24, padding: 22, paddingBottom: 34, maxHeight: '88%' },
   sheetHead: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 18 },
   sheetTitle: { fontSize: 18, fontWeight: '600' },
   label: { fontSize: 10.5, fontWeight: '700', letterSpacing: 1.3, marginBottom: 10 },
