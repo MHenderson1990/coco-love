@@ -201,10 +201,21 @@ function AffirmationModal({ visible, onClose, onSaved, colors }) {
       setError('Write something first.');
       return;
     }
+
     setError('');
     setBusy(true);
+
     try {
-      await adminApi.createAffirmation(text.trim(), date.toISOString());
+      let year = date.getFullYear();
+      let month = String(date.getMonth() + 1).padStart(2, '0');
+      let day = String(date.getDate()).padStart(2, '0');
+
+      let dateOnly = `${year}-${month}-${day}`;
+
+      console.log('PICKED DATE OBJECT:', date);
+      console.log('DATE ONLY BEING SENT:', dateOnly);
+
+      await adminApi.createAffirmation(text.trim(), dateOnly);
       setText('');
       setDate(new Date());
       onSaved?.();

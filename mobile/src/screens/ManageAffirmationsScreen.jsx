@@ -29,11 +29,16 @@ export default function ManageAffirmationsScreen({ navigation }) {
   useFocusEffect(load);
 
   let filtered = month
-    ? items.filter((a) => {
-        let d = new Date(a.scheduledDate);
-        return d.getFullYear() === month.getFullYear() && d.getMonth() === month.getMonth();
-      })
-    : items;
+  ? items.filter((a) => {
+      let dateOnly = a.scheduledDate.split('T')[0];
+      let [year, itemMonth] = dateOnly.split('-').map(Number);
+
+      return (
+        year === month.getFullYear() &&
+        itemMonth === month.getMonth() + 1
+      );
+    })
+  : items;
 
   function confirmDelete(a) {
     Alert.alert(
@@ -58,15 +63,30 @@ export default function ManageAffirmationsScreen({ navigation }) {
   }
 
   function label(dateStr) {
-    let d = new Date(dateStr);
-    let today = new Date().setHours(0, 0, 0, 0);
-    let day = new Date(dateStr).setHours(0, 0, 0, 0);
-    let diff = Math.round((day - today) / 86400000);
-    let base = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-    if (diff === 0) return `${base} · Today`;
-    if (diff > 0) return `${base} · in ${diff}d`;
-    return base;
-  }
+  let dateOnly = dateStr.split('T')[0];
+
+  let [year, month, day] = dateOnly.split('-').map(Number);
+
+  let d = new Date(year, month - 1, day);
+
+  let today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  let selectedDay = new Date(year, month - 1, day);
+  selectedDay.setHours(0, 0, 0, 0);
+
+  let diff = Math.round((selectedDay - today) / 86400000);
+
+  let base = d.toLocaleDateString('en-US', {
+    month: 'short',
+    day: 'numeric'
+  });
+
+  if (diff === 0) return `${base} · Today`;
+  if (diff > 0) return `${base} · in ${diff}d`;
+
+  return base;
+}
 
   return (
     <SafeAreaView style={[styles.wrap, { backgroundColor: 'transparent' }]} edges={['top']}>
@@ -133,10 +153,15 @@ function EditAffirmationModal({ affirmation, colors, onClose, onSaved, onDelete 
   let [ready, setReady] = useState(false);
 
   if (affirmation && !ready) {
-    setText(affirmation.text || '');
-    setDate(new Date(affirmation.scheduledDate));
-    setReady(true);
-  }
+  setText(affirmation.text || '');
+
+  let dateOnly = affirmation.scheduledDate.split('T')[0];
+  let [year, month, day] = dateOnly.split('-').map(Number);
+
+  setDate(new Date(year, month - 1, day));
+  setReady(true);
+}
+
   if (!affirmation && ready) setReady(false);
 
   async function save() {
@@ -144,9 +169,22 @@ function EditAffirmationModal({ affirmation, colors, onClose, onSaved, onDelete 
       Alert.alert('Message required', 'Write something.');
       return;
     }
+
     setBusy(true);
+
     try {
-      let updated = await adminApi.updateAffirmation(affirmation._id, text.trim(), date.toISOString());
+      let year = date.getFullYear();
+      let month = String(date.getMonth() + 1).padStart(2, '0');
+      let day = String(date.getDate()).padStart(2, '0');
+
+      let dateOnly = `${year}-${month}-${day}`;
+
+      let updated = await adminApi.updateAffirmation(
+        affirmation._id,
+        text.trim(),
+        dateOnly
+    );
+
       onSaved(updated);
     } catch (err) {
       Alert.alert(
