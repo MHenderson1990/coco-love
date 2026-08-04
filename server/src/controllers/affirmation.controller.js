@@ -12,6 +12,10 @@ function dayAnchor(input) {
   return new Date(`${ymd}T00:00:00.000Z`);
 }
 
+function scheduledDateAnchor(dateString) {
+  return new Date(`${dateString}T00:00:00.000Z`);
+}
+
 // GET /api/affirmations/today
 exports.getToday = async (req, res) => {
   try {
@@ -48,18 +52,31 @@ exports.getHistory = async (req, res) => {
 exports.create = async (req, res) => {
   try {
     let { text, scheduledDate, tags } = req.body;
-    if (!text || !scheduledDate) {
-      return res.status(400).json({ error: 'text and scheduledDate are required' });
-    }
 
-    let date = dayAnchor(scheduledDate);
+if (!text || !scheduledDate) {
+  return res.status(400).json({ error: 'text and scheduledDate are required' });
+}
 
-    let affirmation = await Affirmation.create({ text, scheduledDate: date, tags });
+console.log('RAW scheduledDate from request:', scheduledDate);
+
+let date = scheduledDateAnchor(scheduledDate);
+
+console.log('DATE ISO being saved:', date.toISOString());
+
+let affirmation = await Affirmation.create({
+  text,
+  scheduledDate: date,
+  tags
+});
+
     res.status(201).json({ affirmation });
   } catch (err) {
     if (err.code === 11000) {
-      return res.status(409).json({ error: 'An affirmation is already scheduled for that date' });
+      return res.status(409).json({
+        error: 'An affirmation is already scheduled for that date'
+      });
     }
+
     res.status(500).json({ error: err.message });
   }
 };
@@ -72,7 +89,7 @@ exports.update = async (req, res) => {
     if (text !== undefined) updates.text = text;
     if (tags !== undefined) updates.tags = tags;
     if (scheduledDate !== undefined) {
-      updates.scheduledDate = dayAnchor(scheduledDate);
+      updates.scheduledDate = scheduledDateAnchor(scheduledDate);
     }
 
     let affirmation = await Affirmation.findByIdAndUpdate(req.params.id, updates, {
