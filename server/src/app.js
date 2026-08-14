@@ -19,6 +19,10 @@ let authLimiter = rateLimit({
 });
 app.use('/api/auth', authLimiter);
 app.use('/api', routes);
+
+app.get('/health', (req, res) => {
+  res.json({ status: 'ok' });
+});
 // unknown route → 404 through the same handler
 app.use((req, res, next) => {
   next(new ApiError(404, 'Not found'));
@@ -26,8 +30,6 @@ app.use((req, res, next) => {
 
 app.use(errorHandler);
 
-app.get('/health', (req, res) => {
-  res.json({ status: 'ok' });
-});
+
 
 module.exports = app;
