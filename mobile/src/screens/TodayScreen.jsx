@@ -120,11 +120,16 @@ export default function TodayScreen({ navigation }) {
           </Text>
 
           <TypewriterText
-  style={[styles.sub, { color: colors.muted }]}
-  text="TYPEWRITER TEST"
-  delay={5000}
-  speed={500}
-/>
+            key={revealed ? 'revealed-message' : 'opening-message'}
+            style={[styles.sub, { color: colors.muted }]}
+            text={
+              revealed
+                ? 'Take it with you today.'
+                : 'Are you ready for today\u2019s message?'
+            }
+            delay={500}
+            speed={45}
+          />
         </View>
 
         {error ? (

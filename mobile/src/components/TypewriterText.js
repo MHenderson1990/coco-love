@@ -79,7 +79,7 @@ export default function TypewriterText({
 
   return (
   <Text style={style}>
-    TEST: {displayedText}
+    {displayedText}
     <Animated.Text style={{ opacity: blink }}>|</Animated.Text>
   </Text>
 );
