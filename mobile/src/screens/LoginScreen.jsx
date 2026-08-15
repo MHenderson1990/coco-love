@@ -152,7 +152,7 @@ export default function LoginScreen({ navigation }) {
           <Text style={[styles.moon, { color: colors.accentSoft }]}>☾</Text>
         </View>
 
-        <Text style={[styles.title, { color: colors.ink }]}>House of Love</Text>
+        <Text style={[styles.title, { color: colors.ink }]}>Love G.E.M.S.</Text>
         <Text style={[styles.tagline, { color: colors.muted }]}>Peace and love, friend. Sign in to begin.</Text>
 
         <TextInput
