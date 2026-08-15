@@ -21,6 +21,10 @@ import ResetPasswordScreen from './src/screens/ResetPasswordScreen';
 import LoadingScreen from './src/screens/LoadingScreen';
 import SavedScreen from './src/screens/SavedScreen';
 import { useFonts, Lora_400Regular, Lora_400Regular_Italic, Lora_700Bold } from '@expo-google-fonts/lora';
+import { AmaticSC_700Bold } from '@expo-google-fonts/amatic-sc';
+import { Allison_400Regular } from '@expo-google-fonts/allison';
+import { QwitcherGrypen_400Regular, QwitcherGrypen_700Bold } from '@expo-google-fonts/qwitcher-grypen';
+import { PlayfairDisplay_400Regular, PlayfairDisplay_500Medium } from '@expo-google-fonts/playfair-display';
 
 let Stack = createNativeStackNavigator();
 
@@ -36,7 +40,13 @@ Notifications.setNotificationHandler({
 function Root() {
   let { user, loading } = useAuth();
   let { colors } = useTheme();
-  let [fontsLoaded] = useFonts({ Lora_400Regular, Lora_400Regular_Italic, Lora_700Bold });
+  let [fontsLoaded] = useFonts({
+    Lora_400Regular, Lora_400Regular_Italic, Lora_700Bold,
+    AmaticSC_700Bold,
+    Allison_400Regular,
+    QwitcherGrypen_400Regular, QwitcherGrypen_700Bold,
+    PlayfairDisplay_400Regular, PlayfairDisplay_500Medium,
+  });
 
   if (loading || !fontsLoaded) {
     return <LoadingScreen />;

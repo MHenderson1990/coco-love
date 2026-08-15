@@ -88,7 +88,7 @@ export default function JournalScreen() {
       <View style={styles.headerRow}>
         <View style={{ flex: 1 }}>
           <Text style={[styles.title, { color: colors.ink }]}>Your journal</Text>
-          <Text style={[styles.sub, { color: colors.muted }]}>A space just for you.</Text>
+          <Text style={[styles.sub, { color: colors.muted }]}>Just you and your thoughts.</Text>
         </View>
         <Pressable
           style={[styles.newBtn, { backgroundColor: colors.accent }]}
@@ -116,7 +116,7 @@ export default function JournalScreen() {
           }
           renderItem={({ item }) => (
             <Pressable
-              style={[styles.row, { backgroundColor: colors.surface, borderColor: colors.line }]}
+              style={[styles.row, { backgroundColor: 'rgba(255,255,255,0.6)', borderColor: colors.line }]}
               onPress={() => setSheet(item)}
               onLongPress={() => confirmDelete(item)}
             >
@@ -250,7 +250,7 @@ function EntryModal({ visible, mode, entry, colors, isPaid, onClose, onCreated, 
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       >
         <Pressable style={styles.backdrop} onPress={handleClose} />
-        <View style={[styles.sheet, { backgroundColor: colors.surface }]}>
+        <View style={[styles.sheet, { backgroundColor: 'rgba(255,255,255,0.6)' }]}>
           <View style={styles.sheetHead}>
             <Text style={[styles.sheetTitle, { color: colors.ink }]}>
               {mode === 'create' ? 'New entry' : 'Edit entry'}

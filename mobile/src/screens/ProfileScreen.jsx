@@ -69,24 +69,8 @@ export default function ProfileScreen({ navigation }) {
         <Text style={[styles.title, { color: colors.ink }]}>Make it yours</Text>
         <Text style={[styles.sub, { color: colors.muted }]}>{user?.name} · {user?.email}</Text>
 
-        <View style={[styles.card, { backgroundColor: colors.surface, borderColor: colors.line }]}>
-          <Text style={[styles.label, { color: colors.ink }]}>Appearance</Text>
-          <View style={[styles.toggle, { borderColor: colors.line }]}>
-            {['light', 'dark'].map((m) => (
-              <Pressable
-                key={m}
-                style={[styles.toggleBtn, mode === m && { backgroundColor: colors.accent }]}
-                onPress={() => setMode(m)}
-              >
-                <Text style={[styles.toggleText, { color: mode === m ? colors.surface : colors.muted }]}>
-                  {m === 'light' ? 'Light' : 'Dark'}
-                </Text>
-              </Pressable>
-            ))}
-          </View>
-        </View>
-
-        <View style={[styles.card, { backgroundColor: colors.surface, borderColor: colors.line }]}>
+        
+        <View style={[styles.card, { backgroundColor: 'rgba(255,255,255,0.6)', borderColor: colors.line }]}>
           <Text style={[styles.label, { color: colors.ink }]}>Color</Text>
           <View style={styles.swatches}>
             {PALETTE_KEYS.map((key) => (
@@ -103,7 +87,7 @@ export default function ProfileScreen({ navigation }) {
           </View>
         </View>
 
-        <View style={[styles.card, { backgroundColor: colors.surface, borderColor: colors.line }]}>
+        <View style={[styles.card, { backgroundColor: 'rgba(255,255,255,0.6)', borderColor: colors.line }]}>
           <Text style={[styles.label, { color: colors.ink }]}>Background</Text>
           <View style={styles.swatches}>
             {BACKGROUNDS.map((key) => (
@@ -124,7 +108,7 @@ export default function ProfileScreen({ navigation }) {
           </View>
         </View>
 
-        <View style={[styles.card, { backgroundColor: colors.surface, borderColor: colors.line }]}>
+        <View style={[styles.card, { backgroundColor: 'rgba(255,255,255,0.6)', borderColor: colors.line }]}>
           <View style={styles.row}>
             <Text style={[styles.label, { color: colors.ink }]}>Daily reminder</Text>
             <Switch
@@ -169,7 +153,7 @@ export default function ProfileScreen({ navigation }) {
 
         {user?.promoUnlockedAt && (
           <Pressable
-            style={[styles.card, { backgroundColor: colors.surface, borderColor: colors.accent }]}
+            style={[styles.card, { backgroundColor: 'rgba(255,255,255,0.6)', borderColor: colors.accent }]}
             onPress={() => navigation.navigate('Reward')}
           >
             <Text style={[styles.label, { color: colors.ink }]}>✨ Your reward</Text>
@@ -180,7 +164,7 @@ export default function ProfileScreen({ navigation }) {
         )}
 
         <Pressable
-          style={[styles.card, { backgroundColor: colors.surface, borderColor: colors.line }]}
+          style={[styles.card, { backgroundColor: 'rgba(255,255,255,0.6)', borderColor: colors.line }]}
           onPress={() => navigation.navigate('Saved')}
         >
           <Text style={[styles.label, { color: colors.ink }]}>Saved messages</Text>
@@ -190,7 +174,7 @@ export default function ProfileScreen({ navigation }) {
         </Pressable>
 
         <Pressable
-          style={[styles.card, { backgroundColor: colors.surface, borderColor: colors.line }]}
+          style={[styles.card, { backgroundColor: 'rgba(255,255,255,0.6)', borderColor: colors.line }]}
           onPress={() => navigation.navigate('History')}
         >
           <Text style={[styles.label, { color: colors.ink }]}>Affirmation history</Text>
@@ -200,7 +184,7 @@ export default function ProfileScreen({ navigation }) {
         </Pressable>
 
         <Pressable
-          style={[styles.card, { backgroundColor: colors.surface, borderColor: colors.line }]}
+          style={[styles.card, { backgroundColor: 'rgba(255,255,255,0.6)', borderColor: colors.line }]}
           onPress={() => navigation.navigate('Announcements')}
         >
           <Text style={[styles.label, { color: colors.ink }]}>From Coco Love</Text>
@@ -211,7 +195,7 @@ export default function ProfileScreen({ navigation }) {
 
         {user?.role === 'admin' && (
           <Pressable
-            style={[styles.card, { backgroundColor: colors.surface, borderColor: colors.line }]}
+            style={[styles.card, { backgroundColor: 'rgba(255,255,255,0.6)', borderColor: colors.line }]}
             onPress={() => navigation.navigate('Admin')}
           >
             <Text style={[styles.label, { color: colors.ink }]}>Your dashboard</Text>
@@ -222,7 +206,7 @@ export default function ProfileScreen({ navigation }) {
         )}
 
         <Pressable
-          style={[styles.signout, { borderColor: colors.line, backgroundColor: colors.surface }]}
+          style={[styles.signout, { borderColor: colors.line, backgroundColor: 'rgba(255,255,255,0.6)' }]}
           onPress={logout}
         >
           <Text style={[styles.signoutText, { color: colors.accent }]}>Sign out</Text>

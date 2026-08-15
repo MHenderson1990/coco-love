@@ -11,6 +11,7 @@ import * as favoritesApi from '../api/favorites';
 import * as feedbackApi from '../api/feedback';
 import JournalDrawer from '../components/JournalDrawer';
 import AnnouncementBanner from '../components/AnnouncementBanner';
+import TypewriterText from '../components/TypewriterText';
 
 
 export default function TodayScreen({ navigation }) {
@@ -114,16 +115,20 @@ export default function TodayScreen({ navigation }) {
         <AnnouncementBanner onPress={() => navigation.navigate('Announcements')} />
 
         <View style={styles.greet}>
-          <Text style={[styles.hello, { color: colors.ink }]}>
-            Peace and love, <Text style={{ fontFamily: 'Lora_400Regular_Italic' }}>{user?.name}</Text>
+          <Text style={[styles.hello, { color: colors.accent }]}>
+            Peace & Love, <Text style={[styles.name, { color: colors.ink }]}>{user?.name}</Text>
           </Text>
-          <Text style={[styles.sub, { color: colors.muted }]}>
-            {revealed ? 'Take it with you today.' : 'Are you ready for today\u2019s message?'}
-          </Text>
+
+          <TypewriterText
+  style={[styles.sub, { color: colors.muted }]}
+  text="TYPEWRITER TEST"
+  delay={5000}
+  speed={500}
+/>
         </View>
 
         {error ? (
-          <View style={[styles.errorBox, { backgroundColor: colors.surface, borderColor: colors.line }]}>
+          <View style={[styles.errorBox, { backgroundColor: 'rgba(255,255,255,0.4)', borderColor: colors.line }]}>
             <Text style={{ color: colors.muted, textAlign: 'center' }}>{error}</Text>
           </View>
         ) : (
@@ -141,7 +146,7 @@ export default function TodayScreen({ navigation }) {
               <Pressable
                 style={[
                   styles.act,
-                  { backgroundColor: saved ? colors.accentSoft : colors.surface, borderColor: saved ? colors.accent : colors.line },
+                  { backgroundColor: saved ? colors.accentSoft : 'rgba(255,255,255,0.4)', borderColor: saved ? colors.accent : colors.line },
                 ]}
                 onPress={handleSave}
               >
@@ -151,14 +156,14 @@ export default function TodayScreen({ navigation }) {
               </Pressable>
 
               <Pressable
-                style={[styles.act, { backgroundColor: colors.surface, borderColor: colors.line }]}
+                style={[styles.act, { backgroundColor: 'rgba(255,255,255,0.4)', borderColor: colors.line }]}
                 onPress={handleShare}
               >
                 <Text style={[styles.actText, { color: colors.muted }]}>Share</Text>
               </Pressable>
 
               <Pressable
-                style={[styles.act, { backgroundColor: colors.surface, borderColor: colors.line }]}
+                style={[styles.act, { backgroundColor: 'rgba(255,255,255,0.4)', borderColor: colors.line }]}
                 onPress={() => handleFeedback('more')}
               >
                 <Text style={[styles.actText, { color: colors.muted }]}>More like this</Text>
@@ -186,8 +191,9 @@ let styles = StyleSheet.create({
   center: { flex: 1, alignItems: 'center', justifyContent: 'center' },
   body: { flexGrow: 1, paddingHorizontal: 22, paddingBottom: 34 },
   greet: { marginTop: 22 },
-  hello: { fontSize: 25, fontWeight: '500', letterSpacing: -0.4, marginBottom: 7 },
-  sub: { fontSize: 14 },
+  hello: { fontSize: 40, fontFamily: 'AmaticSC_700Bold', letterSpacing: 0.5 },
+  name: { fontSize: 50, fontFamily: 'Allison_400Regular' },
+  sub: { fontSize: 15, fontFamily: 'PlayfairDisplay_400Regular' },
   errorBox: { minHeight: 260, marginTop: 16, borderRadius: 22, borderWidth: 1, alignItems: 'center', justifyContent: 'center', padding: 24 },
   actions: { flexDirection: 'row', gap: 8, marginTop: 14 },
   act: { flex: 1, borderWidth: 1, borderRadius: 14, paddingVertical: 13, alignItems: 'center' },

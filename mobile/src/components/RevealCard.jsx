@@ -1,5 +1,5 @@
 import { useRef } from 'react';
-import { View, Text, StyleSheet, Animated, PanResponder, Dimensions } from 'react-native';
+import { View, Text, StyleSheet, Animated, PanResponder, Dimensions, ImageBackground } from 'react-native';
 import { useTheme } from '../context/ThemeContext';
 import RichText from './RichText';
 
@@ -38,30 +38,27 @@ export default function RevealCard({ text, revealed, onReveal, compact }) {
   ).current;
 
   return (
-    <View
-      style={[
-        styles.card,
-        { backgroundColor: colors.surface, borderColor: colors.line },
-        compact && { minHeight: 130, paddingVertical: 20 },
-      ]}
-    >
+    <View style={[styles.card, compact && { minHeight: 130, paddingVertical: 20 }]}>
       <RichText
         text={text}
-        style={[styles.affirm, { color: colors.accent }]}
-        fonts={{ bold: 'Lora_700Bold', italic: 'Lora_400Regular_Italic' }}
+        style={[styles.affirm, { color: '#1A1A1A' }]}
+        fonts={{ bold: 'QwitcherGrypen_700Bold' }}
       />
 
       {!revealed && (
         <Animated.View
           {...panResponder.panHandlers}
-          style={[
-            styles.veil,
-            { backgroundColor: colors.accentSoft, transform: [{ translateY }] },
-          ]}
+          style={[styles.veil, { transform: [{ translateY }] }]}
         >
-          <Text style={[styles.chev, { color: colors.ink }]}>⌃</Text>
-          <Text style={[styles.veilText, { color: colors.ink }]}>SWIPE UP TO REVEAL</Text>
-          <View style={[styles.grip, { backgroundColor: colors.ink }]} />
+          <ImageBackground
+            source={require('../../assets/paper-bg.jpg')}
+            style={styles.veilPaper}
+            resizeMode="cover"
+          >
+            <Text style={[styles.chev, { color: '#5A5A5A' }]}>⌃</Text>
+            <Text style={[styles.veilText, { color: '#5A5A5A' }]}>SWIPE UP TO REVEAL</Text>
+            <View style={[styles.grip, { backgroundColor: '#9A9A9A' }]} />
+          </ImageBackground>
         </Animated.View>
       )}
     </View>
@@ -70,15 +67,13 @@ export default function RevealCard({ text, revealed, onReveal, compact }) {
 
 let styles = StyleSheet.create({
   card: {
-    minHeight: 280, marginTop: 16, borderRadius: 22, borderWidth: 1,
+    minHeight: 280, marginTop: 16, borderRadius: 22,
     overflow: 'hidden', alignItems: 'center', justifyContent: 'center',
     paddingHorizontal: 24, paddingVertical: 28,
   },
-  affirm: { fontSize: 22, lineHeight: 31, textAlign: 'center', letterSpacing: -0.3, fontFamily: 'Lora_400Regular' },
-  veil: {
-    ...StyleSheet.absoluteFillObject,
-    alignItems: 'center', justifyContent: 'center', gap: 12,
-  },
+  affirm: { fontSize: 30, lineHeight: 40, textAlign: 'center', fontFamily: 'QwitcherGrypen_400Regular' },
+  veil: { ...StyleSheet.absoluteFillObject },
+  veilPaper: { flex: 1, width: '100%', alignItems: 'center', justifyContent: 'center', gap: 12 },
   chev: { fontSize: 28, opacity: 0.5, marginBottom: -8 },
   veilText: { fontSize: 11.5, fontWeight: '600', letterSpacing: 1.4, opacity: 0.62 },
   grip: { position: 'absolute', bottom: 16, width: 38, height: 4, borderRadius: 100, opacity: 0.16 },

@@ -16,7 +16,7 @@ export default function StreakRing({ streak }) {
   let remaining = Math.max(MILESTONE - streak, 0);
 
   return (
-    <View style={[styles.wrap, { backgroundColor: colors.surface, borderColor: colors.line }]}>
+    <View style={[styles.wrap, { backgroundColor: 'rgba(255,255,255,0.4)', borderColor: colors.line }]}>
       <Svg width={SIZE} height={SIZE}>
         <Circle
           cx={SIZE / 2} cy={SIZE / 2} r={radius}

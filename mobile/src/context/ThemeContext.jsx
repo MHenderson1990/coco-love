@@ -16,7 +16,6 @@ export function ThemeProvider({ children }) {
     if (user?.preferences) {
       let saved = user.preferences.colorPalette;
       if (saved && PALETTES[saved]) setPaletteState(saved);
-      if (user.preferences.theme) setModeState(user.preferences.theme);
       if (user.preferences.background) setBackgroundState(user.preferences.background);
     }
   }, [user?._id]);
@@ -48,7 +47,7 @@ export function ThemeProvider({ children }) {
     }
   }
 
-  let colors = (PALETTES[palette] || PALETTES.purple)[mode] || PALETTES.purple.light;
+  let colors = (PALETTES[palette] || PALETTES.purple).light;
 
   return (
     <ThemeContext.Provider value={{ colors, palette, setPalette, mode, setMode, background, setBackground }}>

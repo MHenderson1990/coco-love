@@ -41,7 +41,7 @@ export default function JournalDrawer({ affirmationId, onOpenChange }) {
   }
 
   return (
-    <View style={[styles.wrap, { backgroundColor: colors.surface, borderColor: colors.line }]}>
+    <View style={[styles.wrap, { backgroundColor: 'rgba(255,255,255,0.4)', borderColor: colors.line }]}>
       <Pressable style={styles.head} onPress={toggle}>
         <Text style={[styles.headText, { color: colors.ink }]}>
           {saved ? 'Entry saved' : 'Add to your journal'}

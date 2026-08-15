@@ -44,7 +44,7 @@ export default function SavedScreen({ navigation }) {
             </Text>
           }
           renderItem={({ item }) => (
-            <View style={[styles.row, { backgroundColor: colors.surface, borderColor: colors.line }]}>
+            <View style={[styles.row, { backgroundColor: 'rgba(255,255,255,0.6)', borderColor: colors.line }]}>
               <RichText style={[styles.text, { color: colors.ink }]} text={item.affirmation?.text} />
               <Text style={[styles.meta, { color: colors.muted }]}>
                 Saved {new Date(item.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}

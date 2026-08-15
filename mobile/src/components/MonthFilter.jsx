@@ -18,7 +18,7 @@ export default function MonthFilter({ value, onChange }) {
     : 'All time';
 
   return (
-    <View style={[styles.bar, { borderColor: colors.line, backgroundColor: colors.surface }]}>
+    <View style={[styles.bar, { borderColor: colors.line, backgroundColor: 'rgba(255,255,255,0.6)' }]}>
       <Pressable onPress={() => step(-1)} hitSlop={10} disabled={!value}>
         <Text style={[styles.chev, { color: colors.ink, opacity: value ? 1 : 0.3 }]}>‹</Text>
       </Pressable>

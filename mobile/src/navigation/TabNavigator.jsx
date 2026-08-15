@@ -35,7 +35,7 @@ export default function TabNavigator() {
           paddingTop: 6,
           height: 88,
         },
-        tabBarLabelStyle: { fontSize: 10, fontWeight: '600' },
+        tabBarLabelStyle: { fontSize: 11, fontFamily: 'PlayfairDisplay_500Medium' },
         tabBarIcon: ({ color, size }) => (
           <Ionicons name={ICONS[route.name]} size={size - 2} color={color} />
         ),
