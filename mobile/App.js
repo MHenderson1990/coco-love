@@ -21,9 +21,9 @@ import ResetPasswordScreen from './src/screens/ResetPasswordScreen';
 import LoadingScreen from './src/screens/LoadingScreen';
 import SavedScreen from './src/screens/SavedScreen';
 import { useFonts, Lora_400Regular, Lora_400Regular_Italic, Lora_700Bold } from '@expo-google-fonts/lora';
-import { AmaticSC_700Bold } from '@expo-google-fonts/amatic-sc';
+import { ShadowsIntoLight_400Regular } from '@expo-google-fonts/shadows-into-light';
 import { Allison_400Regular } from '@expo-google-fonts/allison';
-import { QwitcherGrypen_400Regular, QwitcherGrypen_700Bold } from '@expo-google-fonts/qwitcher-grypen';
+import { PlaywriteGBS_400Regular } from '@expo-google-fonts/playwrite-gb-s';
 import { PlayfairDisplay_400Regular, PlayfairDisplay_500Medium } from '@expo-google-fonts/playfair-display';
 
 let Stack = createNativeStackNavigator();
@@ -42,9 +42,9 @@ function Root() {
   let { colors } = useTheme();
   let [fontsLoaded] = useFonts({
     Lora_400Regular, Lora_400Regular_Italic, Lora_700Bold,
-    AmaticSC_700Bold,
+    ShadowsIntoLight_400Regular,
     Allison_400Regular,
-    QwitcherGrypen_400Regular, QwitcherGrypen_700Bold,
+    PlaywriteGBS_400Regular,
     PlayfairDisplay_400Regular, PlayfairDisplay_500Medium,
   });
 

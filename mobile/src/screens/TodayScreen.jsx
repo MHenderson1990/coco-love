@@ -115,9 +115,10 @@ export default function TodayScreen({ navigation }) {
         <AnnouncementBanner onPress={() => navigation.navigate('Announcements')} />
 
         <View style={styles.greet}>
-          <Text style={[styles.hello, { color: colors.accent }]}>
-            Peace & Love, <Text style={[styles.name, { color: colors.ink }]}>{user?.name}</Text>
-          </Text>
+          <View style={styles.greetRow}>
+            <Text style={[styles.hello, { color: colors.accent }]}>{'Peace\u2009&\u2009Love,'}</Text>
+            <Text style={[styles.name, { color: colors.ink }]}>{user?.name}</Text>
+          </View>
 
           <TypewriterText
             key={revealed ? 'revealed-message' : 'opening-message'}
@@ -196,8 +197,9 @@ let styles = StyleSheet.create({
   center: { flex: 1, alignItems: 'center', justifyContent: 'center' },
   body: { flexGrow: 1, paddingHorizontal: 22, paddingBottom: 34 },
   greet: { marginTop: 22 },
-  hello: { fontSize: 40, fontFamily: 'AmaticSC_700Bold', letterSpacing: 0.5 },
-  name: { fontSize: 50, fontFamily: 'Allison_400Regular' },
+  hello: { fontSize: 40, fontFamily: 'ShadowsIntoLight_400Regular', letterSpacing: 0 },
+  greetRow: { flexDirection: 'row', alignItems: 'baseline', flexWrap: 'wrap' },
+  name: { fontSize: 50, fontFamily: 'Allison_400Regular', marginLeft: 4 },
   sub: { fontSize: 15, fontFamily: 'PlayfairDisplay_400Regular' },
   errorBox: { minHeight: 260, marginTop: 16, borderRadius: 22, borderWidth: 1, alignItems: 'center', justifyContent: 'center', padding: 24 },
   actions: { flexDirection: 'row', gap: 8, marginTop: 14 },

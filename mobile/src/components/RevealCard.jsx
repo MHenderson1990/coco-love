@@ -42,7 +42,6 @@ export default function RevealCard({ text, revealed, onReveal, compact }) {
       <RichText
         text={text}
         style={[styles.affirm, { color: '#1A1A1A' }]}
-        fonts={{ bold: 'QwitcherGrypen_700Bold' }}
       />
 
       {!revealed && (
@@ -71,7 +70,7 @@ let styles = StyleSheet.create({
     overflow: 'hidden', alignItems: 'center', justifyContent: 'center',
     paddingHorizontal: 24, paddingVertical: 28,
   },
-  affirm: { fontSize: 30, lineHeight: 40, textAlign: 'center', fontFamily: 'QwitcherGrypen_400Regular' },
+  affirm: { fontSize: 26, lineHeight: 35, textAlign: 'center', fontFamily: 'PlaywriteGBS_400Regular' },
   veil: { ...StyleSheet.absoluteFillObject },
   veilPaper: { flex: 1, width: '100%', alignItems: 'center', justifyContent: 'center', gap: 12 },
   chev: { fontSize: 28, opacity: 0.5, marginBottom: -8 },
