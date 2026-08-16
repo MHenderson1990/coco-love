@@ -25,6 +25,7 @@ import { ShadowsIntoLight_400Regular } from '@expo-google-fonts/shadows-into-lig
 import { MeowScript_400Regular } from '@expo-google-fonts/meow-script';
 import { PlaywriteGBS_400Regular } from '@expo-google-fonts/playwrite-gb-s';
 import { PlayfairDisplay_400Regular, PlayfairDisplay_500Medium } from '@expo-google-fonts/playfair-display';
+import EngagementScreen from './src/screens/EngagementScreen';
 
 let Stack = createNativeStackNavigator();
 
@@ -60,6 +61,7 @@ function Root() {
             <>
               <Stack.Screen name="Main" component={TabNavigator} />
               <Stack.Screen name="Admin" component={AdminScreen} />
+              <Stack.Screen name="Engagement" component={EngagementScreen} />
               <Stack.Screen name="Announcements" component={AnnouncementsScreen} />
               <Stack.Screen name="History" component={HistoryScreen} />
               <Stack.Screen name="Upgrade" component={UpgradeScreen} />

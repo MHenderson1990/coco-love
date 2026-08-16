@@ -200,7 +200,7 @@ let styles = StyleSheet.create({
   greet: { marginTop: 22 },
   hello: { fontSize: 40, fontFamily: 'ShadowsIntoLight_400Regular', letterSpacing: .5 },
   greetRow: { flexDirection: 'row', alignItems: 'baseline', flexWrap: 'wrap' },
-  name: { fontSize: 50, fontFamily: 'MeowScript_400Regular', marginTop: -25, textAlign: 'center' },
+  name: { fontSize: 50, fontFamily: 'MeowScript_400Regular', marginTop: -20, textAlign: 'center' },
   sub: { fontSize: 15, fontFamily: 'PlayfairDisplay_400Regular' },
   errorBox: { minHeight: 260, marginTop: 16, borderRadius: 22, borderWidth: 1, alignItems: 'center', justifyContent: 'center', padding: 24 },
   actions: { flexDirection: 'row', gap: 8, marginTop: 14 },

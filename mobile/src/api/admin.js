@@ -69,3 +69,13 @@ export async function setPromo(code) {
   let res = await client.put('/admin/promo', { code });
   return res.data.code;
 }
+
+export async function getEngagement() {
+  let res = await client.get('/admin/affirmations/engagement');
+  return res.data.affirmations;
+}
+
+export async function getSavers(id) {
+  let res = await client.get(`/admin/affirmations/${id}/savers`);
+  return res.data.savers;
+}

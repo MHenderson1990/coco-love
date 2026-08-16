@@ -99,6 +99,13 @@ export default function AdminScreen({ navigation }) {
                 <Text style={[styles.btnText, { color: colors.surface }]}>Write a message</Text>
               </Pressable>
 
+            <Pressable
+                style={[styles.btn, styles.ghost, { backgroundColor: colors.surface, borderColor: colors.line }]}
+                onPress={() => navigation.navigate('Engagement')}
+              >
+                <Text style={[styles.btnText, { color: colors.ink }]}>Who's loving what</Text>
+              </Pressable>
+
               <Pressable
                 style={[styles.btn, styles.ghost, { backgroundColor: colors.surface, borderColor: colors.line }]}
                 onPress={() => setShowAnnouncement(true)}

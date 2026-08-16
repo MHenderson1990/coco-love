@@ -66,7 +66,7 @@ export default function RevealCard({ text, revealed, onReveal, compact }) {
 
 let styles = StyleSheet.create({
   card: {
-    minHeight: 280, marginTop: -15, borderRadius: 22,
+    minHeight: 280, marginTop: 0, borderRadius: 22,
     overflow: 'hidden', alignItems: 'center', justifyContent: 'center',
     paddingHorizontal: 24, paddingVertical: 28,
   },
