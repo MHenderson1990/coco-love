@@ -2,6 +2,7 @@ let User = require('../models/User');
 let Affirmation = require('../models/Affirmation');
 let dailyAffirmationJob = require('../jobs/dailyAffirmation.job');
 let Setting = require('../models/Setting');
+let Favorite = require('../models/Favorite');
 
 // GET /api/admin/stats
 exports.stats = async (req, res) => {
@@ -147,6 +148,43 @@ exports.getPromo = async (req, res) => {
   try {
     let setting = await Setting.findOne({ key: 'promoCode' });
     res.json({ code: setting?.value || '' });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+// GET /api/admin/affirmations/engagement — every message with saves + feedback, most-saved first
+exports.affirmationEngagement = async (req, res) => {
+  try {
+    let results = await Affirmation.aggregate([
+      { $lookup: { from: 'favorites', localField: '_id', foreignField: 'affirmation', as: 'favorites' } },
+      { $lookup: { from: 'feedbacks', localField: '_id', foreignField: 'affirmation', as: 'feedback' } },
+      {
+        $addFields: {
+          favoriteCount: { $size: '$favorites' },
+          moreCount: { $size: { $filter: { input: '$feedback', as: 'f', cond: { $eq: ['$$f.signal', 'more'] } } } },
+          lessCount: { $size: { $filter: { input: '$feedback', as: 'f', cond: { $eq: ['$$f.signal', 'less'] } } } },
+        },
+      },
+      { $project: { text: 1, scheduledDate: 1, favoriteCount: 1, moreCount: 1, lessCount: 1 } },
+      { $sort: { favoriteCount: -1, scheduledDate: -1 } },
+    ]);
+    res.json({ affirmations: results });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+// GET /api/admin/affirmations/:id/savers — names of users who saved this message
+exports.affirmationSavers = async (req, res) => {
+  try {
+    let favorites = await Favorite.find({ affirmation: req.params.id })
+      .populate('user', 'name')          // name ONLY — no email/sensitive fields leave the server
+      .sort({ createdAt: -1 });
+    let savers = favorites
+      .filter((f) => f.user)             // guard against deleted users
+      .map((f) => ({ name: f.user.name, savedAt: f.createdAt }));
+    res.json({ savers });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
