@@ -66,11 +66,11 @@ export default function RevealCard({ text, revealed, onReveal, compact }) {
 
 let styles = StyleSheet.create({
   card: {
-    minHeight: 280, marginTop: 16, borderRadius: 22,
+    minHeight: 280, marginTop: -15, borderRadius: 22,
     overflow: 'hidden', alignItems: 'center', justifyContent: 'center',
     paddingHorizontal: 24, paddingVertical: 28,
   },
-  affirm: { fontSize: 26, lineHeight: 35, textAlign: 'center', fontFamily: 'PlaywriteGBS_400Regular' },
+  affirm: { fontSize: 20, lineHeight: 35, textAlign: 'center', fontFamily: 'PlaywriteGBS_400Regular' },
   veil: { ...StyleSheet.absoluteFillObject },
   veilPaper: { flex: 1, width: '100%', alignItems: 'center', justifyContent: 'center', gap: 12 },
   chev: { fontSize: 28, opacity: 0.5, marginBottom: -8 },

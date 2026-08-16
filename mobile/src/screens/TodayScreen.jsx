@@ -108,21 +108,22 @@ export default function TodayScreen({ navigation }) {
         ref={scrollRef}
         contentContainerStyle={styles.body}
         keyboardShouldPersistTaps="handled"
-        automaticallyAdjustKeyboardInsets
         showsVerticalScrollIndicator={false}
+        bounces={false}
+        overScrollMode="never"
       >
         <StreakRing streak={streak} />
         <AnnouncementBanner onPress={() => navigation.navigate('Announcements')} />
 
         <View style={styles.greet}>
-          <View style={styles.greetRow}>
-            <Text style={[styles.hello, { color: colors.accent }]}>{'Peace\u2009&\u2009Love,'}</Text>
+          <View style={{ alignItems: 'center' }}>
+            <Text style={[styles.hello, { color: colors.accent }]}>{'Peace\u2009&\u2009love'}</Text>
             <Text style={[styles.name, { color: colors.ink }]}>{user?.name}</Text>
           </View>
 
           <TypewriterText
             key={revealed ? 'revealed-message' : 'opening-message'}
-            style={[styles.sub, { color: colors.muted }]}
+            style={[styles.sub, { color: colors.muted, textAlign: 'center' }]}
             text={
               revealed
                 ? 'Take it with you today.'
@@ -195,11 +196,11 @@ export default function TodayScreen({ navigation }) {
 let styles = StyleSheet.create({
   wrap: { flex: 1 },
   center: { flex: 1, alignItems: 'center', justifyContent: 'center' },
-  body: { flexGrow: 1, paddingHorizontal: 22, paddingBottom: 34 },
+  body: { flexGrow: 1, paddingHorizontal: 22, paddingBottom: 40, justifyContent: 'flex-start' },
   greet: { marginTop: 22 },
-  hello: { fontSize: 40, fontFamily: 'ShadowsIntoLight_400Regular', letterSpacing: 0 },
+  hello: { fontSize: 40, fontFamily: 'ShadowsIntoLight_400Regular', letterSpacing: .5 },
   greetRow: { flexDirection: 'row', alignItems: 'baseline', flexWrap: 'wrap' },
-  name: { fontSize: 50, fontFamily: 'Allison_400Regular', marginLeft: 4 },
+  name: { fontSize: 50, fontFamily: 'MeowScript_400Regular', marginTop: -25, textAlign: 'center' },
   sub: { fontSize: 15, fontFamily: 'PlayfairDisplay_400Regular' },
   errorBox: { minHeight: 260, marginTop: 16, borderRadius: 22, borderWidth: 1, alignItems: 'center', justifyContent: 'center', padding: 24 },
   actions: { flexDirection: 'row', gap: 8, marginTop: 14 },

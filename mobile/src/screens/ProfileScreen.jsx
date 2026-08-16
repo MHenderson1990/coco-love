@@ -87,26 +87,7 @@ export default function ProfileScreen({ navigation }) {
           </View>
         </View>
 
-        <View style={[styles.card, { backgroundColor: 'rgba(255,255,255,0.6)', borderColor: colors.line }]}>
-          <Text style={[styles.label, { color: colors.ink }]}>Background</Text>
-          <View style={styles.swatches}>
-            {BACKGROUNDS.map((key) => (
-              <Pressable
-                key={key}
-                onPress={() => {
-                  console.log('tapped background:', key);
-                  setBackground(key);
-                }}
-                style={[
-                  styles.bgSwatch,
-                  { backgroundColor: key === 'gradient' ? colors.accentSoft : key === 'glow' ? colors.accent : colors.bg, borderColor: colors.line },
-                  background === key && { borderWidth: 3, borderColor: colors.ink },
-                ]}
-              >
-              </Pressable>
-            ))}
-          </View>
-        </View>
+        
 
         <View style={[styles.card, { backgroundColor: 'rgba(255,255,255,0.6)', borderColor: colors.line }]}>
           <View style={styles.row}>

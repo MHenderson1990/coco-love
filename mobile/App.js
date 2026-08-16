@@ -22,7 +22,7 @@ import LoadingScreen from './src/screens/LoadingScreen';
 import SavedScreen from './src/screens/SavedScreen';
 import { useFonts, Lora_400Regular, Lora_400Regular_Italic, Lora_700Bold } from '@expo-google-fonts/lora';
 import { ShadowsIntoLight_400Regular } from '@expo-google-fonts/shadows-into-light';
-import { Allison_400Regular } from '@expo-google-fonts/allison';
+import { MeowScript_400Regular } from '@expo-google-fonts/meow-script';
 import { PlaywriteGBS_400Regular } from '@expo-google-fonts/playwrite-gb-s';
 import { PlayfairDisplay_400Regular, PlayfairDisplay_500Medium } from '@expo-google-fonts/playfair-display';
 
@@ -43,7 +43,7 @@ function Root() {
   let [fontsLoaded] = useFonts({
     Lora_400Regular, Lora_400Regular_Italic, Lora_700Bold,
     ShadowsIntoLight_400Regular,
-    Allison_400Regular,
+    MeowScript_400Regular,
     PlaywriteGBS_400Regular,
     PlayfairDisplay_400Regular, PlayfairDisplay_500Medium,
   });
