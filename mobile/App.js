@@ -21,8 +21,8 @@ import ResetPasswordScreen from './src/screens/ResetPasswordScreen';
 import LoadingScreen from './src/screens/LoadingScreen';
 import SavedScreen from './src/screens/SavedScreen';
 import { useFonts, Lora_400Regular, Lora_400Regular_Italic, Lora_700Bold } from '@expo-google-fonts/lora';
-import { ShadowsIntoLight_400Regular } from '@expo-google-fonts/shadows-into-light';
-import { MeowScript_400Regular } from '@expo-google-fonts/meow-script';
+import { BebasNeue_400Regular } from '@expo-google-fonts/bebas-neue';
+import { PassionsConflict_400Regular } from '@expo-google-fonts/passions-conflict';
 import { PlaywriteGBS_400Regular } from '@expo-google-fonts/playwrite-gb-s';
 import { PlayfairDisplay_400Regular, PlayfairDisplay_500Medium } from '@expo-google-fonts/playfair-display';
 import EngagementScreen from './src/screens/EngagementScreen';
@@ -43,8 +43,8 @@ function Root() {
   let { colors } = useTheme();
   let [fontsLoaded] = useFonts({
     Lora_400Regular, Lora_400Regular_Italic, Lora_700Bold,
-    ShadowsIntoLight_400Regular,
-    MeowScript_400Regular,
+    BebasNeue_400Regular,
+    PassionsConflict_400Regular,
     PlaywriteGBS_400Regular,
     PlayfairDisplay_400Regular, PlayfairDisplay_500Medium,
   });
