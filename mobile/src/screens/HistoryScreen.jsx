@@ -74,7 +74,7 @@ export default function HistoryScreen({ navigation }) {
           }
           renderItem={({ item }) => (
             <Pressable
-              style={[styles.row, { backgroundColor: 'rgba(255,255,255,0.6)', borderColor: colors.line }]}
+              style={[styles.row, { backgroundColor: colors.surface, borderColor: colors.line }]}
               onPress={() => setActive(item)}
             >
               <Text style={[styles.date, { color: colors.accent }]}>

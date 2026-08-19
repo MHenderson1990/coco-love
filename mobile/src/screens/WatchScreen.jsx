@@ -42,7 +42,7 @@ export default function WatchScreen({ navigation }) {
           }
           renderItem={({ item }) => (
             <Pressable
-              style={[styles.row, { backgroundColor: 'rgba(255,255,255,0.6)', borderColor: colors.line }]}
+              style={[styles.row, { backgroundColor: colors.surface, borderColor: colors.line }]}
               onPress={() => {
                 navigation.navigate('VideoPlayer', {
                   videoUrl: item.videoUrl,

@@ -90,7 +90,7 @@ function Row({ item, colors }) {
 
   return (
     <Pressable
-      style={[styles.row, { backgroundColor: 'rgba(255,255,255,0.6)', borderColor: colors.line }]}
+      style={[styles.row, { backgroundColor: colors.surface, borderColor: colors.line }]}
       onPress={toggle}
     >
       <RichText

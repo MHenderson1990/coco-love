@@ -116,7 +116,7 @@ export default function JournalScreen() {
           }
           renderItem={({ item }) => (
             <Pressable
-              style={[styles.row, { backgroundColor: 'rgba(255,255,255,0.6)', borderColor: colors.line }]}
+              style={[styles.row, { backgroundColor: colors.surface, borderColor: colors.line }]}
               onPress={() => setSheet(item)}
               onLongPress={() => confirmDelete(item)}
             >
@@ -250,7 +250,7 @@ function EntryModal({ visible, mode, entry, colors, isPaid, onClose, onCreated, 
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       >
         <Pressable style={styles.backdrop} onPress={handleClose} />
-        <View style={[styles.sheet, { backgroundColor: 'rgba(255,255,255,0.6)' }]}>
+        <View style={[styles.sheet, { backgroundColor: colors.surface }]}>
           <View style={styles.sheetHead}>
             <Text style={[styles.sheetTitle, { color: colors.ink }]}>
               {mode === 'create' ? 'New entry' : 'Edit entry'}
@@ -329,9 +329,9 @@ function EntryModal({ visible, mode, entry, colors, isPaid, onClose, onCreated, 
                         <Ionicons name="videocam" size={20} color={colors.accent} />
                       </View>
                     ) : (
-                      <Image source={{ uri: m.url }} style={styles.thumb} />
+                    <Image source={{ uri: m.url }} style={styles.thumb} />
                     )}
-                    <Pressable style={styles.thumbX} onPress={() => { journalApi.destroyMedia(m.publicId, m.type); setMedia((prev) => prev.filter((_, j) => j !== i)); }}>
+                    <Pressable style={[styles.thumbX, { backgroundColor: colors.surface }]} onPress={() => { journalApi.destroyMedia(m.publicId, m.type); setMedia((prev) => prev.filter((_, j) => j !== i)); }}>
                       <Text style={styles.thumbXText}>✕</Text>
                     </Pressable>
                   </View>
@@ -404,7 +404,7 @@ let styles = StyleSheet.create({
   thumbWrap: { position: 'relative' },
   thumb: { width: 60, height: 60, borderRadius: 10 },
   thumbCenter: { alignItems: 'center', justifyContent: 'center' },
-  thumbX: { position: 'absolute', top: -6, right: -6, width: 20, height: 20, borderRadius: 10, backgroundColor: 'rgba(0,0,0,0.7)', alignItems: 'center', justifyContent: 'center' },
+  thumbX: { position: 'absolute', top: -6, right: -6, width: 20, height: 20, borderRadius: 10, alignItems: 'center', justifyContent: 'center' },
   thumbXText: { color: '#fff', fontSize: 12, fontWeight: '700' },
   addMedia: { width: 60, height: 60, borderRadius: 10, borderWidth: 1, borderStyle: 'dashed', alignItems: 'center', justifyContent: 'center' },
 });

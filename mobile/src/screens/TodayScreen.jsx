@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef } from 'react';
-import { View, Text, StyleSheet, Pressable, ActivityIndicator, Share, Alert, Platform, KeyboardAvoidingView, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, Pressable, ActivityIndicator, Share, Alert, Platform, KeyboardAvoidingView, ScrollView, ImageBackground } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTheme } from '../context/ThemeContext';
 import { useAuth } from '../context/AuthContext';
@@ -102,7 +102,8 @@ export default function TodayScreen({ navigation }) {
     );
   }
 
-  return (
+    return (
+    <ImageBackground source={require('../../assets/placeholder.png')} style={{ flex: 1 }} resizeMode="cover">
     <SafeAreaView style={[styles.wrap, { backgroundColor: 'transparent' }]} edges={['top']}>
       <ScrollView
         ref={scrollRef}
@@ -117,13 +118,13 @@ export default function TodayScreen({ navigation }) {
 
         <View style={styles.greet}>
           <View style={{ alignItems: 'center' }}>
-            <Text style={[styles.hello, { color: colors.accent }]}>{'Peace\u2009&\u2009love'}</Text>
-            <Text style={[styles.name, { color: colors.ink }]}>{user?.name}</Text>
+            <Text style={[styles.hello, { color: '#fff' }]}>{'Peace\u2009&\u2009love'}</Text>
+            <Text style={[styles.name, { color: '#fff' }]}>{user?.name}</Text>
           </View>
 
           <TypewriterText
             key={revealed ? 'revealed-message' : 'opening-message'}
-            style={[styles.sub, { color: colors.muted, textAlign: 'center' }]}
+            style={[styles.sub, {  color: '#fff' , textAlign: 'center' }]}
             text={
               revealed
                 ? 'Take it with you today.'
@@ -190,6 +191,7 @@ export default function TodayScreen({ navigation }) {
         )}
       </ScrollView>
     </SafeAreaView>
+    </ImageBackground>
   );
 }
 

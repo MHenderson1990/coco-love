@@ -1,7 +1,8 @@
 import { useRef } from 'react';
-import { View, Text, StyleSheet, Animated, PanResponder, Dimensions, ImageBackground } from 'react-native';
+import { View, Text, StyleSheet, Animated, PanResponder, Dimensions } from 'react-native';
 import { useTheme } from '../context/ThemeContext';
 import RichText from './RichText';
+import { BlurView } from 'expo-blur';
 
 export default function RevealCard({ text, revealed, onReveal, compact }) {
   let { colors } = useTheme();
@@ -41,7 +42,7 @@ export default function RevealCard({ text, revealed, onReveal, compact }) {
     <View style={[styles.card, compact && { minHeight: 130, paddingVertical: 20 }]}>
       <RichText
         text={text}
-        style={[styles.affirm, { color: '#1A1A1A' }]}
+        style={[styles.affirm, { color: '#fff' }]}
       />
 
       {!revealed && (
@@ -49,15 +50,11 @@ export default function RevealCard({ text, revealed, onReveal, compact }) {
           {...panResponder.panHandlers}
           style={[styles.veil, { transform: [{ translateY }] }]}
         >
-          <ImageBackground
-            source={require('../../assets/paper-bg.jpg')}
-            style={styles.veilPaper}
-            resizeMode="cover"
-          >
-            <Text style={[styles.chev, { color: '#5A5A5A' }]}>⌃</Text>
-            <Text style={[styles.veilText, { color: '#5A5A5A' }]}>SWIPE UP TO REVEAL</Text>
-            <View style={[styles.grip, { backgroundColor: '#9A9A9A' }]} />
-          </ImageBackground>
+          <BlurView intensity={40} tint="dark" style={styles.veilBlur}>
+            <Text style={[styles.chev, { color: '#fff' }]}>⌃</Text>
+            <Text style={[styles.veilText, { color: '#fff' }]}>SWIPE UP TO REVEAL</Text>
+            <View style={[styles.grip, { backgroundColor: '#fff' }]} />
+          </BlurView>
         </Animated.View>
       )}
     </View>
@@ -71,8 +68,8 @@ let styles = StyleSheet.create({
     paddingHorizontal: 24, paddingVertical: 28,
   },
   affirm: { fontSize: 20, lineHeight: 35, textAlign: 'center', fontFamily: 'PlaywriteGBS_400Regular' },
-  veil: { ...StyleSheet.absoluteFillObject },
-  veilPaper: { flex: 1, width: '100%', alignItems: 'center', justifyContent: 'center', gap: 12 },
+  veil: { ...StyleSheet.absoluteFillObject, borderRadius: 22, overflow: 'hidden' },
+  veilBlur: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: 12 },
   chev: { fontSize: 28, opacity: 0.5, marginBottom: -8 },
   veilText: { fontSize: 11.5, fontWeight: '600', letterSpacing: 1.4, opacity: 0.62 },
   grip: { position: 'absolute', bottom: 16, width: 38, height: 4, borderRadius: 100, opacity: 0.16 },
