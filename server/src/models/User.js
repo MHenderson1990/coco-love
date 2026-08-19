@@ -22,7 +22,7 @@ const userSchema = new mongoose.Schema({
     colorPalette: { type: String, enum: ['green', 'blue', 'pink', 'purple'], default: 'purple' },
   },
 
-  pushToken:            { type: String },
+  pushToken:            { type: String, default: null },
   notificationsEnabled: { type: Boolean, default: true },
   notificationTime:     { type: String, default: '11:11' },
   resetCodeHash:        { type: String },

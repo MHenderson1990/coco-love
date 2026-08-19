@@ -26,6 +26,7 @@ import { PassionsConflict_400Regular } from '@expo-google-fonts/passions-conflic
 import { PlaywriteGBS_400Regular } from '@expo-google-fonts/playwrite-gb-s';
 import { PlayfairDisplay_400Regular, PlayfairDisplay_500Medium } from '@expo-google-fonts/playfair-display';
 import EngagementScreen from './src/screens/EngagementScreen';
+import { usePushToken } from './src/hooks/usePushToken';
 
 let Stack = createNativeStackNavigator();
 
@@ -48,6 +49,8 @@ function Root() {
     PlaywriteGBS_400Regular,
     PlayfairDisplay_400Regular, PlayfairDisplay_500Medium,
   });
+
+  usePushToken(user); // ← registers for push once the app is up
 
   if (loading || !fontsLoaded) {
     return <LoadingScreen />;
