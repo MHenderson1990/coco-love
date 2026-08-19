@@ -35,6 +35,7 @@ exports.updateMe = async (req, res) => {
         { pushToken, _id: { $ne: req.user.id } },
         { $unset: { pushToken: '' } }
       );
+      updates.pushToken = pushToken; // ← actually save it on the current user
     }
     if (notificationsEnabled !== undefined) updates.notificationsEnabled = notificationsEnabled;
 
