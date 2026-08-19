@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { View, Text, TextInput, Pressable, StyleSheet, LayoutAnimation, Platform, UIManager } from 'react-native';
 import { useTheme } from '../context/ThemeContext';
 import * as journalApi from '../api/journal';
+import { BlurView } from 'expo-blur';
 
 if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
   UIManager.setLayoutAnimationEnabledExperimental(true);
@@ -41,17 +42,17 @@ export default function JournalDrawer({ affirmationId, onOpenChange }) {
   }
 
   return (
-    <View style={[styles.wrap, { backgroundColor: 'rgba(255,255,255,0.4)', borderColor: colors.line }]}>
+    <BlurView intensity={30} tint="dark" style={styles.wrap}>
       <Pressable style={styles.head} onPress={toggle}>
-        <Text style={[styles.headText, { color: colors.ink }]}>
+        <Text style={[styles.headText, { color: '#fff' }]}>
           {saved ? 'Entry saved' : 'Add to your journal'}
         </Text>
-        <Text style={[styles.chev, { color: colors.muted }]}>{open ? '⌃' : '⌄'}</Text>
+        <Text style={[styles.chev, { color: 'rgba(255,255,255,0.8)' }]}>{open ? '⌃' : '⌄'}</Text>
       </Pressable>
 
       {open && (
-        <View style={[styles.body, { borderTopColor: colors.line }]}>
-          <Text style={[styles.label, { color: colors.muted }]}>HOW ARE YOU FEELING?</Text>
+        <View style={[styles.body, { borderTopColor: 'rgba(255,255,255,0.15)' }]}>
+          <Text style={[styles.label, { color: 'rgba(255,255,255,0.8)' }]}>HOW ARE YOU FEELING?</Text>
           <View style={styles.moods}>
             {MOODS.map((m) => (
               <Pressable
@@ -68,7 +69,7 @@ export default function JournalDrawer({ affirmationId, onOpenChange }) {
             ))}
           </View>
 
-          <Text style={[styles.label, { color: colors.muted }]}>WRITE IT DOWN</Text>
+          <Text style={[styles.label, { color: 'rgba(255,255,255,0.8)' }]}>WRITE IT DOWN</Text>
           <TextInput
             style={[styles.input, { backgroundColor: colors.bg, color: colors.ink }]}
             placeholder="What's on your mind today?"
@@ -92,12 +93,12 @@ export default function JournalDrawer({ affirmationId, onOpenChange }) {
           </Pressable>
         </View>
       )}
-    </View>
+    </BlurView>
   );
 }
 
 let styles = StyleSheet.create({
-  wrap: { borderWidth: 1, borderRadius: 16, marginTop: 10, overflow: 'hidden' },
+  wrap: { borderWidth: 1, borderColor: 'rgba(255,255,255,0.25)', borderRadius: 16, marginTop: 10, overflow: 'hidden' },
   head: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', padding: 15 },
   headText: { fontSize: 13, fontWeight: '600' },
   chev: { fontSize: 15 },

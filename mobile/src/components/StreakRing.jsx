@@ -1,5 +1,6 @@
 import { View, Text, StyleSheet } from 'react-native';
 import Svg, { Circle } from 'react-native-svg';
+import { BlurView } from 'expo-blur';
 import { useTheme } from '../context/ThemeContext';
 
 let MILESTONE = 30;
@@ -16,7 +17,7 @@ export default function StreakRing({ streak }) {
   let remaining = Math.max(MILESTONE - streak, 0);
 
   return (
-    <View style={[styles.wrap, { backgroundColor: 'rgba(255,255,255,0.4)', borderColor: colors.line }]}>
+    <BlurView intensity={30} tint="dark" style={styles.wrap}>
       <Svg width={SIZE} height={SIZE}>
         <Circle
           cx={SIZE / 2} cy={SIZE / 2} r={radius}
@@ -32,21 +33,22 @@ export default function StreakRing({ streak }) {
         />
       </Svg>
       <View style={styles.text}>
-        <Text style={[styles.count, { color: colors.ink }]}>
+        <Text style={[styles.count, { color: '#fff' }]}>
           {streak} {streak === 1 ? 'day' : 'days'}
         </Text>
-        <Text style={[styles.label, { color: colors.muted }]}>
+        <Text style={[styles.label, { color: 'rgba(255,255,255,0.75)' }]}>
           {remaining > 0 ? `${remaining} to your reward` : 'Reward unlocked'}
         </Text>
       </View>
-    </View>
+    </BlurView>
   );
 }
 
 let styles = StyleSheet.create({
   wrap: {
     flexDirection: 'row', alignItems: 'center', gap: 10,
-    alignSelf: 'flex-start', borderWidth: 1, borderRadius: 100,
+    alignSelf: 'flex-start', borderWidth: 1, borderColor: 'rgba(255,255,255,0.25)',
+    borderRadius: 100, overflow: 'hidden',
     paddingVertical: 8, paddingLeft: 10, paddingRight: 16,
   },
   text: { gap: 1 },

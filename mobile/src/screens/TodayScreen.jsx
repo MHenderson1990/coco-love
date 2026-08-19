@@ -12,6 +12,7 @@ import * as feedbackApi from '../api/feedback';
 import JournalDrawer from '../components/JournalDrawer';
 import AnnouncementBanner from '../components/AnnouncementBanner';
 import TypewriterText from '../components/TypewriterText';
+import { BlurView } from 'expo-blur';
 
 
 export default function TodayScreen({ navigation }) {
@@ -151,30 +152,22 @@ export default function TodayScreen({ navigation }) {
         {revealed && (
           <>
             <View style={styles.actions}>
-              <Pressable
-                style={[
-                  styles.act,
-                  { backgroundColor: saved ? colors.accentSoft : 'rgba(255,255,255,0.4)', borderColor: saved ? colors.accent : colors.line },
-                ]}
-                onPress={handleSave}
-              >
-                <Text style={[styles.actText, { color: saved ? colors.accent : colors.muted }]}>
-                  {saved ? 'Saved' : 'Save'}
-                </Text>
+              <Pressable style={styles.actWrap} onPress={handleSave}>
+                <BlurView intensity={30} tint="dark" style={[styles.act, saved && styles.actSaved]}>
+                  <Text style={[styles.actText, { color: '#fff' }]}>{saved ? 'Saved' : 'Save'}</Text>
+                </BlurView>
               </Pressable>
 
-              <Pressable
-                style={[styles.act, { backgroundColor: 'rgba(255,255,255,0.4)', borderColor: colors.line }]}
-                onPress={handleShare}
-              >
-                <Text style={[styles.actText, { color: colors.muted }]}>Share</Text>
+              <Pressable style={styles.actWrap} onPress={handleShare}>
+                <BlurView intensity={30} tint="dark" style={styles.act}>
+                  <Text style={[styles.actText, { color: '#fff' }]}>Share</Text>
+                </BlurView>
               </Pressable>
 
-              <Pressable
-                style={[styles.act, { backgroundColor: 'rgba(255,255,255,0.4)', borderColor: colors.line }]}
-                onPress={() => handleFeedback('more')}
-              >
-                <Text style={[styles.actText, { color: colors.muted }]}>More like this</Text>
+              <Pressable style={styles.actWrap} onPress={() => handleFeedback('more')}>
+                <BlurView intensity={30} tint="dark" style={styles.act}>
+                  <Text style={[styles.actText, { color: '#fff' }]}>More like this</Text>
+                </BlurView>
               </Pressable>
             </View>
 
@@ -206,6 +199,9 @@ let styles = StyleSheet.create({
   sub: { fontSize: 15, fontFamily: 'PlayfairDisplay_400Regular' },
   errorBox: { minHeight: 260, marginTop: 16, borderRadius: 22, borderWidth: 1, alignItems: 'center', justifyContent: 'center', padding: 24 },
   actions: { flexDirection: 'row', gap: 8, marginTop: 14 },
-  act: { flex: 1, borderWidth: 1, borderRadius: 14, paddingVertical: 13, alignItems: 'center' },
+  actWrap: { flex: 1, borderRadius: 14, overflow: 'hidden' },
+  act: { paddingVertical: 13, alignItems: 'center', justifyContent: 'center' },
+  actSaved: { backgroundColor: 'rgba(255,255,255,0.22)' },
+  actText: { fontSize: 11, fontWeight: '600' },
   actText: { fontSize: 11, fontWeight: '600' },
 });
