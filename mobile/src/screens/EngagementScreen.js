@@ -5,11 +5,13 @@ import { useFocusEffect } from '@react-navigation/native';
 import { useTheme } from '../context/ThemeContext';
 import RichText from '../components/RichText';
 import * as adminApi from '../api/admin';
+import MonthFilter from '../components/MonthFilter';
 
 export default function EngagementScreen({ navigation }) {
   let { colors } = useTheme();
   let [items, setItems] = useState([]);
   let [loading, setLoading] = useState(true);
+  let [month, setMonth] = useState(null); // null = all time
 
   let load = useCallback(() => {
   let active = true;
@@ -45,6 +47,15 @@ export default function EngagementScreen({ navigation }) {
 
   useFocusEffect(load);
 
+
+    let shown = month
+    ? items.filter((a) => {
+        if (!a.scheduledDate) return false;
+        let d = new Date(a.scheduledDate);
+        return d.getUTCFullYear() === month.getFullYear() && d.getUTCMonth() === month.getMonth();
+      })
+    : items;
+
   return (
     <SafeAreaView style={[styles.wrap, { backgroundColor: 'transparent' }]} edges={['top']}>
       <Pressable onPress={() => navigation.goBack()}>
@@ -53,11 +64,13 @@ export default function EngagementScreen({ navigation }) {
       <Text style={[styles.title, { color: colors.ink }]}>Who's loving what</Text>
       <Text style={[styles.sub, { color: colors.muted }]}>Tap a message to see who saved it. Most-saved first.</Text>
 
+      <MonthFilter value={month} onChange={setMonth} />
+
       {loading ? (
         <ActivityIndicator color={colors.accent} style={{ marginTop: 40 }} />
       ) : (
         <FlatList
-          data={items}
+          data={shown}
           keyExtractor={(item) => item._id}
           contentContainerStyle={styles.list}
           ListEmptyComponent={<Text style={[styles.empty, { color: colors.muted }]}>No messages yet.</Text>}
