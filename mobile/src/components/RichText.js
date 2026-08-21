@@ -19,7 +19,7 @@ function parseRich(input) {
 export default function RichText({ text, style, fonts, numberOfLines }) {
   let runs = parseRich(text || '');
   return (
-    <Text style={style} numberOfLines={numberOfLines}>
+    <Text style={style} numberOfLines={numberOfLines} selectable>
       {runs.map((r, i) => {
         let s = null;
         if (r.s === 'bold') s = fonts?.bold ? { fontFamily: fonts.bold } : { fontWeight: '700' };
