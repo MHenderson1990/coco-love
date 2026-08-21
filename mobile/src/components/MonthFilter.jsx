@@ -4,7 +4,7 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 import { useTheme } from '../context/ThemeContext';
 
 export default function MonthFilter({ value, onChange }) {
-  let { colors } = useTheme();
+  let { colors, mode } = useTheme();
   let [open, setOpen] = useState(false);
   let [temp, setTemp] = useState(value || new Date());
 
@@ -46,6 +46,7 @@ export default function MonthFilter({ value, onChange }) {
             value={temp}
             mode="date"
             display={Platform.OS === 'ios' ? 'spinner' : 'default'}
+            themeVariant={mode === 'dark' ? 'dark' : 'light'}
             onChange={(e, sel) => { if (sel) setTemp(sel); }}
           />
         </View>

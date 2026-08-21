@@ -132,7 +132,7 @@ export default function ProfileScreen({ navigation }) {
                     mode="time"
                     display={Platform.OS === 'ios' ? 'spinner' : 'default'}
                     onChange={onTimeChange}
-                    themeVariant={colors.bg === '#171422' ? 'dark' : 'light'}
+                    themeVariant={mode === 'dark' ? 'dark' : 'light'}
                   />
                   {Platform.OS === 'ios' && (
                     <Pressable style={styles.doneBtn} onPress={() => setShowTimePicker(false)}>

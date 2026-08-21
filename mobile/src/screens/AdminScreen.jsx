@@ -189,6 +189,7 @@ function Stat({ label, value, colors }) {
 }
 
 function AffirmationModal({ visible, onClose, onSaved, colors }) {
+  let { mode } = useTheme();
   let [text, setText] = useState('');
   let [date, setDate] = useState(new Date());
   let [showPicker, setShowPicker] = useState(false);
@@ -288,6 +289,7 @@ function AffirmationModal({ visible, onClose, onSaved, colors }) {
             value={date}
             mode="date"
             display={Platform.OS === 'ios' ? 'spinner' : 'default'}
+            themeVariant={mode === 'dark' ? 'dark' : 'light'}
             onChange={(e, selected) => {
               if (Platform.OS === 'android') setShowPicker(false);
               if (selected) setDate(selected);
