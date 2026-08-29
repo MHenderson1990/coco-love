@@ -210,3 +210,22 @@ exports.userFavorites = async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 };
+
+// GET /api/admin/users?search=  (admin) — name/email search for the personalize-message picker
+exports.searchUsers = async (req, res) => {
+  try {
+    let { search } = req.query;
+    let query = {};
+    if (search) {
+      let re = new RegExp(search.trim(), 'i');
+      query = { $or: [{ name: re }, { email: re }] };
+    }
+    let users = await User.find(query)
+      .select('name email')
+      .sort({ name: 1 })
+      .limit(20);
+    res.json({ users });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
