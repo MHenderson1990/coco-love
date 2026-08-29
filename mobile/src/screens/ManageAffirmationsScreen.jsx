@@ -117,7 +117,14 @@ export default function ManageAffirmationsScreen({ navigation }) {
               onPress={() => setEditing(item)}
               onLongPress={() => confirmDelete(item)}
             >
-              <Text style={[styles.date, { color: colors.accent }]}>{label(item.scheduledDate).toUpperCase()}</Text>
+              <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 7 }}>
+                <Text style={[styles.date, { color: colors.accent, marginBottom: 0 }]}>{label(item.scheduledDate).toUpperCase()}</Text>
+                {item.targetUser ? (
+                  <View style={{ backgroundColor: colors.accentSoft, borderRadius: 100, paddingHorizontal: 8, paddingVertical: 3 }}>
+                    <Text style={{ color: colors.accent, fontSize: 10, fontWeight: '700' }}>{item.targetUser.name}</Text>
+                  </View>
+                ) : null}
+              </View>
               <Text style={[styles.text, { color: colors.ink }]}>{item.text}</Text>
             </Pressable>
           )}
