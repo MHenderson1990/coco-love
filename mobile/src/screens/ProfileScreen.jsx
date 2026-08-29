@@ -7,6 +7,8 @@ import { useAuth } from '../context/AuthContext';
 import { PALETTES, PALETTE_KEYS, BACKGROUNDS } from '../theme/palettes';
 import { usePushToken } from '../hooks/usePushToken';
 import { updateMe } from '../api/user';
+import { PHOTOS, PHOTO_KEYS } from '../theme/photos';
+import { Image } from 'react-native';
 
 function timeStringToDate(hhmm) {
   let [h, m] = (hhmm || '11:11').split(':').map(Number);
@@ -26,7 +28,7 @@ function formatTimeDisplay(hhmm) {
 }
 
 export default function ProfileScreen({ navigation }) {
-  let { colors, palette, setPalette, mode, setMode, background, setBackground } = useTheme();
+  let { colors, palette, setPalette, mode, setMode, background, setBackground, todayPhoto, setTodayPhoto } = useTheme();
   let { user, logout } = useAuth();
   let { expoPushToken, error: pushError } = usePushToken();
 
@@ -104,7 +106,24 @@ export default function ProfileScreen({ navigation }) {
           </View>
         </View>
 
-        
+        <View style={[styles.card, { backgroundColor: colors.surface, borderColor: colors.line }]}>
+          <Text style={[styles.label, { color: colors.ink }]}>Today photo</Text>
+          <View style={styles.photoRow}>
+            {PHOTO_KEYS.map((key) => (
+              <Pressable
+                key={key}
+                onPress={() => setTodayPhoto(key)}
+                style={[
+                  styles.photoSwatch,
+                  { borderColor: colors.line },
+                  todayPhoto === key && { borderWidth: 3, borderColor: colors.ink },
+                ]}
+              >
+                <Image source={PHOTOS[key]} style={styles.photoImg} resizeMode="cover" />
+              </Pressable>
+            ))}
+          </View>
+        </View>
 
         <View style={[styles.card, { backgroundColor: colors.surface, borderColor: colors.line }]}>
           <View style={styles.row}>
@@ -233,4 +252,7 @@ let styles = StyleSheet.create({
   signout: { borderWidth: 1, borderRadius: 14, paddingVertical: 15, alignItems: 'center', marginTop: 12 },
   signoutText: { fontSize: 14, fontWeight: '700' },
   bgSwatch: { width: 44, height: 56, borderRadius: 10, borderWidth: 1 },
+  photoRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 10, marginTop: 12 },
+  photoSwatch: { width: 64, height: 64, borderRadius: 12, borderWidth: 1, overflow: 'hidden' },
+  photoImg: { width: '100%', height: '100%' },
 });

@@ -13,10 +13,11 @@ import JournalDrawer from '../components/JournalDrawer';
 import AnnouncementBanner from '../components/AnnouncementBanner';
 import TypewriterText from '../components/TypewriterText';
 import { BlurView } from 'expo-blur';
+import { PHOTOS } from '../theme/photos';
 
 
 export default function TodayScreen({ navigation }) {
-  let { colors, background } = useTheme();
+  let { colors, background, todayPhoto } = useTheme();
   let { user } = useAuth();
 
   let [affirmation, setAffirmation] = useState(null);
@@ -104,7 +105,7 @@ export default function TodayScreen({ navigation }) {
   }
 
     return (
-    <ImageBackground source={require('../../assets/placeholder.png')} style={{ flex: 1 }} resizeMode="cover">
+    <ImageBackground source={PHOTOS[todayPhoto] || PHOTOS.default} style={{ flex: 1 }} resizeMode="cover">
     <SafeAreaView style={[styles.wrap, { backgroundColor: 'transparent' }]} edges={['top']}>
       <ScrollView
         ref={scrollRef}
