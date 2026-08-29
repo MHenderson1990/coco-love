@@ -157,6 +157,7 @@ exports.getPromo = async (req, res) => {
 exports.affirmationEngagement = async (req, res) => {
   try {
     let results = await Affirmation.aggregate([
+      { $match: { targetUser: null } },
       { $lookup: { from: 'favorites', localField: '_id', foreignField: 'affirmation', as: 'favorites' } },
       { $lookup: { from: 'feedbacks', localField: '_id', foreignField: 'affirmation', as: 'feedback' } },
       {
