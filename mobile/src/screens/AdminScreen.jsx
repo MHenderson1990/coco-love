@@ -2,6 +2,7 @@ import { useCallback, useState, useEffect } from 'react';
 import {
   View, Text, StyleSheet, ScrollView, Pressable, TextInput,
   ActivityIndicator, Modal, Linking, Platform, KeyboardAvoidingView, Alert,
+  Switch, FlatList,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useFocusEffect } from '@react-navigation/native';
@@ -196,6 +197,43 @@ function AffirmationModal({ visible, onClose, onSaved, colors }) {
   let [busy, setBusy] = useState(false);
   let [error, setError] = useState('');
   let [selection, setSelection] = useState({ start: 0, end: 0 });
+  let [personalize, setPersonalize] = useState(false);
+  let [userQuery, setUserQuery] = useState('');
+  let [userResults, setUserResults] = useState([]);
+  let [selectedUser, setSelectedUser] = useState(null);
+  let [likedAffirmations, setLikedAffirmations] = useState([]);
+  let [searching, setSearching] = useState(false);
+
+  useEffect(() => {
+    if (!personalize || !userQuery.trim()) {
+      setUserResults([]);
+      return;
+    }
+    let handle = setTimeout(async () => {
+      setSearching(true);
+      try {
+        let results = await adminApi.searchUsers(userQuery.trim());
+        setUserResults(results);
+      } catch (err) {
+        setUserResults([]);
+      } finally {
+        setSearching(false);
+      }
+    }, 300);
+    return () => clearTimeout(handle);
+  }, [userQuery, personalize]);
+
+  async function selectUser(user) {
+    setSelectedUser(user);
+    setUserResults([]);
+    setUserQuery('');
+    try {
+      let liked = await adminApi.getUserFavorites(user._id);
+      setLikedAffirmations(liked);
+    } catch (err) {
+      setLikedAffirmations([]);
+    }
+  }
 
   function wrap(marker) {
     let { start, end } = selection;
@@ -223,12 +261,24 @@ function AffirmationModal({ visible, onClose, onSaved, colors }) {
       console.log('PICKED DATE OBJECT:', date);
       console.log('DATE ONLY BEING SENT:', dateOnly);
 
-      await adminApi.createAffirmation(text.trim(), dateOnly);
+      if (personalize && !selectedUser) {
+        setError('Pick a user to personalize for, or turn personalize off.');
+        setBusy(false);
+        return;
+      }
+
+      let savedForName = personalize ? selectedUser.name : null;
+
+      await adminApi.createAffirmation(text.trim(), dateOnly, undefined, personalize ? selectedUser._id : null);
       setText('');
       setDate(new Date());
+      setPersonalize(false);
+      setSelectedUser(null);
+      setLikedAffirmations([]);
       onSaved?.();
       onClose();
-      Alert.alert('Saved', 'Your message is scheduled.');
+      Alert.alert('Saved', savedForName ? `Personalized message scheduled for ${savedForName}.` : 'Your message is scheduled.');
+
     } catch (err) {
       setError(err.response?.data?.error || 'Could not save. Try again.');
     } finally {
@@ -271,6 +321,68 @@ function AffirmationModal({ visible, onClose, onSaved, colors }) {
         <View style={[styles.preview, { borderColor: colors.line }]}>
           <Text style={[styles.previewLabel, { color: colors.muted }]}>PREVIEW</Text>
           <RichText style={{ color: colors.ink, fontSize: 15, lineHeight: 22 }} text={text} />
+        </View>
+      ) : null}
+
+      <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+        <Text style={{ color: colors.ink, fontSize: 14 }}>Personalize for a user</Text>
+        <Switch
+          value={personalize}
+          onValueChange={(val) => {
+            setPersonalize(val);
+            if (!val) {
+              setSelectedUser(null);
+              setLikedAffirmations([]);
+              setUserQuery('');
+              setUserResults([]);
+            }
+          }}
+        />
+      </View>
+
+      {personalize && !selectedUser ? (
+        <View style={{ marginBottom: 12 }}>
+          <TextInput
+            style={[styles.input, { backgroundColor: colors.bg, color: colors.ink }]}
+            placeholder="Search by name or email"
+            placeholderTextColor={colors.muted}
+            value={userQuery}
+            onChangeText={setUserQuery}
+          />
+          {searching ? <ActivityIndicator color={colors.accent} /> : null}
+          {userResults.map((u) => (
+            <Pressable
+              key={u._id}
+              style={{ paddingVertical: 10, borderBottomWidth: StyleSheet.hairlineWidth, borderColor: colors.line }}
+              onPress={() => selectUser(u)}
+            >
+              <Text style={{ color: colors.ink }}>{u.name}</Text>
+              <Text style={{ color: colors.muted, fontSize: 12 }}>{u.email}</Text>
+            </Pressable>
+          ))}
+        </View>
+      ) : null}
+
+      {personalize && selectedUser ? (
+        <View style={{ borderWidth: 1, borderColor: colors.line, borderRadius: 12, padding: 12, marginBottom: 12 }}>
+          <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+            <Text style={{ color: colors.ink, fontWeight: '700' }}>{selectedUser.name}</Text>
+            <Pressable onPress={() => { setSelectedUser(null); setLikedAffirmations([]); }}>
+              <Text style={{ color: colors.accent }}>Change</Text>
+            </Pressable>
+          </View>
+          {likedAffirmations.length > 0 ? (
+            <View style={{ marginTop: 8 }}>
+              <Text style={{ color: colors.muted, fontSize: 12, marginBottom: 4 }}>THEY'VE LIKED</Text>
+              {likedAffirmations.slice(0, 5).map((a) => (
+                <Text key={a.affirmationId} style={{ color: colors.ink, fontSize: 13, marginBottom: 4 }} numberOfLines={2}>
+                  • {a.text}
+                </Text>
+              ))}
+            </View>
+          ) : (
+            <Text style={{ color: colors.muted, fontSize: 12, marginTop: 8 }}>No liked messages yet.</Text>
+          )}
         </View>
       ) : null}
 

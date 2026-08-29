@@ -24,7 +24,7 @@ exports.getToday = async (req, res) => {
 
     let affirmation = await Affirmation.findOne({
       scheduledDate: { $gte: start, $lt: end },
-      targetUser: req.user._id,
+      targetUser: req.user.id,
     });
 
     if (!affirmation) {
