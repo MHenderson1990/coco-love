@@ -20,6 +20,7 @@ const userSchema = new mongoose.Schema({
     theme:        { type: String, enum: ['light', 'dark'], default: 'light' },
     background:   { type: String, default: 'default' },
     colorPalette: { type: String, enum: ['green', 'blue', 'pink', 'purple'], default: 'purple' },
+    todayPhoto: { type: String, default: 'default' },
   },
 
   pushToken:            { type: String, default: null },

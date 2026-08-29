@@ -51,6 +51,7 @@ exports.updateMe = async (req, res) => {
       if (preferences.theme !== undefined) updates['preferences.theme'] = preferences.theme;
       if (preferences.background !== undefined) updates['preferences.background'] = preferences.background;
       if (preferences.colorPalette !== undefined) updates['preferences.colorPalette'] = preferences.colorPalette;
+      if (preferences.todayPhoto !== undefined) updates['preferences.todayPhoto'] = preferences.todayPhoto;
     }
 
     let user = await User.findByIdAndUpdate(req.user.id, updates, {
