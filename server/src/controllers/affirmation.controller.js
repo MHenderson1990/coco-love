@@ -22,14 +22,23 @@ exports.getToday = async (req, res) => {
     let start = dayAnchor(new Date());
     let end = new Date(start.getTime() + 86400000);
 
-    const affirmation = await Affirmation.findOne({
+    let affirmation = await Affirmation.findOne({
       scheduledDate: { $gte: start, $lt: end },
+      targetUser: req.user._id,
     });
+
+    if (!affirmation) {
+      affirmation = await Affirmation.findOne({
+        scheduledDate: { $gte: start, $lt: end },
+        targetUser: null,
+      });
+    }
 
     if (!affirmation) {
       return res.status(404).json({ error: 'No affirmation scheduled for today' });
     }
     res.json({ affirmation });
+
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -51,7 +60,7 @@ exports.getHistory = async (req, res) => {
 // POST /api/affirmations  (admin)
 exports.create = async (req, res) => {
   try {
-    let { text, scheduledDate, tags } = req.body;
+    let { text, scheduledDate, tags, targetUser } = req.body;
 
 if (!text || !scheduledDate) {
   return res.status(400).json({ error: 'text and scheduledDate are required' });
@@ -66,7 +75,8 @@ console.log('DATE ISO being saved:', date.toISOString());
 let affirmation = await Affirmation.create({
   text,
   scheduledDate: date,
-  tags
+  tags,
+  targetUser: targetUser || null,
 });
 
     res.status(201).json({ affirmation });
@@ -84,10 +94,11 @@ let affirmation = await Affirmation.create({
 // PATCH /api/affirmations/:id  (admin)
 exports.update = async (req, res) => {
   try {
-    let { text, scheduledDate, tags } = req.body;
+    let { text, scheduledDate, tags, targetUser } = req.body;
     let updates = {};
     if (text !== undefined) updates.text = text;
     if (tags !== undefined) updates.tags = tags;
+    if (targetUser !== undefined) updates.targetUser = targetUser || null;
     if (scheduledDate !== undefined) {
       updates.scheduledDate = scheduledDateAnchor(scheduledDate);
     }
