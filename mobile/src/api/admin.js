@@ -10,8 +10,8 @@ export async function getTopAffirmations() {
   return res.data.affirmations;
 }
 
-export async function createAffirmation(text, scheduledDate, tags) {
-  let res = await client.post('/affirmations', { text, scheduledDate, tags });
+export async function createAffirmation(text, scheduledDate, tags, targetUser) {
+  let res = await client.post('/affirmations', { text, scheduledDate, tags, targetUser });
   return res.data.affirmation;
 }
 
@@ -51,8 +51,8 @@ export async function listAllAffirmations() {
   return res.data.affirmations;
 }
 
-export async function updateAffirmation(id, text, scheduledDate) {
-  let res = await client.patch(`/affirmations/${id}`, { text, scheduledDate });
+export async function updateAffirmation(id, text, scheduledDate, targetUser) {
+  let res = await client.patch(`/affirmations/${id}`, { text, scheduledDate, targetUser });
   return res.data.affirmation;
 }
 
@@ -78,4 +78,14 @@ export async function getEngagement() {
 export async function getSavers(id) {
   let res = await client.get(`/admin/affirmations/${id}/savers`);
   return res.data.savers;
+}
+
+export async function searchUsers(search) {
+  let res = await client.get('/admin/users', { params: { search } });
+  return res.data.users;
+}
+
+export async function getUserFavorites(userId) {
+  let res = await client.get(`/admin/users/${userId}/favorites`);
+  return res.data.liked;
 }
