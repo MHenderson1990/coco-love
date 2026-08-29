@@ -189,3 +189,23 @@ exports.affirmationSavers = async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 };
+
+// GET /api/admin/users/:id/favorites  (admin) — that user's liked affirmations, for composing a personalized message
+exports.userFavorites = async (req, res) => {
+  try {
+    let favorites = await Favorite.find({ user: req.params.id })
+      .populate('affirmation', 'text scheduledDate')
+      .sort({ createdAt: -1 });
+    let liked = favorites
+      .filter((f) => f.affirmation)      // guard against deleted affirmations
+      .map((f) => ({
+        affirmationId: f.affirmation._id,
+        text: f.affirmation.text,
+        scheduledDate: f.affirmation.scheduledDate,
+        savedAt: f.createdAt,
+      }));
+    res.json({ liked });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
