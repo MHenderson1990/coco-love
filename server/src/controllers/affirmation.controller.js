@@ -135,7 +135,9 @@ exports.remove = async (req, res) => {
 // GET /api/affirmations/all  (admin) — includes future ones
 exports.listAll = async (req, res) => {
   try {
-    let affirmations = await Affirmation.find().sort({ scheduledDate: -1 });
+    let affirmations = await Affirmation.find()
+      .populate('targetUser', 'name')
+      .sort({ scheduledDate: -1 });
     res.json({ affirmations });
   } catch (err) {
     res.status(500).json({ error: err.message });
