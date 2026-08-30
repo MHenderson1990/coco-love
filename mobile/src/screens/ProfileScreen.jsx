@@ -9,7 +9,9 @@ import { usePushToken } from '../hooks/usePushToken';
 import { updateMe } from '../api/user';
 import { PHOTOS, PHOTO_KEYS } from '../theme/photos';
 import { Image } from 'react-native';
-
+import * as ImagePicker from 'expo-image-picker';
+import * as userApi from '../api/user';
+import { ActivityIndicator } from 'react-native';
 function timeStringToDate(hhmm) {
   let [h, m] = (hhmm || '11:11').split(':').map(Number);
   let d = new Date();
@@ -35,6 +37,31 @@ export default function ProfileScreen({ navigation }) {
   let [notificationsEnabled, setNotificationsEnabled] = useState(true);
   let [notificationTime, setNotificationTime] = useState('11:11');
   let [showTimePicker, setShowTimePicker] = useState(false);
+  let [uploadingPhoto, setUploadingPhoto] = useState(false);
+
+  async function pickCustomPhoto() {
+    let perm = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (!perm.granted) {
+      return;
+    }
+
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      quality: 0.8,
+    });
+
+    if (result.canceled || !result.assets?.length) return;
+
+    setUploadingPhoto(true);
+    try {
+      let url = await userApi.uploadTodayPhoto(result.assets[0].uri);
+      await setTodayPhoto(url);
+    } catch (err) {
+      // upload failed — background stays as it was
+    } finally {
+      setUploadingPhoto(false);
+    }
+  }
 
   useEffect(() => {
     if (user) {
@@ -89,7 +116,7 @@ export default function ProfileScreen({ navigation }) {
           </View>
         </View>
 
-                <View style={[styles.card, { backgroundColor: colors.surface, borderColor: colors.line }]}>
+        <View style={[styles.card, { backgroundColor: colors.surface, borderColor: colors.line }]}>
           <Text style={[styles.label, { color: colors.ink }]}>Appearance</Text>
           <View style={[styles.toggle, { borderColor: colors.line }]}>
             {['light', 'dark'].map((m) => (
@@ -108,7 +135,7 @@ export default function ProfileScreen({ navigation }) {
 
         <View style={[styles.card, { backgroundColor: colors.surface, borderColor: colors.line }]}>
           <Text style={[styles.label, { color: colors.ink }]}>Today photo</Text>
-          <View style={styles.photoRow}>
+                    <View style={styles.photoRow}>
             {PHOTO_KEYS.map((key) => (
               <Pressable
                 key={key}
@@ -122,6 +149,32 @@ export default function ProfileScreen({ navigation }) {
                 <Image source={PHOTOS[key]} style={styles.photoImg} resizeMode="cover" />
               </Pressable>
             ))}
+
+            {todayPhoto && todayPhoto.startsWith('http') && (
+              <View
+                style={[
+                  styles.photoSwatch,
+                  { borderColor: colors.line, borderWidth: 3, borderColor: colors.ink },
+                ]}
+              >
+                <Image source={{ uri: todayPhoto }} style={styles.photoImg} resizeMode="cover" />
+              </View>
+            )}
+
+            <Pressable
+              onPress={pickCustomPhoto}
+              disabled={uploadingPhoto}
+              style={[
+                styles.photoSwatch,
+                { borderColor: colors.line, alignItems: 'center', justifyContent: 'center' },
+              ]}
+            >
+              {uploadingPhoto ? (
+                <ActivityIndicator color={colors.accent} />
+              ) : (
+                <Text style={{ color: colors.muted, fontSize: 24 }}>+</Text>
+              )}
+            </Pressable>
           </View>
         </View>
 
