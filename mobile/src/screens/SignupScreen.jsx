@@ -125,6 +125,10 @@ export default function SignupScreen({ navigation }) {
 
         {error ? <Text style={[styles.error, { color: colors.accent }]}>{error}</Text> : null}
 
+        <Text style={[styles.disclosure, { color: colors.muted }]}>
+          Coco can see which messages you've saved, so she can personalize your experience — your journal entries always stay private.
+        </Text>
+
         <Pressable
           style={[styles.button, { backgroundColor: colors.accent, opacity: busy ? 0.6 : 1 }]}
           onPress={handleSignup}
@@ -155,6 +159,7 @@ let styles = StyleSheet.create({
   pickerWrap: { borderWidth: 1, borderRadius: 14, marginBottom: 12, overflow: 'hidden' },
   doneBtn: { alignItems: 'center', paddingVertical: 12 },
   error: { fontSize: 13, marginBottom: 12 },
+  disclosure: { fontSize: 11.5, lineHeight: 16, marginBottom: 14, textAlign: 'center' },
   button: { borderRadius: 14, paddingVertical: 16, alignItems: 'center', marginTop: 8 },
   buttonText: { fontSize: 15, fontWeight: '700' },
   link: { textAlign: 'center', fontSize: 14, marginTop: 20 },
