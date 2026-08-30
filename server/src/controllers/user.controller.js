@@ -1,5 +1,11 @@
 const User = require('../models/User');
 const streakService = require('../services/streak.service');
+const crypto = require('crypto');
+const {
+  cloudinaryCloudName,
+  cloudinaryApiKey,
+  cloudinaryApiSecret,
+} = require('../config/env');
 
 exports.getMe = async (req, res) => {
   try {
@@ -16,6 +22,31 @@ exports.checkIn = async (req, res) => {
   try {
     const result = await streakService.checkIn(req.user.id);
     res.json(result);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+// GET /api/users/me/upload-signature — for uploading a custom Today-screen background photo
+exports.uploadSignature = async (req, res) => {
+  try {
+    if (!cloudinaryCloudName || !cloudinaryApiKey || !cloudinaryApiSecret) {
+      return res.status(500).json({ error: 'Cloudinary is not configured' });
+    }
+
+    let timestamp = Math.round(Date.now() / 1000);
+    let folder = `house-of-love/backgrounds/${req.user.id}`;
+
+    let toSign = `folder=${folder}&timestamp=${timestamp}${cloudinaryApiSecret}`;
+    let signature = crypto.createHash('sha1').update(toSign).digest('hex');
+
+    res.json({
+      signature,
+      timestamp,
+      folder,
+      apiKey: cloudinaryApiKey,
+      cloudName: cloudinaryCloudName,
+    });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
