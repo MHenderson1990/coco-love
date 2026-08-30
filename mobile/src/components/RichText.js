@@ -2,7 +2,7 @@ import { Text } from 'react-native';
 
 let RX = /(\*\*([^*]+)\*\*|__([^_]+)__|\*([^*]+)\*)/g;
 
-function parseRich(input) {
+export function parseRich(input) {
   let out = [], last = 0, m;
   RX.lastIndex = 0;
   while ((m = RX.exec(input)) !== null) {
