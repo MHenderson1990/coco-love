@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, Pressable, ScrollView, Switch, Platform } from 'react-native';
+import { View, Text, StyleSheet, Pressable, ScrollView, Switch, Platform, Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { useTheme } from '../context/ThemeContext';
@@ -57,7 +57,7 @@ export default function ProfileScreen({ navigation }) {
       let url = await userApi.uploadTodayPhoto(result.assets[0].uri);
       await setTodayPhoto(url);
     } catch (err) {
-      // upload failed — background stays as it was
+      Alert.alert('Upload failed', 'Try again in a moment.');
     } finally {
       setUploadingPhoto(false);
     }
