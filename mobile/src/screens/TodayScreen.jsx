@@ -17,7 +17,7 @@ import { PHOTOS } from '../theme/photos';
 
 
 export default function TodayScreen({ navigation }) {
-  let { colors, background, todayPhoto } = useTheme();
+  let { colors, background, todayPhoto, themeReady } = useTheme();
   let { user } = useAuth();
 
   let [affirmation, setAffirmation] = useState(null);
@@ -96,9 +96,9 @@ export default function TodayScreen({ navigation }) {
     }
   }
 
-  if (loading) {
+  if (loading || !themeReady) {
     return (
-      <View style={[styles.center, { backgroundColor: 'transparent' }]}>
+      <View style={[styles.center, { backgroundColor: colors.bg }]}>
         <ActivityIndicator color={colors.accent} />
       </View>
     );

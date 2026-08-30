@@ -12,7 +12,7 @@ export function ThemeProvider({ children }) {
   let [mode, setModeState] = useState('light');
   let [background, setBackgroundState] = useState('default');
   let [todayPhoto, setTodayPhotoState] = useState('default');
-
+  let [themeReady, setThemeReady] = useState(false);
   // adopt the user's saved preferences on login
   useEffect(() => {
     if (user?.preferences) {
@@ -22,6 +22,7 @@ export function ThemeProvider({ children }) {
       if (user.preferences.theme) setModeState(user.preferences.theme);
       if (user.preferences.todayPhoto && (PHOTO_KEYS.includes(user.preferences.todayPhoto) || user.preferences.todayPhoto.startsWith('http'))) {
           setTodayPhotoState(user.preferences.todayPhoto); }
+      setThemeReady(true);
     }
   }, [user?._id]);
 
@@ -64,7 +65,7 @@ export function ThemeProvider({ children }) {
   let colors = (PALETTES[palette] || PALETTES.purple)[mode] || PALETTES.purple.light;
 
   return (
-      <ThemeContext.Provider value={{ colors, palette, setPalette, mode, setMode, background, setBackground, todayPhoto, setTodayPhoto }}>
+    <ThemeContext.Provider value={{ colors, palette, setPalette, mode, setMode, background, setBackground, todayPhoto, setTodayPhoto, themeReady }}>
       {children}
     </ThemeContext.Provider>
   );
