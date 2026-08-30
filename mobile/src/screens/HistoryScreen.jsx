@@ -34,18 +34,21 @@ export default function HistoryScreen({ navigation }) {
 
   function formatDate(value) {
     let date = new Date(value);
-    let today = new Date();
-    today.setHours(0, 0, 0, 0);
-    let diff = Math.round((today - new Date(date).setHours(0, 0, 0, 0)) / 86400000);
+    let dateOnly = new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate()));
+
+    let now = new Date();
+    let todayOnly = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
+
+    let diff = Math.round((todayOnly - dateOnly) / 86400000);
     if (diff === 0) return 'Today';
     if (diff === 1) return 'Yesterday';
-    return date.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
+    return date.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', timeZone: 'UTC' });
   }
 
   let shown = month
     ? items.filter((e) => {
         let d = new Date(e.scheduledDate);
-        return d.getFullYear() === month.getFullYear() && d.getMonth() === month.getMonth();
+        return d.getUTCFullYear() === month.getFullYear() && d.getUTCMonth() === month.getMonth();
       })
     : items;
 
