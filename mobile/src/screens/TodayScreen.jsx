@@ -104,8 +104,12 @@ export default function TodayScreen({ navigation }) {
     );
   }
 
+    let bgSource = todayPhoto && todayPhoto.startsWith('http')
+      ? { uri: todayPhoto }
+      : (PHOTOS[todayPhoto] || PHOTOS.default);
+
     return (
-    <ImageBackground source={PHOTOS[todayPhoto] || PHOTOS.default} style={{ flex: 1 }} resizeMode="cover">
+    <ImageBackground source={bgSource} style={{ flex: 1 }} resizeMode="cover">
     <SafeAreaView style={[styles.wrap, { backgroundColor: 'transparent' }]} edges={['top']}>
       <ScrollView
         ref={scrollRef}

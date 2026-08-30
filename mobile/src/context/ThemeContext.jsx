@@ -20,7 +20,7 @@ export function ThemeProvider({ children }) {
       if (saved && PALETTES[saved]) setPaletteState(saved);
       if (user.preferences.background) setBackgroundState(user.preferences.background);
       if (user.preferences.theme) setModeState(user.preferences.theme);
-      if (user.preferences.todayPhoto && PHOTO_KEYS.includes(user.preferences.todayPhoto)) {
+      if (user.preferences.todayPhoto && (PHOTO_KEYS.includes(user.preferences.todayPhoto) || user.preferences.todayPhoto.startsWith('http'))) {
           setTodayPhotoState(user.preferences.todayPhoto); }
     }
   }, [user?._id]);
