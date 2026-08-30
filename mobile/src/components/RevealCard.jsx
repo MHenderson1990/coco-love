@@ -41,18 +41,13 @@ export default function RevealCard({ text, revealed, onReveal, compact }) {
 
   return (
     <View style={[styles.card, compact && { minHeight: 130, paddingVertical: 20 }]}>
-      {revealed ? (
+      {revealed && (
         <RichTypewriterText
           key={text}
           text={text}
           style={[styles.affirm, { color: '#fff' }]}
           delay={200}
           speed={35}
-        />
-      ) : (
-        <RichText
-          text={text}
-          style={[styles.affirm, { color: '#fff' }]}
         />
       )}
 
