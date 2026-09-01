@@ -1,0 +1,10 @@
+{
+  "type": "widget",
+  "name": "TodayWidget",
+  "colors": {
+    "$accent": "#000000"
+  },
+  "entitlements": {
+    "com.apple.security.application-groups": ["group.com.coco.houseoflove"]
+  }
+}
