@@ -9,6 +9,7 @@
     "web": "expo start --web"
   },
   "dependencies": {
+    "@bacons/apple-targets": "^5.0.0",
     "@expo-google-fonts/allison": "^0.4.2",
     "@expo-google-fonts/amatic-sc": "^0.4.2",
     "@expo-google-fonts/bebas-neue": "^0.4.1",

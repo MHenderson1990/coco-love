@@ -12,7 +12,7 @@
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
-     "ios": {
+    "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.coco.houseoflove",
       "buildNumber": "3",
@@ -34,7 +34,7 @@
     "web": {
       "favicon": "./assets/favicon.png"
     },
-    "plugins": [
+        "plugins": [
       [
       "expo-image-picker",
         {
@@ -53,8 +53,13 @@
         {
           "microphonePermission": "House of Love uses the microphone so you can record voice journal entries."
         }
+      ],
+      [
+        "@bacons/apple-targets",
+        {
+          "appleTeamId": "BV8FDM3UB2"
+        }
       ]
-      
     ],
     "extra": {
       "eas": {
