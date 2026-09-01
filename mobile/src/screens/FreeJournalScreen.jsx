@@ -16,7 +16,7 @@ import RichText from '../components/RichText';
 import VoiceNotePlayer from '../components/VoiceNotePlayer';
 
 
-let MOODS = ['🌤', '😌', '😐', '😔', '🔥'];
+let MOODS = ['🥹', '😢', '🤗', '😌', '🤬'];
 let MEDIA_ATTACHMENTS_ENABLED = false;
 
 export default function JournalScreen() {

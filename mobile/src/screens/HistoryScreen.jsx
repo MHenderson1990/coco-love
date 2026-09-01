@@ -12,7 +12,7 @@ import * as journalApi from '../api/journal';
 import MonthFilter from '../components/MonthFilter';
 import RichText from '../components/RichText';
 
-let MOODS = ['🌤', '😌', '😐', '😔', '🔥'];
+let MOODS = ['🥹', '😢', '🤗', '😌', '🤬'];
 
 export default function HistoryScreen({ navigation }) {
   let { colors } = useTheme();

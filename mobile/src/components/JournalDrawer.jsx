@@ -8,7 +8,7 @@ if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental
   UIManager.setLayoutAnimationEnabledExperimental(true);
 }
 
-let MOODS = ['🌤', '😌', '😐', '😔', '🔥'];
+let MOODS = ['🥹', '😢', '🤗', '😌', '🤬'];
 
 export default function JournalDrawer({ affirmationId, onOpenChange }) {
   let { colors } = useTheme();

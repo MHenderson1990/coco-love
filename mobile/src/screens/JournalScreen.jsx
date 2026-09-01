@@ -9,7 +9,7 @@ import { useTheme } from '../context/ThemeContext';
 import * as journalApi from '../api/journal';
 import { Ionicons } from '@expo/vector-icons';
 
-let MOODS = ['🌤', '😌', '😐', '😔', '🔥'];
+let MOODS = ['🥹', '😢', '🤗', '😌', '🤬'];
 
 export default function JournalScreen({ navigation }) {
   let { colors } = useTheme();
