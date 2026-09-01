@@ -28,15 +28,23 @@
       },
       "edgeToEdgeEnabled": true,
       "permissions": [
-        "android.permission.RECORD_AUDIO"
-      ]
+        "android.permission.RECORD_AUDIO",
+        "android.permission.USE_BIOMETRIC",
+        "android.permission.USE_FINGERPRINT",
+        "android.permission.MODIFY_AUDIO_SETTINGS",
+        "android.permission.RECORD_AUDIO",
+        "android.permission.USE_BIOMETRIC",
+        "android.permission.USE_FINGERPRINT",
+        "android.permission.MODIFY_AUDIO_SETTINGS"
+      ],
+      "package": "com.coco.houseoflove"
     },
     "web": {
       "favicon": "./assets/favicon.png"
     },
-        "plugins": [
+    "plugins": [
       [
-      "expo-image-picker",
+        "expo-image-picker",
         {
           "photosPermission": "House of Love needs access to your library so you can upload sessions."
         }
@@ -49,7 +57,7 @@
         }
       ],
       [
-    "expo-audio",
+        "expo-audio",
         {
           "microphonePermission": "House of Love uses the microphone so you can record voice journal entries."
         }
@@ -63,7 +71,24 @@
     ],
     "extra": {
       "eas": {
-        "projectId": "d70c1ebb-cfaa-406b-b627-8402c396e584"
+        "projectId": "d70c1ebb-cfaa-406b-b627-8402c396e584",
+        "build": {
+          "experimental": {
+            "ios": {
+              "appExtensions": [
+                {
+                  "bundleIdentifier": "com.coco.houseoflove.widget",
+                  "targetName": "TodayWidget",
+                  "entitlements": {
+                    "com.apple.security.application-groups": [
+                      "group.com.coco.houseoflove"
+                    ]
+                  }
+                }
+              ]
+            }
+          }
+        }
       }
     }
   }
