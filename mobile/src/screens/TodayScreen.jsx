@@ -17,6 +17,7 @@ import { PHOTOS } from '../theme/photos';
 import { ExtensionStorage } from '@bacons/apple-targets';
 
 let widgetStorage = new ExtensionStorage('group.com.coco.houseoflove');
+console.log('WIDGET DEBUG native module linked:', !!global.expo?.modules?.ExtensionStorage);
 
 
 export default function TodayScreen({ navigation }) {
@@ -39,9 +40,14 @@ export default function TodayScreen({ navigation }) {
         setAffirmation(today);
 
         let isPinned = await widgetStorage.get('widgetIsPinned');
+        console.log('WIDGET DEBUG isPinned:', isPinned);
         if (!isPinned) {
-          widgetStorage.set('widgetAffirmationText', today.text);
+          await widgetStorage.set('widgetAffirmationText', today.text);
+          console.log('WIDGET DEBUG wrote text:', today.text);
           ExtensionStorage.reloadWidget();
+          console.log('WIDGET DEBUG reload triggered');
+          let readBack = await widgetStorage.get('widgetAffirmationText');
+          console.log('WIDGET DEBUG readback:', readBack);
         }
       } catch (err) {
         setError(err.response?.data?.error || 'Could not load today\u2019s message.');
