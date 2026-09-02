@@ -62,10 +62,18 @@
           "microphonePermission": "House of Love uses the microphone so you can record voice journal entries."
         }
       ],
-      [
+            [
         "@bacons/apple-targets",
         {
           "appleTeamId": "BV8FDM3UB2"
+        }
+      ],
+      [
+        "expo-build-properties",
+        {
+          "ios": {
+            "deploymentTarget": "17.0"
+          }
         }
       ]
     ],
