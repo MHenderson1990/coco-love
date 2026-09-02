@@ -14,6 +14,9 @@ import AnnouncementBanner from '../components/AnnouncementBanner';
 import TypewriterText from '../components/TypewriterText';
 import { BlurView } from 'expo-blur';
 import { PHOTOS } from '../theme/photos';
+import { ExtensionStorage } from '@bacons/apple-targets';
+
+let widgetStorage = new ExtensionStorage('group.com.coco.houseoflove');
 
 
 export default function TodayScreen({ navigation }) {
@@ -34,6 +37,13 @@ export default function TodayScreen({ navigation }) {
       try {
         let today = await affirmationsApi.getToday();
         setAffirmation(today);
+
+        let isPinned = await widgetStorage.get('widgetIsPinned');
+        if (!isPinned) {
+          widgetStorage.set('widgetAffirmationText', today.text);
+          widgetStorage.set('widgetStreak', String(streak));
+          ExtensionStorage.reloadWidget();
+        }
       } catch (err) {
         setError(err.response?.data?.error || 'Could not load today\u2019s message.');
       } finally {
