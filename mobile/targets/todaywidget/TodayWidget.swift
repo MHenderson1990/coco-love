@@ -108,6 +108,7 @@ struct TodayWidgetEntryView: View {
   }
 }
 
+@main
 struct TodayWidget: Widget {
   let kind: String = "TodayWidget"
 
