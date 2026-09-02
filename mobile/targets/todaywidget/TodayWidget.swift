@@ -4,7 +4,6 @@ import SwiftUI
 struct AffirmationEntry: TimelineEntry {
   let date: Date
   let text: String
-  let streak: Int
   let isPinned: Bool
 }
 
@@ -12,7 +11,7 @@ struct Provider: TimelineProvider {
   let suiteName = "group.com.coco.houseoflove"
 
   func placeholder(in context: Context) -> AffirmationEntry {
-    AffirmationEntry(date: Date(), text: "Your peace is a priority, not a luxury.", streak: 0, isPinned: false)
+    AffirmationEntry(date: Date(), text: "Your peace is a priority, not a luxury.", isPinned: false)
   }
 
   func getSnapshot(in context: Context, completion: @escaping (AffirmationEntry) -> Void) {
@@ -29,9 +28,8 @@ struct Provider: TimelineProvider {
   func loadEntry() -> AffirmationEntry {
     let defaults = UserDefaults(suiteName: suiteName)
     let text = defaults?.string(forKey: "widgetAffirmationText") ?? "Your peace is a priority, not a luxury."
-    let streak = defaults?.integer(forKey: "widgetStreak") ?? 0
     let isPinned = defaults?.bool(forKey: "widgetIsPinned") ?? false
-    return AffirmationEntry(date: Date(), text: text, streak: streak, isPinned: isPinned)
+    return AffirmationEntry(date: Date(), text: text, isPinned: isPinned)
   }
 }
 
@@ -76,16 +74,10 @@ struct TodayWidgetEntryView: View {
           .lineLimit(4)
           .minimumScaleFactor(0.7)
         Spacer()
-        HStack {
-          if entry.isPinned {
-            Text("PINNED")
-              .font(.system(size: 9, weight: .bold))
-              .opacity(0.5)
-          }
-          Spacer()
-          Text("\(entry.streak) day streak")
-            .font(.system(size: 10, weight: .semibold))
-            .opacity(0.6)
+        if entry.isPinned {
+          Text("PINNED")
+            .font(.system(size: 9, weight: .bold))
+            .opacity(0.5)
         }
       }
     }
@@ -104,16 +96,10 @@ struct TodayWidgetEntryView: View {
         .lineLimit(8)
         .minimumScaleFactor(0.7)
       Spacer()
-      HStack {
-        if entry.isPinned {
-          Text("PINNED")
-            .font(.system(size: 10, weight: .bold))
-            .opacity(0.5)
-        }
-        Spacer()
-        Text("\(entry.streak) day streak")
-          .font(.system(size: 12, weight: .semibold))
-          .opacity(0.6)
+      if entry.isPinned {
+        Text("PINNED")
+          .font(.system(size: 10, weight: .bold))
+          .opacity(0.5)
       }
     }
     .padding()
