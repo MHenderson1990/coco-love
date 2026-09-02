@@ -12,13 +12,16 @@
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
-    "ios": {
+         "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.coco.houseoflove",
       "buildNumber": "3",
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false,
         "CFBundleDisplayName": "Love G.E.M.S"
+      },
+      "entitlements": {
+        "com.apple.security.application-groups": ["group.com.coco.houseoflove"]
       }
     },
     "android": {
