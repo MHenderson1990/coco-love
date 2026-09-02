@@ -41,7 +41,6 @@ export default function TodayScreen({ navigation }) {
         let isPinned = await widgetStorage.get('widgetIsPinned');
         if (!isPinned) {
           widgetStorage.set('widgetAffirmationText', today.text);
-          widgetStorage.set('widgetStreak', String(streak));
           ExtensionStorage.reloadWidget();
         }
       } catch (err) {
