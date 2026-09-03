@@ -6,6 +6,7 @@ import { useTheme } from '../context/ThemeContext';
 import * as favoritesApi from '../api/favorites';
 import RichText from '../components/RichText';
 import { ExtensionStorage } from '@bacons/apple-targets';
+import * as affirmationsApi from '../api/affirmations';
 
 let widgetStorage = new ExtensionStorage('group.com.coco.houseoflove');
 
@@ -26,7 +27,8 @@ export default function SavedScreen({ navigation }) {
     if (!affirmationId) return;
 
     if (pinnedId === affirmationId) {
-      // unpin — widget reverts to showing today's message on its next load
+      // unpin — leave widgetAffirmationText alone; it'll show whatever was last
+      // actually revealed in-app until the next real reveal updates it
       widgetStorage.set('widgetIsPinned', null);
       widgetStorage.set('widgetPinnedId', null);
       setPinnedId(null);

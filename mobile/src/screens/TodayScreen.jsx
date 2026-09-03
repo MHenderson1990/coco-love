@@ -39,16 +39,6 @@ export default function TodayScreen({ navigation }) {
         let today = await affirmationsApi.getToday();
         setAffirmation(today);
 
-        let isPinned = await widgetStorage.get('widgetIsPinned');
-        console.log('WIDGET DEBUG isPinned:', isPinned);
-        if (!isPinned) {
-          await widgetStorage.set('widgetAffirmationText', today.text);
-          console.log('WIDGET DEBUG wrote text:', today.text);
-          ExtensionStorage.reloadWidget();
-          console.log('WIDGET DEBUG reload triggered');
-          let readBack = await widgetStorage.get('widgetAffirmationText');
-          console.log('WIDGET DEBUG readback:', readBack);
-        }
       } catch (err) {
         setError(err.response?.data?.error || 'Could not load today\u2019s message.');
       } finally {
@@ -63,6 +53,13 @@ export default function TodayScreen({ navigation }) {
     try {
       let checkin = await userApi.checkIn();
       setStreak(checkin.currentStreak);
+
+      let isPinned = await widgetStorage.get('widgetIsPinned');
+      if (!isPinned && affirmation?.text) {
+        widgetStorage.set('widgetAffirmationText', affirmation.text);
+        ExtensionStorage.reloadWidget();
+      }
+
       if (checkin.promoJustUnlocked) {
         setTimeout(() => {
           Alert.alert(
