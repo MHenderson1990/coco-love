@@ -3,6 +3,9 @@ import { PALETTES } from '../theme/palettes';
 import { useAuth } from './AuthContext';
 import * as userApi from '../api/user';
 import { PHOTO_KEYS } from '../theme/photos';
+import { ExtensionStorage } from '@bacons/apple-targets';
+
+let widgetStorage = new ExtensionStorage('group.com.coco.houseoflove');
 
 let ThemeContext = createContext(null);
 
@@ -21,7 +24,10 @@ export function ThemeProvider({ children }) {
       if (user.preferences.background) setBackgroundState(user.preferences.background);
       if (user.preferences.theme) setModeState(user.preferences.theme);
       if (user.preferences.todayPhoto && (PHOTO_KEYS.includes(user.preferences.todayPhoto) || user.preferences.todayPhoto.startsWith('http'))) {
-          setTodayPhotoState(user.preferences.todayPhoto); }
+          setTodayPhotoState(user.preferences.todayPhoto);
+          widgetStorage.set('widgetBackgroundPhoto', user.preferences.todayPhoto);
+          ExtensionStorage.reloadWidget();
+      }
       setThemeReady(true);
     }
   }, [user?._id]);
@@ -55,6 +61,8 @@ export function ThemeProvider({ children }) {
 
     async function setTodayPhoto(next) {
     setTodayPhotoState(next);
+    widgetStorage.set('widgetBackgroundPhoto', next);
+    ExtensionStorage.reloadWidget();
     try {
       await userApi.updateMe({ preferences: { todayPhoto: next } });
     } catch (err) {
