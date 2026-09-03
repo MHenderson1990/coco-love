@@ -23,18 +23,23 @@ export default function SavedScreen({ navigation }) {
   );
 
   async function togglePin(item) {
+    console.log('PIN DEBUG tapped, item:', JSON.stringify(item));
     let affirmationId = item.affirmation?._id;
-    if (!affirmationId) return;
+    console.log('PIN DEBUG affirmationId:', affirmationId);
+    if (!affirmationId) {
+      console.log('PIN DEBUG bailing — no affirmationId');
+      return;
+    }
 
-    if (pinnedId === affirmationId) {
+      if (pinnedId === affirmationId) {
       // unpin — leave widgetAffirmationText alone; it'll show whatever was last
       // actually revealed in-app until the next real reveal updates it
-      widgetStorage.set('widgetIsPinned', null);
+      widgetStorage.set('widgetIsPinned', 0);
       widgetStorage.set('widgetPinnedId', null);
       setPinnedId(null);
     } else {
       widgetStorage.set('widgetAffirmationText', item.affirmation.text);
-      widgetStorage.set('widgetIsPinned', true);
+      widgetStorage.set('widgetIsPinned', 1);
       widgetStorage.set('widgetPinnedId', affirmationId);
       setPinnedId(affirmationId);
     }
