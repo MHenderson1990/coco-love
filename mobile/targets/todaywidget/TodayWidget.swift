@@ -20,11 +20,6 @@ struct Provider: TimelineProvider {
     "flowers": "bg_flowers",
   ]
 
-private let logger = Logger(
-  subsystem: "com.coco.houseoflove.TodayWidget",
-  category: "WidgetStorage"
-)
-
   func placeholder(in context: Context) -> AffirmationEntry {
     AffirmationEntry(date: Date(), text: "Your peace is a priority, not a luxury.", isPinned: false, backgroundImage: UIImage(named: "bg_default"))
   }
@@ -58,23 +53,9 @@ private let logger = Logger(
 func loadEntry(completion: @escaping (AffirmationEntry) -> Void) {
   let defaults = UserDefaults(suiteName: suiteName)
 
-  let storedObject = defaults?.object(forKey: "widgetAffirmationText")
-  let storedText = defaults?.string(forKey: "widgetAffirmationText")
-
-  let text = storedText ?? "Your peace is a priority, not a luxury."
+  let text = defaults?.string(forKey: "widgetAffirmationText") ?? "Your peace is a priority, not a luxury."
   let isPinned = defaults?.bool(forKey: "widgetIsPinned") ?? false
-  let backgroundPhoto =
-    defaults?.string(forKey: "widgetBackgroundPhoto") ?? "default"
-
-  logger.notice("""
-  Loading widget:
-  suite=\(self.suiteName, privacy: .public)
-  object=\(String(describing: storedObject), privacy: .public)
-  text=\(String(reflecting: text), privacy: .public)
-  length=\(text.count)
-  pinned=\(isPinned)
-  family-independent provider load
-  """)
+  let backgroundPhoto = defaults?.string(forKey: "widgetBackgroundPhoto") ?? "default"
 
     if backgroundPhoto.hasPrefix("http") {
       guard let url = URL(string: backgroundPhoto) else {
@@ -158,12 +139,10 @@ struct TodayWidgetEntryView: View {
 
   private var smallView: some View {
     VStack(alignment: .leading, spacing: 6) {
-      Text("[\(entry.text)]")
-        .font(.system(size: 11, weight: .bold))
+      Text(entry.text)
+        .font(.system(size: 13, weight: .medium))
         .lineLimit(5)
-
-      Text("len: \(entry.text.count)")
-        .font(.system(size: 10))
+        .minimumScaleFactor(0.7)
 
       Spacer()
 
@@ -179,12 +158,10 @@ struct TodayWidgetEntryView: View {
 
   private var mediumView: some View {
     VStack(alignment: .leading, spacing: 8) {
-      Text("[\(entry.text)]")
-        .font(.system(size: 13, weight: .bold))
-        .lineLimit(6)
-
-      Text("len: \(entry.text.count)")
-        .font(.system(size: 10))
+      Text(entry.text)
+        .font(.system(size: 15, weight: .medium))
+        .lineLimit(4)
+        .minimumScaleFactor(0.7)
 
       Spacer()
 
