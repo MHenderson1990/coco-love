@@ -4,6 +4,13 @@
   "colors": {
     "$accent": "#000000"
   },
+  "images": {
+    "bg_default": "../../assets/placeholder.png",
+    "bg_woman": "../../assets/placeholder3.png",
+    "bg_fall": "../../assets/fall.png",
+    "bg_stars": "../../assets/stars.jpg",
+    "bg_flowers": "../../assets/flowers.jpg"
+  },
   "entitlements": {
     "com.apple.security.application-groups": ["group.com.coco.houseoflove"]
   }
