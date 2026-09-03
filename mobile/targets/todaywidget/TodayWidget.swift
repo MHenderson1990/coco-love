@@ -5,31 +5,57 @@ struct AffirmationEntry: TimelineEntry {
   let date: Date
   let text: String
   let isPinned: Bool
+  let backgroundImage: UIImage?
 }
 
 struct Provider: TimelineProvider {
   let suiteName = "group.com.coco.houseoflove"
 
+  let presetImageNames: [String: String] = [
+    "default": "bg_default",
+    "woman": "bg_woman",
+    "fall": "bg_fall",
+    "stars": "bg_stars",
+    "flowers": "bg_flowers",
+  ]
+
   func placeholder(in context: Context) -> AffirmationEntry {
-    AffirmationEntry(date: Date(), text: "Your peace is a priority, not a luxury.", isPinned: false)
+    AffirmationEntry(date: Date(), text: "Your peace is a priority, not a luxury.", isPinned: false, backgroundImage: UIImage(named: "bg_default"))
   }
 
   func getSnapshot(in context: Context, completion: @escaping (AffirmationEntry) -> Void) {
-    completion(loadEntry())
+    loadEntry { entry in
+      completion(entry)
+    }
   }
 
   func getTimeline(in context: Context, completion: @escaping (Timeline<AffirmationEntry>) -> Void) {
-    let entry = loadEntry()
-    // refresh once a day at minimum; app will also force a reload when data changes
-    let nextUpdate = Calendar.current.date(byAdding: .hour, value: 6, to: Date())!
-    completion(Timeline(entries: [entry], policy: .after(nextUpdate)))
+    loadEntry { entry in
+      let nextUpdate = Calendar.current.date(byAdding: .hour, value: 6, to: Date())!
+      completion(Timeline(entries: [entry], policy: .after(nextUpdate)))
+    }
   }
 
-  func loadEntry() -> AffirmationEntry {
+  func loadEntry(completion: @escaping (AffirmationEntry) -> Void) {
     let defaults = UserDefaults(suiteName: suiteName)
     let text = defaults?.string(forKey: "widgetAffirmationText") ?? "Your peace is a priority, not a luxury."
     let isPinned = defaults?.bool(forKey: "widgetIsPinned") ?? false
-    return AffirmationEntry(date: Date(), text: text, isPinned: isPinned)
+    let backgroundPhoto = defaults?.string(forKey: "widgetBackgroundPhoto") ?? "default"
+
+    if backgroundPhoto.hasPrefix("http") {
+      guard let url = URL(string: backgroundPhoto) else {
+        completion(AffirmationEntry(date: Date(), text: text, isPinned: isPinned, backgroundImage: UIImage(named: "bg_default")))
+        return
+      }
+      URLSession.shared.dataTask(with: url) { data, _, _ in
+        let image = data.flatMap { UIImage(data: $0) } ?? UIImage(named: "bg_default")
+        completion(AffirmationEntry(date: Date(), text: text, isPinned: isPinned, backgroundImage: image))
+      }.resume()
+    } else {
+      let assetName = presetImageNames[backgroundPhoto] ?? "bg_default"
+      let image = UIImage(named: assetName) ?? UIImage(named: "bg_default")
+      completion(AffirmationEntry(date: Date(), text: text, isPinned: isPinned, backgroundImage: image))
+    }
   }
 }
 
@@ -38,14 +64,26 @@ struct TodayWidgetEntryView: View {
   @Environment(\.widgetFamily) var family
 
   var body: some View {
-    switch family {
-    case .systemSmall:
-      smallView
-    case .systemMedium:
-      mediumView
-    default:
-      largeView
+    ZStack {
+      if let bg = entry.backgroundImage {
+        Image(uiImage: bg)
+          .resizable()
+          .aspectRatio(contentMode: .fill)
+      } else {
+        Color.black
+      }
+      Color.black.opacity(0.35)
+
+      switch family {
+      case .systemSmall:
+        smallView
+      case .systemMedium:
+        mediumView
+      default:
+        largeView
+      }
     }
+    .containerBackground(for: .widget) { Color.black }
   }
 
   var smallView: some View {
@@ -58,11 +96,10 @@ struct TodayWidgetEntryView: View {
       if entry.isPinned {
         Text("PINNED")
           .font(.system(size: 9, weight: .bold))
-          .opacity(0.5)
+          .opacity(0.7)
       }
     }
     .padding()
-    .containerBackground(for: .widget) { Color.black }
     .foregroundColor(.white)
   }
 
@@ -77,12 +114,12 @@ struct TodayWidgetEntryView: View {
         if entry.isPinned {
           Text("PINNED")
             .font(.system(size: 9, weight: .bold))
-            .opacity(0.5)
+            .opacity(0.7)
         }
       }
+      Spacer()
     }
     .padding()
-    .containerBackground(for: .widget) { Color.black }
     .foregroundColor(.white)
   }
 
@@ -90,7 +127,7 @@ struct TodayWidgetEntryView: View {
     VStack(alignment: .leading, spacing: 12) {
       Text("TODAY'S MESSAGE")
         .font(.system(size: 11, weight: .bold))
-        .opacity(0.5)
+        .opacity(0.7)
       Text(entry.text)
         .font(.system(size: 20, weight: .medium))
         .lineLimit(8)
@@ -99,11 +136,10 @@ struct TodayWidgetEntryView: View {
       if entry.isPinned {
         Text("PINNED")
           .font(.system(size: 10, weight: .bold))
-          .opacity(0.5)
+          .opacity(0.7)
       }
     }
     .padding()
-    .containerBackground(for: .widget) { Color.black }
     .foregroundColor(.white)
   }
 }
