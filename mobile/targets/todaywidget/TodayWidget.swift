@@ -103,10 +103,11 @@ struct TodayWidgetEntryView: View {
 
   var smallView: some View {
     VStack(alignment: .leading, spacing: 6) {
-      Text(entry.text)
-        .font(.system(size: 13, weight: .medium))
+      Text("DEBUG TEST 123")
+        .font(.system(size: 13, weight: .bold))
         .lineLimit(5)
-        .minimumScaleFactor(0.7)
+      Text("len:\(entry.text.count)")
+        .font(.system(size: 10))
       Spacer()
       if entry.isPinned {
         Text("PINNED")
