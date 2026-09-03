@@ -103,8 +103,8 @@ struct TodayWidgetEntryView: View {
 
   var smallView: some View {
     VStack(alignment: .leading, spacing: 6) {
-      Text("DEBUG TEST 123")
-        .font(.system(size: 13, weight: .bold))
+      Text("[\(entry.text)]")
+        .font(.system(size: 11, weight: .bold))
         .lineLimit(5)
       Text("len:\(entry.text.count)")
         .font(.system(size: 10))
