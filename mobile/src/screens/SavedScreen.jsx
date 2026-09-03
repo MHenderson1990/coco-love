@@ -5,11 +5,39 @@ import { useFocusEffect } from '@react-navigation/native';
 import { useTheme } from '../context/ThemeContext';
 import * as favoritesApi from '../api/favorites';
 import RichText from '../components/RichText';
+import { ExtensionStorage } from '@bacons/apple-targets';
+
+let widgetStorage = new ExtensionStorage('group.com.coco.houseoflove');
 
 export default function SavedScreen({ navigation }) {
   let { colors } = useTheme();
   let [items, setItems] = useState([]);
   let [loading, setLoading] = useState(true);
+  let [pinnedId, setPinnedId] = useState(null);
+
+  useFocusEffect(
+    useCallback(() => {
+      widgetStorage.get('widgetPinnedId').then(setPinnedId).catch(() => {});
+    }, [])
+  );
+
+  async function togglePin(item) {
+    let affirmationId = item.affirmation?._id;
+    if (!affirmationId) return;
+
+    if (pinnedId === affirmationId) {
+      // unpin — widget reverts to showing today's message on its next load
+      widgetStorage.set('widgetIsPinned', null);
+      widgetStorage.set('widgetPinnedId', null);
+      setPinnedId(null);
+    } else {
+      widgetStorage.set('widgetAffirmationText', item.affirmation.text);
+      widgetStorage.set('widgetIsPinned', true);
+      widgetStorage.set('widgetPinnedId', affirmationId);
+      setPinnedId(affirmationId);
+    }
+    ExtensionStorage.reloadWidget();
+  }
 
   // refetch each time the tab is focused, so newly saved items show up
   useFocusEffect(
@@ -43,14 +71,24 @@ export default function SavedScreen({ navigation }) {
               Tap Save on a message to keep it here.
             </Text>
           }
-          renderItem={({ item }) => (
-            <View style={[styles.row, { backgroundColor: colors.surface, borderColor: colors.line }]}>
-              <RichText style={[styles.text, { color: colors.ink }]} text={item.affirmation?.text} />
-              <Text style={[styles.meta, { color: colors.muted }]}>
-                Saved {new Date(item.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
-              </Text>
-            </View>
-          )}
+          renderItem={({ item }) => {
+            let isPinned = pinnedId === item.affirmation?._id;
+            return (
+              <View style={[styles.row, { backgroundColor: colors.surface, borderColor: colors.line }]}>
+                <RichText style={[styles.text, { color: colors.ink }]} text={item.affirmation?.text} />
+                <View style={styles.rowFooter}>
+                  <Text style={[styles.meta, { color: colors.muted }]}>
+                    Saved {new Date(item.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                  </Text>
+                  <Pressable onPress={() => togglePin(item)} hitSlop={8}>
+                    <Text style={{ fontSize: 11, fontWeight: '700', color: isPinned ? colors.accent : colors.muted }}>
+                      {isPinned ? 'PINNED TO WIDGET ✓' : 'Pin to widget'}
+                    </Text>
+                  </Pressable>
+                </View>
+              </View>
+            );
+          }}
         />
       )}
     </SafeAreaView>
@@ -65,6 +103,7 @@ let styles = StyleSheet.create({
   list: { gap: 9, paddingBottom: 24 },
   row: { borderWidth: 1, borderRadius: 15, padding: 15 },
   text: { fontSize: 15, lineHeight: 21 },
-  meta: { fontSize: 11, marginTop: 8 },
+  meta: { fontSize: 11 },
+  rowFooter: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginTop: 8 },
   empty: { textAlign: 'center', marginTop: 40, fontSize: 14 },
 });
