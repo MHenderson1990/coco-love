@@ -122,10 +122,11 @@ struct TodayWidgetEntryView: View {
   var mediumView: some View {
     HStack {
       VStack(alignment: .leading, spacing: 8) {
-        Text(entry.text)
-          .font(.system(size: 15, weight: .medium))
-          .lineLimit(4)
-          .minimumScaleFactor(0.7)
+        Text("[\(entry.text)]")
+          .font(.system(size: 13, weight: .bold))
+          .lineLimit(6)
+        Text("len:\(entry.text.count)")
+          .font(.system(size: 10))
         Spacer()
         if entry.isPinned {
           Text("PINNED")
