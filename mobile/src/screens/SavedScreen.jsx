@@ -18,7 +18,7 @@ export default function SavedScreen({ navigation }) {
 
   useFocusEffect(
     useCallback(() => {
-      widgetStorage.get('widgetPinnedId').then(setPinnedId).catch(() => {});
+      setPinnedId(widgetStorage.get('widgetPinnedId'));
     }, [])
   );
 
