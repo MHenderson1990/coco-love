@@ -1,5 +1,6 @@
 import WidgetKit
 import SwiftUI
+import OSLog
 
 struct AffirmationEntry: TimelineEntry {
   let date: Date
@@ -18,6 +19,11 @@ struct Provider: TimelineProvider {
     "stars": "bg_stars",
     "flowers": "bg_flowers",
   ]
+
+private let logger = Logger(
+  subsystem: "com.coco.houseoflove.TodayWidget",
+  category: "WidgetStorage"
+)
 
   func placeholder(in context: Context) -> AffirmationEntry {
     AffirmationEntry(date: Date(), text: "Your peace is a priority, not a luxury.", isPinned: false, backgroundImage: UIImage(named: "bg_default"))
@@ -49,11 +55,26 @@ struct Provider: TimelineProvider {
     }
   }
 
-  func loadEntry(completion: @escaping (AffirmationEntry) -> Void) {
-    let defaults = UserDefaults(suiteName: suiteName)
-    let text = defaults?.string(forKey: "widgetAffirmationText") ?? "Your peace is a priority, not a luxury."
-    let isPinned = defaults?.bool(forKey: "widgetIsPinned") ?? false
-    let backgroundPhoto = defaults?.string(forKey: "widgetBackgroundPhoto") ?? "default"
+func loadEntry(completion: @escaping (AffirmationEntry) -> Void) {
+  let defaults = UserDefaults(suiteName: suiteName)
+
+  let storedObject = defaults?.object(forKey: "widgetAffirmationText")
+  let storedText = defaults?.string(forKey: "widgetAffirmationText")
+
+  let text = storedText ?? "Your peace is a priority, not a luxury."
+  let isPinned = defaults?.bool(forKey: "widgetIsPinned") ?? false
+  let backgroundPhoto =
+    defaults?.string(forKey: "widgetBackgroundPhoto") ?? "default"
+
+  logger.notice("""
+  Loading widget:
+  suite=\(self.suiteName, privacy: .public)
+  object=\(String(describing: storedObject), privacy: .public)
+  text=\(String(reflecting: text), privacy: .public)
+  length=\(text.count)
+  pinned=\(isPinned)
+  family-independent provider load
+  """)
 
     if backgroundPhoto.hasPrefix("http") {
       guard let url = URL(string: backgroundPhoto) else {
@@ -76,39 +97,76 @@ struct Provider: TimelineProvider {
 
 struct TodayWidgetEntryView: View {
   var entry: Provider.Entry
-  @Environment(\.widgetFamily) var family
+
+  @Environment(\.widgetFamily) private var family
 
   var body: some View {
-    ZStack {
-      if let bg = entry.backgroundImage {
-        Image(uiImage: bg)
-          .resizable()
-          .aspectRatio(contentMode: .fill)
-      } else {
-        Color.black
-      }
-      Color.black.opacity(0.35)
+    GeometryReader { geometry in
+      ZStack(alignment: .topLeading) {
+        backgroundView(size: geometry.size)
 
-      switch family {
-      case .systemSmall:
-        smallView
-      case .systemMedium:
-        mediumView
-      default:
-        largeView
+        Color.black.opacity(0.35)
+
+        contentView
+          .frame(
+            width: geometry.size.width,
+            height: geometry.size.height,
+            alignment: .topLeading
+          )
       }
+      .frame(
+        width: geometry.size.width,
+        height: geometry.size.height
+      )
+      .clipped()
     }
-    .containerBackground(for: .widget) { Color.black }
+    .containerBackground(for: .widget) {
+      Color.black
+    }
   }
 
-  var smallView: some View {
+  @ViewBuilder
+  private func backgroundView(size: CGSize) -> some View {
+    if let backgroundImage = entry.backgroundImage {
+      Image(uiImage: backgroundImage)
+        .resizable()
+        .scaledToFill()
+        .frame(width: size.width, height: size.height)
+        .clipped()
+    } else {
+      Color.black
+        .frame(width: size.width, height: size.height)
+    }
+  }
+
+  @ViewBuilder
+  private var contentView: some View {
+    switch family {
+    case .systemSmall:
+      smallView
+
+    case .systemMedium:
+      mediumView
+
+    case .systemLarge:
+      largeView
+
+    default:
+      smallView
+    }
+  }
+
+  private var smallView: some View {
     VStack(alignment: .leading, spacing: 6) {
       Text("[\(entry.text)]")
         .font(.system(size: 11, weight: .bold))
         .lineLimit(5)
-      Text("len:\(entry.text.count)")
+
+      Text("len: \(entry.text.count)")
         .font(.system(size: 10))
+
       Spacer()
+
       if entry.isPinned {
         Text("PINNED")
           .font(.system(size: 9, weight: .bold))
@@ -116,40 +174,44 @@ struct TodayWidgetEntryView: View {
       }
     }
     .padding()
-    .foregroundColor(.white)
+    .foregroundStyle(.white)
   }
 
-  var mediumView: some View {
-    HStack {
-      VStack(alignment: .leading, spacing: 8) {
-        Text("[\(entry.text)]")
-          .font(.system(size: 13, weight: .bold))
-          .lineLimit(6)
-        Text("len:\(entry.text.count)")
-          .font(.system(size: 10))
-        Spacer()
-        if entry.isPinned {
-          Text("PINNED")
-            .font(.system(size: 9, weight: .bold))
-            .opacity(0.7)
-        }
-      }
+  private var mediumView: some View {
+    VStack(alignment: .leading, spacing: 8) {
+      Text("[\(entry.text)]")
+        .font(.system(size: 13, weight: .bold))
+        .lineLimit(6)
+
+      Text("len: \(entry.text.count)")
+        .font(.system(size: 10))
+
       Spacer()
+
+      if entry.isPinned {
+        Text("PINNED")
+          .font(.system(size: 9, weight: .bold))
+          .opacity(0.7)
+      }
     }
     .padding()
-    .foregroundColor(.white)
+    .foregroundStyle(.white)
+    .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
   }
 
-  var largeView: some View {
+  private var largeView: some View {
     VStack(alignment: .leading, spacing: 12) {
       Text("TODAY'S MESSAGE")
         .font(.system(size: 11, weight: .bold))
         .opacity(0.7)
+
       Text(entry.text)
         .font(.system(size: 20, weight: .medium))
         .lineLimit(8)
         .minimumScaleFactor(0.7)
+
       Spacer()
+
       if entry.isPinned {
         Text("PINNED")
           .font(.system(size: 10, weight: .bold))
@@ -157,7 +219,8 @@ struct TodayWidgetEntryView: View {
       }
     }
     .padding()
-    .foregroundColor(.white)
+    .foregroundStyle(.white)
+    .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
   }
 }
 
