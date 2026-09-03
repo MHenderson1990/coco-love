@@ -36,6 +36,17 @@ struct Provider: TimelineProvider {
     }
   }
 
+  static func downscale(_ image: UIImage, maxDimension: CGFloat) -> UIImage {
+    let size = image.size
+    let scale = min(maxDimension / size.width, maxDimension / size.height, 1.0)
+    if scale >= 1.0 { return image }
+    let newSize = CGSize(width: size.width * scale, height: size.height * scale)
+    let renderer = UIGraphicsImageRenderer(size: newSize)
+    return renderer.image { _ in
+      image.draw(in: CGRect(origin: .zero, size: newSize))
+    }
+  }
+
   func loadEntry(completion: @escaping (AffirmationEntry) -> Void) {
     let defaults = UserDefaults(suiteName: suiteName)
     let text = defaults?.string(forKey: "widgetAffirmationText") ?? "Your peace is a priority, not a luxury."
@@ -48,9 +59,11 @@ struct Provider: TimelineProvider {
         return
       }
       URLSession.shared.dataTask(with: url) { data, _, _ in
-        let image = data.flatMap { UIImage(data: $0) } ?? UIImage(named: "bg_default")
+        let rawImage = data.flatMap { UIImage(data: $0) }
+        let image = rawImage.flatMap { Self.downscale($0, maxDimension: 700) } ?? UIImage(named: "bg_default")
         completion(AffirmationEntry(date: Date(), text: text, isPinned: isPinned, backgroundImage: image))
       }.resume()
+
     } else {
       let assetName = presetImageNames[backgroundPhoto] ?? "bg_default"
       let image = UIImage(named: assetName) ?? UIImage(named: "bg_default")
