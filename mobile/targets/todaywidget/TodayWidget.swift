@@ -41,7 +41,9 @@ struct Provider: TimelineProvider {
     let scale = min(maxDimension / size.width, maxDimension / size.height, 1.0)
     if scale >= 1.0 { return image }
     let newSize = CGSize(width: size.width * scale, height: size.height * scale)
-    let renderer = UIGraphicsImageRenderer(size: newSize)
+    let format = UIGraphicsImageRendererFormat()
+    format.scale = 1.0
+    let renderer = UIGraphicsImageRenderer(size: newSize, format: format)
     return renderer.image { _ in
       image.draw(in: CGRect(origin: .zero, size: newSize))
     }
