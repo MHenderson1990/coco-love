@@ -31,9 +31,12 @@ export default function SavedScreen({ navigation }) {
       return;
     }
 
-      if (pinnedId === affirmationId) {
-      // unpin — leave widgetAffirmationText alone; it'll show whatever was last
-      // actually revealed in-app until the next real reveal updates it
+    if (pinnedId === affirmationId) {
+      // unpin — restore whatever was last actually revealed in-app
+      let lastRevealed = widgetStorage.get('widgetLastRevealedText');
+      if (lastRevealed) {
+        widgetStorage.set('widgetAffirmationText', lastRevealed);
+      }
       widgetStorage.set('widgetIsPinned', 0);
       widgetStorage.set('widgetPinnedId', null);
       setPinnedId(null);

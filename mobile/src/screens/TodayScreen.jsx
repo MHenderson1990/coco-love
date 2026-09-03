@@ -54,9 +54,12 @@ export default function TodayScreen({ navigation }) {
       let checkin = await userApi.checkIn();
       setStreak(checkin.currentStreak);
 
-      let isPinned = widgetStorage.get('widgetIsPinned');
-      if (!isPinned && affirmation?.text) {
-        widgetStorage.set('widgetAffirmationText', affirmation.text);
+      if (affirmation?.text) {
+        widgetStorage.set('widgetLastRevealedText', affirmation.text);
+        let isPinned = widgetStorage.get('widgetIsPinned');
+        if (!isPinned) {
+          widgetStorage.set('widgetAffirmationText', affirmation.text);
+        }
         ExtensionStorage.reloadWidget();
       }
 
