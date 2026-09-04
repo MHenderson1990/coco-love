@@ -60,12 +60,9 @@ export function ThemeProvider({ children }) {
   }
 
   async function setTodayPhoto(next) {
-    console.log('WIDGET BG DEBUG setTodayPhoto called with:', next);
     setTodayPhotoState(next);
     widgetStorage.set('widgetBackgroundPhoto', next);
-    console.log('WIDGET BG DEBUG readback:', widgetStorage.get('widgetBackgroundPhoto'));
     ExtensionStorage.reloadWidget();
-    console.log('WIDGET BG DEBUG reload called');
     try {
       await userApi.updateMe({ preferences: { todayPhoto: next } });
     } catch (err) {
