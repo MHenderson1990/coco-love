@@ -57,6 +57,8 @@ func loadEntry(completion: @escaping (AffirmationEntry) -> Void) {
   let isPinned = defaults?.bool(forKey: "widgetIsPinned") ?? false
   let backgroundPhoto = defaults?.string(forKey: "widgetBackgroundPhoto") ?? "default"
 
+  print("WIDGET BG DEBUG loadEntry called, backgroundPhoto=\(backgroundPhoto)")
+
     if backgroundPhoto.hasPrefix("http") {
       guard let url = URL(string: backgroundPhoto) else {
         completion(AffirmationEntry(date: Date(), text: text, isPinned: isPinned, backgroundImage: UIImage(named: "bg_default")))
