@@ -72,7 +72,8 @@ func loadEntry(completion: @escaping (AffirmationEntry) -> Void) {
 
     } else {
       let assetName = presetImageNames[backgroundPhoto] ?? "bg_default"
-      let image = UIImage(named: assetName) ?? UIImage(named: "bg_default")
+      let rawImage = UIImage(named: assetName) ?? UIImage(named: "bg_default")
+      let image = rawImage.flatMap { Self.downscale($0, maxDimension: 700) }
       completion(AffirmationEntry(date: Date(), text: text, isPinned: isPinned, backgroundImage: image))
     }
   }
