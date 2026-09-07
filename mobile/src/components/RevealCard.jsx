@@ -47,7 +47,7 @@ export default function RevealCard({ text, revealed, onReveal, compact }) {
           text={text}
           style={[styles.affirm, { color: '#fff' }]}
           delay={200}
-          speed={35}
+          speed={75}
         />
       )}
 
@@ -70,7 +70,7 @@ export default function RevealCard({ text, revealed, onReveal, compact }) {
 let styles = StyleSheet.create({
   card: {
     minHeight: 280, marginTop: 0, borderRadius: 22,
-    overflow: 'hidden', alignItems: 'center', justifyContent: 'center',
+    overflow: 'hidden', alignItems: 'center', justifyContent: 'flex-start',
     paddingHorizontal: 24, paddingVertical: 28,
   },
   affirm: { fontSize: 20, lineHeight: 35, textAlign: 'center', fontFamily: 'PlaywriteGBS_400Regular' },
