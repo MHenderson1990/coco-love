@@ -4,6 +4,7 @@ import { useTheme } from '../context/ThemeContext';
 import RichText from './RichText';
 import RichTypewriterText from './RichTypewriterText';
 import { BlurView } from 'expo-blur';
+import { Platform } from 'react-native';
 
 export default function RevealCard({ text, revealed, onReveal, compact }) {
   let { colors } = useTheme();
@@ -47,7 +48,7 @@ export default function RevealCard({ text, revealed, onReveal, compact }) {
           text={text}
           style={[styles.affirm, { color: '#fff' }]}
           delay={200}
-          speed={75}
+          speed={88}
         />
       )}
 
@@ -56,7 +57,11 @@ export default function RevealCard({ text, revealed, onReveal, compact }) {
           {...panResponder.panHandlers}
           style={[styles.veil, { transform: [{ translateY }] }]}
         >
-          <BlurView intensity={40} tint="dark" style={styles.veilBlur}>
+          <BlurView
+            intensity={40}
+            tint="dark"
+            style={[styles.veilBlur, Platform.OS === 'android' && { backgroundColor: 'rgba(0,0,0,0.55)' }]}
+          >
             <Text style={[styles.chev, { color: '#fff' }]}>⌃</Text>
             <Text style={[styles.veilText, { color: '#fff' }]}>SWIPE UP TO REVEAL</Text>
             <View style={[styles.grip, { backgroundColor: '#fff' }]} />
