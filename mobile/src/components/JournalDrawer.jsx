@@ -42,7 +42,11 @@ export default function JournalDrawer({ affirmationId, onOpenChange }) {
   }
 
   return (
-    <BlurView intensity={30} tint="dark" style={styles.wrap}>
+    <BlurView
+      intensity={30}
+      tint="dark"
+      style={[styles.wrap, Platform.OS === 'android' && { backgroundColor: 'rgba(0,0,0,0.5)' }]}
+    >
       <Pressable style={styles.head} onPress={toggle}>
         <Text style={[styles.headText, { color: '#fff' }]}>
           {saved ? 'Entry saved' : 'Add to your journal'}

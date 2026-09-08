@@ -173,19 +173,31 @@ export default function TodayScreen({ navigation }) {
           <>
             <View style={styles.actions}>
               <Pressable style={styles.actWrap} onPress={handleSave}>
-                <BlurView intensity={30} tint="dark" style={[styles.act, saved && styles.actSaved]}>
+                <BlurView
+                  intensity={30}
+                  tint="dark"
+                  style={[styles.act, Platform.OS === 'android' && styles.androidBlurFallback, saved && styles.actSaved]}
+                >
                   <Text style={[styles.actText, { color: '#fff' }]}>{saved ? 'Saved' : 'Save'}</Text>
                 </BlurView>
               </Pressable>
 
               <Pressable style={styles.actWrap} onPress={handleShare}>
-                <BlurView intensity={30} tint="dark" style={styles.act}>
+                <BlurView
+                  intensity={30}
+                  tint="dark"
+                  style={[styles.act, Platform.OS === 'android' && styles.androidBlurFallback]}
+                >
                   <Text style={[styles.actText, { color: '#fff' }]}>Share</Text>
                 </BlurView>
               </Pressable>
 
               <Pressable style={styles.actWrap} onPress={() => handleFeedback('more')}>
-                <BlurView intensity={30} tint="dark" style={styles.act}>
+                <BlurView
+                  intensity={30}
+                  tint="dark"
+                  style={[styles.act, Platform.OS === 'android' && styles.androidBlurFallback]}
+                >
                   <Text style={[styles.actText, { color: '#fff' }]}>More like this</Text>
                 </BlurView>
               </Pressable>
@@ -222,6 +234,7 @@ let styles = StyleSheet.create({
   actWrap: { flex: 1, borderRadius: 14, overflow: 'hidden' },
   act: { paddingVertical: 13, alignItems: 'center', justifyContent: 'center' },
   actSaved: { backgroundColor: 'rgba(255,255,255,0.22)' },
+  androidBlurFallback: { backgroundColor: 'rgba(0,0,0,0.45)' },
   actText: { fontSize: 11, fontWeight: '600' },
   actText: { fontSize: 11, fontWeight: '600' },
 });
