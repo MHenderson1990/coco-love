@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "Love G.E.M.S",
-    "slug": "love-gems",
+    "slug": "house-of-love",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -12,7 +12,7 @@
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
-         "ios": {
+    "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.coco.houseoflove",
       "buildNumber": "3",
@@ -21,29 +21,27 @@
         "CFBundleDisplayName": "Love G.E.M.S"
       },
       "entitlements": {
-        "com.apple.security.application-groups": ["group.com.coco.houseoflove"]
+        "com.apple.security.application-groups": [
+          "group.com.coco.houseoflove"
+        ]
       }
     },
-  "android": {
-  "adaptiveIcon": {
-    "foregroundImage": "./assets/adaptive-icon.png",
-    "backgroundColor": "#ffffff"
-  },
-  "edgeToEdgeEnabled": true,
-  "googleServicesFile": "./google-services.json",
-  "permissions": [
-    "android.permission.RECORD_AUDIO",
-    "android.permission.USE_BIOMETRIC",
-    "android.permission.USE_FINGERPRINT",
-    "android.permission.MODIFY_AUDIO_SETTINGS",
-    "android.permission.RECORD_AUDIO",
-    "android.permission.USE_BIOMETRIC",
-    "android.permission.USE_FINGERPRINT",
-    "android.permission.MODIFY_AUDIO_SETTINGS"
-  ],
-  "package": "com.coco.houseoflove"
-},
- "web": {
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#ffffff"
+      },
+      "edgeToEdgeEnabled": true,
+      "googleServicesFile": "./google-services.json",
+      "permissions": [
+        "android.permission.RECORD_AUDIO",
+        "android.permission.USE_BIOMETRIC",
+        "android.permission.USE_FINGERPRINT",
+        "android.permission.MODIFY_AUDIO_SETTINGS"
+      ],
+      "package": "com.coco.houseoflove"
+    },
+    "web": {
       "favicon": "./assets/favicon.png"
     },
     "plugins": [
@@ -66,7 +64,7 @@
           "microphonePermission": "House of Love uses the microphone so you can record voice journal entries."
         }
       ],
-            [
+      [
         "@bacons/apple-targets",
         {
           "appleTeamId": "BV8FDM3UB2"
@@ -102,6 +100,7 @@
           }
         }
       }
-    }
+    },
+    "owner": "mhenderson1990"
   }
 }
