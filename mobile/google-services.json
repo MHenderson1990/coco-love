@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "264075080382",
+    "project_id": "love-gems-35202",
+    "storage_bucket": "love-gems-35202.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:264075080382:android:bc97f9fb1ac7ad2001e4ef",
+        "android_client_info": {
+          "package_name": "com.coco.houseoflove"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBA-xmPTzhmze5l0lI2JwZcgkDzMRSOEcc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
