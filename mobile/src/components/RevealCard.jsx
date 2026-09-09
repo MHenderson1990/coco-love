@@ -6,7 +6,7 @@ import RichTypewriterText from './RichTypewriterText';
 import { BlurView } from 'expo-blur';
 import { Platform } from 'react-native';
 
-export default function RevealCard({ text, revealed, onReveal, compact }) {
+export default function RevealCard({ text, revealed, onReveal, compact, onAffirmationDone }) {
   let { colors } = useTheme();
   let translateY = useRef(new Animated.Value(0)).current;
 
@@ -49,6 +49,7 @@ export default function RevealCard({ text, revealed, onReveal, compact }) {
           style={[styles.affirm, { color: '#fff' }]}
           delay={200}
           speed={88}
+          onComplete={onAffirmationDone}
         />
       )}
 

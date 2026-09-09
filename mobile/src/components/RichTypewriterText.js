@@ -8,6 +8,7 @@ export default function RichTypewriterText({
   fonts,
   speed = 45,
   delay = 500,
+  onComplete,
 }) {
   let [visibleCount, setVisibleCount] = useState(0);
   let [done, setDone] = useState(false);
@@ -31,10 +32,11 @@ export default function RichTypewriterText({
         index += 1;
         setVisibleCount(index);
 
-        if (index < totalLength) {
+    if (index < totalLength) {
           typingTimer = setTimeout(typeNextCharacter, speed);
         } else {
           setDone(true);
+          onComplete?.();
         }
       };
 

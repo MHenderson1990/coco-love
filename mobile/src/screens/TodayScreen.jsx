@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef } from 'react';
-import { View, Text, StyleSheet, Pressable, ActivityIndicator, Share, Alert, Platform, KeyboardAvoidingView, ScrollView, ImageBackground } from 'react-native';
+import { View, Text, StyleSheet, Pressable, ActivityIndicator, Share, Alert, Platform, KeyboardAvoidingView, ScrollView, ImageBackground, Animated } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTheme } from '../context/ThemeContext';
 import { useAuth } from '../context/AuthContext';
@@ -31,6 +31,8 @@ export default function TodayScreen({ navigation }) {
   let [loading, setLoading] = useState(true);
   let [error, setError] = useState('');
   let [journalOpen, setJournalOpen] = useState(false);
+  let [affirmationDone, setAffirmationDone] = useState(false);
+  let subFade = useRef(new Animated.Value(0)).current;
   let scrollRef = useRef(null);
 
   useEffect(() => {
@@ -47,6 +49,22 @@ export default function TodayScreen({ navigation }) {
     }
     load();
   }, []);
+
+  function handleAffirmationDone() {
+    setAffirmationDone(true);
+    Animated.timing(subFade, {
+      toValue: 1,
+      duration: 500,
+      useNativeDriver: true,
+    }).start();
+  }
+
+  useEffect(() => {
+    if (!revealed) {
+      setAffirmationDone(false);
+      subFade.setValue(0);
+    }
+  }, [revealed]);
 
   async function handleReveal() {
     setRevealed(true);
@@ -143,18 +161,22 @@ export default function TodayScreen({ navigation }) {
             <Text style={[styles.name, { color: '#fff' }]}>{user?.name}</Text>
           </View>
 
-          <TypewriterText
-            key={revealed ? 'revealed-message' : 'opening-message'}
-            style={[styles.sub, {  color: '#fff' , textAlign: 'center' }]}
-            text={
-              revealed
-                ? 'Take it with you today.'
-                : 'Are you ready for today\u2019s message?'
-            }
-            delay={500}
-            speed={45}
-          />
-        </View>
+          {revealed ? (
+            <Animated.Text
+              style={[styles.sub, { color: '#fff', textAlign: 'center', opacity: subFade }]}
+            >
+              Take it with you today.
+            </Animated.Text>
+          ) : (
+            <TypewriterText
+              key="opening-message"
+              style={[styles.sub, { color: '#fff', textAlign: 'center' }]}
+              text={'Are you ready for today\u2019s message?'}
+              delay={500}
+              speed={45}
+            />
+          )}
+          </View>
 
         {error ? (
           <View style={[styles.errorBox, { backgroundColor: 'rgba(255,255,255,0.4)', borderColor: colors.line }]}>
@@ -166,6 +188,7 @@ export default function TodayScreen({ navigation }) {
             revealed={revealed}
             onReveal={handleReveal}
             compact={journalOpen}
+            onAffirmationDone={handleAffirmationDone}
           />
         )}
 
