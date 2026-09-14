@@ -84,12 +84,22 @@ export default function TodayScreen({ navigation }) {
           }
           ExtensionStorage.reloadWidget();
         } else if (Platform.OS === 'android') {
-          await AsyncStorage.setItem('widgetAffirmationText', affirmation.text);
+          await AsyncStorage.setItem('widgetLastRevealedText', affirmation.text);
           await AsyncStorage.setItem('widgetTodayPhoto', todayPhoto || 'default');
+
+          let isPinned = (await AsyncStorage.getItem('widgetIsPinned')) === '1';
+          if (!isPinned) {
+            await AsyncStorage.setItem('widgetAffirmationText', affirmation.text);
+          }
+
+          let displayText = isPinned
+            ? await AsyncStorage.getItem('widgetAffirmationText')
+            : affirmation.text;
+
           requestWidgetUpdate({
             widgetName: 'TodayAffirmation',
             renderWidget: () => (
-              <TodayAffirmationWidget text={affirmation.text} photoKey={todayPhoto || 'default'} />
+              <TodayAffirmationWidget text={displayText} photoKey={todayPhoto || 'default'} />
             ),
           });
         }

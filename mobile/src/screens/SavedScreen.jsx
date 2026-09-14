@@ -1,5 +1,5 @@
 import { useCallback, useState } from 'react';
-import { View, Text, FlatList, StyleSheet, ActivityIndicator, Pressable } from 'react-native';
+import { View, Text, FlatList, StyleSheet, ActivityIndicator, Pressable, Platform } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useFocusEffect } from '@react-navigation/native';
 import { useTheme } from '../context/ThemeContext';
@@ -7,6 +7,9 @@ import * as favoritesApi from '../api/favorites';
 import RichText from '../components/RichText';
 import { ExtensionStorage } from '@bacons/apple-targets';
 import * as affirmationsApi from '../api/affirmations';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { requestWidgetUpdate } from 'react-native-android-widget';
+import { TodayAffirmationWidget } from '../../widgets/TodayAffirmationWidget';
 
 let widgetStorage = new ExtensionStorage('group.com.coco.houseoflove');
 
@@ -23,30 +26,50 @@ export default function SavedScreen({ navigation }) {
   );
 
   async function togglePin(item) {
-    console.log('PIN DEBUG tapped, item:', JSON.stringify(item));
     let affirmationId = item.affirmation?._id;
-    console.log('PIN DEBUG affirmationId:', affirmationId);
-    if (!affirmationId) {
-      console.log('PIN DEBUG bailing — no affirmationId');
-      return;
-    }
+    if (!affirmationId) return;
 
-    if (pinnedId === affirmationId) {
-      // unpin — restore whatever was last actually revealed in-app
-      let lastRevealed = widgetStorage.get('widgetLastRevealedText');
-      if (lastRevealed) {
-        widgetStorage.set('widgetAffirmationText', lastRevealed);
+    if (Platform.OS === 'ios') {
+      if (pinnedId === affirmationId) {
+        // unpin — restore whatever was last actually revealed in-app
+        let lastRevealed = widgetStorage.get('widgetLastRevealedText');
+        if (lastRevealed) {
+          widgetStorage.set('widgetAffirmationText', lastRevealed);
+        }
+        widgetStorage.set('widgetIsPinned', 0);
+        widgetStorage.set('widgetPinnedId', null);
+        setPinnedId(null);
+      } else {
+        widgetStorage.set('widgetAffirmationText', item.affirmation.text);
+        widgetStorage.set('widgetIsPinned', 1);
+        widgetStorage.set('widgetPinnedId', affirmationId);
+        setPinnedId(affirmationId);
       }
-      widgetStorage.set('widgetIsPinned', 0);
-      widgetStorage.set('widgetPinnedId', null);
-      setPinnedId(null);
-    } else {
-      widgetStorage.set('widgetAffirmationText', item.affirmation.text);
-      widgetStorage.set('widgetIsPinned', 1);
-      widgetStorage.set('widgetPinnedId', affirmationId);
-      setPinnedId(affirmationId);
+      ExtensionStorage.reloadWidget();
+    } else if (Platform.OS === 'android') {
+      let photoKey = (await AsyncStorage.getItem('widgetTodayPhoto')) || 'default';
+      let newText;
+
+      if (pinnedId === affirmationId) {
+        let lastRevealed = await AsyncStorage.getItem('widgetLastRevealedText');
+        newText = lastRevealed || '';
+        await AsyncStorage.setItem('widgetAffirmationText', newText);
+        await AsyncStorage.setItem('widgetIsPinned', '0');
+        await AsyncStorage.removeItem('widgetPinnedId');
+        setPinnedId(null);
+      } else {
+        newText = item.affirmation.text;
+        await AsyncStorage.setItem('widgetAffirmationText', newText);
+        await AsyncStorage.setItem('widgetIsPinned', '1');
+        await AsyncStorage.setItem('widgetPinnedId', affirmationId);
+        setPinnedId(affirmationId);
+      }
+
+      requestWidgetUpdate({
+        widgetName: 'TodayAffirmation',
+        renderWidget: () => <TodayAffirmationWidget text={newText} photoKey={photoKey} />,
+      });
     }
-    ExtensionStorage.reloadWidget();
   }
 
   // refetch each time the tab is focused, so newly saved items show up

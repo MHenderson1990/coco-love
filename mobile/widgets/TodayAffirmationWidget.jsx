@@ -16,23 +16,24 @@ export function TodayAffirmationWidget({ text, photoKey }) {
         style={{ height: 'match_parent', width: 'match_parent' }}
       />
 
-      <FlexWidget
+    <FlexWidget
         style={{
           height: 'match_parent',
           width: 'match_parent',
-          backgroundColor: '#00000080',
           borderRadius: 16,
           padding: 16,
           alignItems: 'center',
           justifyContent: 'center',
         }}
       >
-        <TextWidget
+    <TextWidget
           text={text || 'Peace and love, friend.'}
           style={{
             fontSize: 16,
             color: '#ffffff',
             textAlign: 'center',
+            textShadowColor: '#00000099',
+            textShadowRadius: 6,
           }}
         />
       </FlexWidget>
