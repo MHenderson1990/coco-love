@@ -15,6 +15,9 @@ import TypewriterText from '../components/TypewriterText';
 import { BlurView } from 'expo-blur';
 import { PHOTOS } from '../theme/photos';
 import { ExtensionStorage } from '@bacons/apple-targets';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { requestWidgetUpdate } from 'react-native-android-widget';
+import { TodayAffirmationWidget } from '../../widgets/TodayAffirmationWidget';
 
 let widgetStorage = new ExtensionStorage('group.com.coco.houseoflove');
 console.log('WIDGET DEBUG native module linked:', !!global.expo?.modules?.ExtensionStorage);
@@ -73,12 +76,20 @@ export default function TodayScreen({ navigation }) {
       setStreak(checkin.currentStreak);
 
       if (affirmation?.text) {
-        widgetStorage.set('widgetLastRevealedText', affirmation.text);
-        let isPinned = widgetStorage.get('widgetIsPinned');
-        if (!isPinned) {
-          widgetStorage.set('widgetAffirmationText', affirmation.text);
+        if (Platform.OS === 'ios') {
+          widgetStorage.set('widgetLastRevealedText', affirmation.text);
+          let isPinned = widgetStorage.get('widgetIsPinned');
+          if (!isPinned) {
+            widgetStorage.set('widgetAffirmationText', affirmation.text);
+          }
+          ExtensionStorage.reloadWidget();
+        } else if (Platform.OS === 'android') {
+          await AsyncStorage.setItem('widgetAffirmationText', affirmation.text);
+          requestWidgetUpdate({
+            widgetName: 'TodayAffirmation',
+            renderWidget: () => <TodayAffirmationWidget text={affirmation.text} />,
+          });
         }
-        ExtensionStorage.reloadWidget();
       }
 
       if (checkin.promoJustUnlocked) {

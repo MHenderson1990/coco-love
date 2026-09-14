@@ -77,7 +77,25 @@
             "deploymentTarget": "17.0"
           }
         }
-      ]
+      ],
+      [
+        "react-native-android-widget",
+    {
+    "widgets": [
+      {
+        "name": "TodayAffirmation",
+        "label": "Love G.E.M.S.",
+        "minWidth": "220dp",
+        "minHeight": "110dp",
+        "targetCellWidth": 3,
+        "targetCellHeight": 2,
+        "description": "Shows today's affirmation",
+        "previewImage": "./assets/placeholder.png",
+        "updatePeriodMillis": 0
+      }
+    ]
+  }
+]
     ],
     "extra": {
       "eas": {
