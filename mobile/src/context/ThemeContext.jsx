@@ -1,9 +1,13 @@
 import { createContext, useContext, useEffect, useState } from 'react';
+import { Platform } from 'react-native';
 import { PALETTES } from '../theme/palettes';
 import { useAuth } from './AuthContext';
 import * as userApi from '../api/user';
 import { PHOTO_KEYS } from '../theme/photos';
 import { ExtensionStorage } from '@bacons/apple-targets';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { requestWidgetUpdate } from 'react-native-android-widget';
+import { TodayAffirmationWidget } from '../../widgets/TodayAffirmationWidget';
 
 let widgetStorage = new ExtensionStorage('group.com.coco.houseoflove');
 
@@ -61,8 +65,19 @@ export function ThemeProvider({ children }) {
 
   async function setTodayPhoto(next) {
     setTodayPhotoState(next);
-    widgetStorage.set('widgetBackgroundPhoto', next);
-    ExtensionStorage.reloadWidget();
+
+    if (Platform.OS === 'ios') {
+      widgetStorage.set('widgetBackgroundPhoto', next);
+      ExtensionStorage.reloadWidget();
+    } else if (Platform.OS === 'android') {
+      let text = await AsyncStorage.getItem('widgetAffirmationText');
+      await AsyncStorage.setItem('widgetTodayPhoto', next);
+      requestWidgetUpdate({
+        widgetName: 'TodayAffirmation',
+        renderWidget: () => <TodayAffirmationWidget text={text} photoKey={next} />,
+      });
+    }
+
     try {
       await userApi.updateMe({ preferences: { todayPhoto: next } });
     } catch (err) {
