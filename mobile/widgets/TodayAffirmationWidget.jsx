@@ -8,10 +8,11 @@ export function TodayAffirmationWidget({ text, photoKey }) {
 
   return (
     <OverlapWidget style={{ height: 'match_parent', width: 'match_parent' }}>
-      <ImageWidget
+        <ImageWidget
         image={imageSource}
-        imageWidth={300}
-        imageHeight={150}
+        imageWidth={400}
+        imageHeight={200}
+        resizeMode="cover"
         style={{ height: 'match_parent', width: 'match_parent' }}
       />
 
