@@ -85,9 +85,12 @@ export default function TodayScreen({ navigation }) {
           ExtensionStorage.reloadWidget();
         } else if (Platform.OS === 'android') {
           await AsyncStorage.setItem('widgetAffirmationText', affirmation.text);
+          await AsyncStorage.setItem('widgetTodayPhoto', todayPhoto || 'default');
           requestWidgetUpdate({
             widgetName: 'TodayAffirmation',
-            renderWidget: () => <TodayAffirmationWidget text={affirmation.text} />,
+            renderWidget: () => (
+              <TodayAffirmationWidget text={affirmation.text} photoKey={todayPhoto || 'default'} />
+            ),
           });
         }
       }

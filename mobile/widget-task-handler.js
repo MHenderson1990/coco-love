@@ -8,12 +8,13 @@ export async function widgetTaskHandler(props) {
   if (widgetInfo.widgetName !== 'TodayAffirmation') return;
 
   let text = await AsyncStorage.getItem('widgetAffirmationText');
+  let photoKey = await AsyncStorage.getItem('widgetTodayPhoto');
 
   switch (props.widgetAction) {
     case 'WIDGET_ADDED':
     case 'WIDGET_UPDATE':
     case 'WIDGET_RESIZED':
-      props.renderWidget(<TodayAffirmationWidget text={text} />);
+      props.renderWidget(<TodayAffirmationWidget text={text} photoKey={photoKey} />);
       break;
     default:
       break;
