@@ -19,6 +19,7 @@ import ThemedBackground from './src/components/ThemedBackground';
 import RewardScreen from './src/screens/RewardScreen';
 import ResetPasswordScreen from './src/screens/ResetPasswordScreen';
 import LoadingScreen from './src/screens/LoadingScreen';
+import AnimatedSplashScreen from './src/components/AnimatedSplashScreen';
 import SavedScreen from './src/screens/SavedScreen';
 import { useFonts, Lora_400Regular, Lora_400Regular_Italic, Lora_700Bold } from '@expo-google-fonts/lora';
 import { BebasNeue_400Regular } from '@expo-google-fonts/bebas-neue';
@@ -27,6 +28,7 @@ import { PlaywriteGBS_400Regular } from '@expo-google-fonts/playwrite-gb-s';
 import { PlayfairDisplay_400Regular, PlayfairDisplay_500Medium } from '@expo-google-fonts/playfair-display';
 import EngagementScreen from './src/screens/EngagementScreen';
 import { usePushToken } from './src/hooks/usePushToken';
+import { useState } from 'react';
 
 let Stack = createNativeStackNavigator();
 
@@ -49,11 +51,16 @@ function Root() {
     PlaywriteGBS_400Regular,
     PlayfairDisplay_400Regular, PlayfairDisplay_500Medium,
   });
+  let [splashDone, setSplashDone] = useState(false);
 
   usePushToken(user); // ← registers for push once the app is up
 
   if (loading || !fontsLoaded) {
     return <LoadingScreen />;
+  }
+
+  if (!splashDone) {
+    return <AnimatedSplashScreen onFinish={() => setSplashDone(true)} />;
   }
 
   return (
