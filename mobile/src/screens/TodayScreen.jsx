@@ -217,7 +217,7 @@ export default function TodayScreen({ navigation }) {
         )}
 
         {revealed && (
-          <>
+          <View style={{ marginTop: 'auto' }}>
             <View style={styles.actions}>
               <Pressable style={styles.actWrap} onPress={handleSave}>
                 <BlurView
@@ -259,7 +259,7 @@ export default function TodayScreen({ navigation }) {
                 }
               }}
             />
-          </>
+          </View>
         )}
       </ScrollView>
     </SafeAreaView>
@@ -270,7 +270,7 @@ export default function TodayScreen({ navigation }) {
 let styles = StyleSheet.create({
   wrap: { flex: 1 },
   center: { flex: 1, alignItems: 'center', justifyContent: 'center' },
-  body: { flexGrow: 1, paddingHorizontal: 22, paddingBottom: 40, justifyContent: 'flex-start' },
+  body: { flexGrow: 1, paddingHorizontal: 22, paddingBottom: 12, justifyContent: 'flex-start' },
   greet: { marginTop: 22 },
   hello: { fontSize: 50, fontFamily: 'BebasNeue_400Regular', letterSpacing: .5 },
   greetRow: { flexDirection: 'row', alignItems: 'baseline', flexWrap: 'wrap' },
