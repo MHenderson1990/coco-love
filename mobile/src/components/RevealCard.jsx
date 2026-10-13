@@ -1,16 +1,38 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { View, Text, StyleSheet, Animated, PanResponder, Dimensions } from 'react-native';
 import { useTheme } from '../context/ThemeContext';
 import RichText from './RichText';
+import SparkleOverlay from './SparkleOverlay';
 import { BlurView } from 'expo-blur';
 import { Platform } from 'react-native';
 
 export default function RevealCard({ text, revealed, onReveal, compact, onAffirmationDone }) {
   let { colors } = useTheme();
   let translateY = useRef(new Animated.Value(0)).current;
+  let [textSize, setTextSize] = useState({ w: 0, h: 0 });
+  let [sparkling, setSparkling] = useState(false);
+  let textFade = useRef(new Animated.Value(0)).current;
+  let sparkFade = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
-    if (revealed) onAffirmationDone?.();
+    if (!revealed) {
+      textFade.setValue(0);
+      sparkFade.setValue(0);
+      setSparkling(false);
+      return undefined;
+    }
+    setSparkling(true);
+    Animated.timing(sparkFade, { toValue: 1, duration: 300, useNativeDriver: true }).start();
+    let t = setTimeout(() => {
+      Animated.parallel([
+        Animated.timing(textFade, { toValue: 1, duration: 900, useNativeDriver: true }),
+        Animated.timing(sparkFade, { toValue: 0, duration: 900, useNativeDriver: true }),
+      ]).start(() => {
+        setSparkling(false);
+        onAffirmationDone?.();
+      });
+    }, 1500);
+    return () => clearTimeout(t);
   }, [revealed]);
 
   function lift() {
@@ -46,11 +68,31 @@ export default function RevealCard({ text, revealed, onReveal, compact, onAffirm
   return (
     <View style={[styles.card, compact && { minHeight: 130, paddingVertical: 20 }]}>
       {revealed && (
-        <RichText
-          key={text}
-          text={text}
-          style={[styles.affirm, { color: '#fff' }]}
-        />
+        <View
+          style={{ alignSelf: 'stretch' }}
+          onLayout={(e) =>
+            setTextSize({
+              w: e.nativeEvent.layout.width,
+              h: e.nativeEvent.layout.height,
+            })
+          }
+        >
+          <Animated.View style={{ opacity: textFade }}>
+            <RichText
+              key={text}
+              text={text}
+              style={[styles.affirm, { color: '#fff' }]}
+            />
+          </Animated.View>
+          {sparkling && textSize.w > 0 && (
+            <Animated.View
+              style={[StyleSheet.absoluteFill, { opacity: sparkFade }]}
+              pointerEvents="none"
+            >
+              <SparkleOverlay width={textSize.w} height={textSize.h} />
+            </Animated.View>
+          )}
+        </View>
       )}
 
       {!revealed && (
