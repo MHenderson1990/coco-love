@@ -18,7 +18,7 @@
       "buildNumber": "3",
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false,
-        "CFBundleDisplayName": "Love G.E.M.S"
+        "CFBundleDisplayName": "G.E.M.S."
       },
       "entitlements": {
         "com.apple.security.application-groups": [
@@ -95,7 +95,11 @@
       }
     ]
   }
-]
+],
+      [
+        "./plugins/withAndroidAppName",
+        { "name": "G.E.M.S." }
+      ]
     ],
     "extra": {
       "eas": {
