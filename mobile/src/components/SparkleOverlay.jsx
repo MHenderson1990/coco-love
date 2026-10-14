@@ -3,7 +3,7 @@ import { Animated, Easing, View, StyleSheet } from 'react-native';
 
 let LAYERS = 10; // more layers = less in sync
 let BAND = 22; // height of the speck band on each text line
-let DENSITY = 30; // px² per speck, lower = denser
+let DENSITY = 12; // px² per speck, lower = denser
 let DRIFT_X = 9; // max sideways wander (px)
 let DRIFT_Y = 5; // max up/down wander (px)
 
@@ -62,8 +62,8 @@ export default function SparkleOverlay({ width, height, lineHeight = 35 }) {
           out[Math.floor(Math.random() * LAYERS)].specks.push({
             x: x + Math.random() * segW,
             y: cy - BAND / 2 + Math.random() * BAND,
-            size: 1.2 + Math.random() * 1.2,
-            opacity: 0.55 + Math.random() * 0.45,
+            size: 0.7 + Math.random() * 0.8,
+            opacity: 0.7 + Math.random() * 0.3,
             color: Math.random() > 0.2 ? '#ffffff' : '#d9d9e8',
           });
         }
