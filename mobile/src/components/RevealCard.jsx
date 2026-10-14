@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { View, Text, StyleSheet, Animated, PanResponder, Dimensions } from 'react-native';
+import { View, Text, StyleSheet, Animated, Easing, PanResponder, Dimensions } from 'react-native';
 import { useTheme } from '../context/ThemeContext';
 import RichText from './RichText';
 import SparkleOverlay from './SparkleOverlay';
@@ -23,15 +23,27 @@ export default function RevealCard({ text, revealed, onReveal, compact, onAffirm
     }
     setSparkling(true);
     Animated.timing(sparkFade, { toValue: 1, duration: 300, useNativeDriver: true }).start();
+
     let t = setTimeout(() => {
       Animated.parallel([
-        Animated.timing(textFade, { toValue: 1, duration: 900, useNativeDriver: true }),
-        Animated.timing(sparkFade, { toValue: 0, duration: 900, useNativeDriver: true }),
+        Animated.timing(textFade, {
+          toValue: 1,
+          duration: 2800,
+          easing: Easing.inOut(Easing.quad),
+          useNativeDriver: true,
+        }),
+        Animated.timing(sparkFade, {
+          toValue: 0,
+          duration: 3400,
+          easing: Easing.inOut(Easing.quad),
+          useNativeDriver: true,
+        }),
       ]).start(() => {
         setSparkling(false);
         onAffirmationDone?.();
       });
     }, 1500);
+
     return () => clearTimeout(t);
   }, [revealed]);
 
