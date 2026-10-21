@@ -83,5 +83,5 @@ let styles = StyleSheet.create({
     overflow: 'hidden', alignItems: 'center', justifyContent: 'flex-start',
     paddingHorizontal: 24, paddingVertical: 28,
   },
-  affirm: { fontSize: 20, lineHeight: 35, textAlign: 'center', fontFamily: 'PlaywriteGBS_400Regular' },
+  affirm: { fontSize: 34, lineHeight: 35, textAlign: 'center', fontFamily: 'Dongle_400Regular' },
 });

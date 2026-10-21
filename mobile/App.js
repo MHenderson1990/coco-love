@@ -26,6 +26,7 @@ import { BebasNeue_400Regular } from '@expo-google-fonts/bebas-neue';
 import { PassionsConflict_400Regular } from '@expo-google-fonts/passions-conflict';
 import { PlaywriteGBS_400Regular } from '@expo-google-fonts/playwrite-gb-s';
 import { PlayfairDisplay_400Regular, PlayfairDisplay_500Medium } from '@expo-google-fonts/playfair-display';
+import { Dongle_400Regular } from '@expo-google-fonts/dongle';
 import EngagementScreen from './src/screens/EngagementScreen';
 import { usePushToken } from './src/hooks/usePushToken';
 import { useState } from 'react';
@@ -50,7 +51,9 @@ function Root() {
     PassionsConflict_400Regular,
     PlaywriteGBS_400Regular,
     PlayfairDisplay_400Regular, PlayfairDisplay_500Medium,
+    Dongle_400Regular,
   });
+  
   let [splashDone, setSplashDone] = useState(false);
 
   usePushToken(user); // ← registers for push once the app is up

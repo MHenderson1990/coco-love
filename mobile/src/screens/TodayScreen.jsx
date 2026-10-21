@@ -36,6 +36,9 @@ export default function TodayScreen({ navigation }) {
   let [journalOpen, setJournalOpen] = useState(false);
   let [affirmationDone, setAffirmationDone] = useState(false);
   let subFade = useRef(new Animated.Value(0)).current;
+  let greetFade = useRef(new Animated.Value(0)).current;
+  let cardFade = useRef(new Animated.Value(0)).current;
+  let [cardReady, setCardReady] = useState(false);
   let scrollRef = useRef(null);
 
   useEffect(() => {
@@ -52,6 +55,26 @@ export default function TodayScreen({ navigation }) {
     }
     load();
   }, []);
+
+  useEffect(() => {
+    if (loading) return undefined;
+    Animated.timing(greetFade, {
+      toValue: 1,
+      duration: 1800,
+      delay: 300,
+      useNativeDriver: true,
+    }).start();
+
+    let CARD_DELAY = 3600; // prompt starts at 2000ms + ~1530ms typing
+    Animated.timing(cardFade, {
+      toValue: 1,
+      duration: 1600,
+      delay: CARD_DELAY,
+      useNativeDriver: true,
+    }).start();
+    let t = setTimeout(() => setCardReady(true), CARD_DELAY);
+    return () => clearTimeout(t);
+  }, [loading]);
 
   function handleAffirmationDone() {
     setAffirmationDone(true);
@@ -180,40 +203,39 @@ export default function TodayScreen({ navigation }) {
         <AnnouncementBanner onPress={() => navigation.navigate('Announcements')} />
 
         <View style={styles.greet}>
-          <View style={{ alignItems: 'center' }}>
+          <Animated.View style={{ alignItems: 'center', opacity: greetFade }}>
             <Text style={[styles.hello, { color: '#fff' }]}>{'Peace\u2009&\u2009love'}</Text>
             <Text style={[styles.name, { color: '#fff' }]}>{user?.name}</Text>
-          </View>
+          </Animated.View>
 
-          {revealed ? (
-            <Animated.Text
-              style={[styles.sub, { color: '#fff', textAlign: 'center', opacity: subFade }]}
-            >
-              Take it with you today.
-            </Animated.Text>
-          ) : (
+          <View style={{ opacity: revealed ? 0 : 1 }} pointerEvents="none">
             <TypewriterText
               key="opening-message"
               style={[styles.sub, { color: '#fff', textAlign: 'center' }]}
               text={'Are you ready for today\u2019s message?'}
-              delay={500}
+              delay={2000}
               speed={45}
             />
-          )}
           </View>
+        </View>
 
         {error ? (
           <View style={[styles.errorBox, { backgroundColor: 'rgba(255,255,255,0.4)', borderColor: colors.line }]}>
             <Text style={{ color: colors.muted, textAlign: 'center' }}>{error}</Text>
           </View>
         ) : (
-          <RevealCard
-            text={affirmation?.text}
-            revealed={revealed}
-            onReveal={handleReveal}
-            compact={journalOpen}
-            onAffirmationDone={handleAffirmationDone}
-          />
+          <Animated.View
+            style={{ opacity: cardFade }}
+            pointerEvents={cardReady ? 'auto' : 'none'}
+          >
+            <RevealCard
+              text={affirmation?.text}
+              revealed={revealed}
+              onReveal={handleReveal}
+              compact={journalOpen}
+              onAffirmationDone={handleAffirmationDone}
+            />
+          </Animated.View>
         )}
 
         {revealed && (
