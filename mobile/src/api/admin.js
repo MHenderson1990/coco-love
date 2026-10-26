@@ -36,7 +36,13 @@ export async function uploadVideo(fileUri, onProgress) {
     { method: 'POST', body: form }
   );
 
-  let data = await res.json();
+  let raw = await res.text();
+  let data;
+  try {
+    data = JSON.parse(raw);
+  } catch (e) {
+    throw new Error(`Cloudinary ${res.status}: ${raw.slice(0, 160)}`);
+  }
   if (!res.ok) throw new Error(data.error?.message || 'Upload failed');
 
   return {

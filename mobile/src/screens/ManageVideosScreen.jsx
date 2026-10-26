@@ -7,6 +7,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useFocusEffect } from '@react-navigation/native';
 import { useTheme } from '../context/ThemeContext';
 import MonthFilter from '../components/MonthFilter';
+import { EXPLORE_CATEGORIES } from '../constants/exploreCategories';
 import * as videosApi from '../api/videos';
 
 export default function ManageVideosScreen({ navigation }) {
@@ -88,7 +89,7 @@ export default function ManageVideosScreen({ navigation }) {
               <View style={{ flex: 1 }}>
                 <Text style={[styles.rowTitle, { color: colors.ink }]}>{item.title}</Text>
                 <Text style={[styles.rowMeta, { color: colors.muted }]}>
-                  {item.tier === 'free' ? 'Free' : 'Members'}
+                  {item.category || 'More'} · {item.tier === 'free' ? 'Free' : 'Members'}
                   {item.description ? ` · ${item.description}` : ''}
                 </Text>
               </View>
@@ -119,6 +120,7 @@ function EditVideoModal({ video, colors, onClose, onSaved, onDelete }) {
   let [title, setTitle] = useState('');
   let [description, setDescription] = useState('');
   let [tier, setTier] = useState('paid');
+  let [category, setCategory] = useState('More');
   let [busy, setBusy] = useState(false);
   let [ready, setReady] = useState(false);
 
@@ -126,6 +128,7 @@ function EditVideoModal({ video, colors, onClose, onSaved, onDelete }) {
     setTitle(video.title || '');
     setDescription(video.description || '');
     setTier(video.tier || 'paid');
+    setCategory(video.category || 'More');
     setReady(true);
   }
   if (!video && ready) setReady(false);
@@ -141,7 +144,9 @@ function EditVideoModal({ video, colors, onClose, onSaved, onDelete }) {
         title: title.trim(),
         description: description.trim(),
         tier,
+        category,
       });
+
       onSaved(updated);
     } catch (err) {
       Alert.alert('Could not save', 'Try again in a moment.');
@@ -194,6 +199,31 @@ function EditVideoModal({ video, colors, onClose, onSaved, onDelete }) {
             ))}
           </View>
 
+          <Text style={[styles.catLabel, { color: colors.muted }]}>Category</Text>
+          <View style={styles.catRow}>
+            {EXPLORE_CATEGORIES.map((c) => (
+              <Pressable
+                key={c}
+                style={[
+                  styles.catChip,
+                  { borderColor: colors.line },
+                  category === c && { backgroundColor: colors.accent, borderColor: colors.accent },
+                ]}
+                onPress={() => setCategory(c)}
+              >
+                <Text
+                  style={{
+                    color: category === c ? colors.surface : colors.muted,
+                    fontSize: 12,
+                    fontWeight: '700',
+                  }}
+                >
+                  {c}
+                </Text>
+              </Pressable>
+            ))}
+          </View>
+
           <Pressable
             style={[styles.btn, { backgroundColor: colors.accent, opacity: busy ? 0.6 : 1 }]}
             onPress={save}
@@ -233,6 +263,9 @@ let styles = StyleSheet.create({
   input: { borderRadius: 12, padding: 14, fontSize: 14, marginBottom: 12 },
   tierToggle: { flexDirection: 'row', borderWidth: 1, borderRadius: 100, overflow: 'hidden', marginBottom: 14 },
   tierBtn: { flex: 1, paddingVertical: 10, alignItems: 'center' },
+  catLabel: { fontSize: 12, fontWeight: '600', marginBottom: 8 },
+  catRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginBottom: 16 },
+  catChip: { borderWidth: 1, borderRadius: 100, paddingHorizontal: 14, paddingVertical: 8 },
   btn: { borderRadius: 13, paddingVertical: 14, alignItems: 'center' },
   btnText: { fontSize: 13, fontWeight: '700' },
   deleteBtn: { alignItems: 'center', paddingVertical: 14 },

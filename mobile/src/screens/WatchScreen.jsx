@@ -8,6 +8,7 @@ export default function WatchScreen({ navigation }) {
   let { colors } = useTheme();
   let [items, setItems] = useState([]);
   let [loading, setLoading] = useState(true);
+  let [section, setSection] = useState('video');
 
   useEffect(() => {
     videosApi.listVideos()
@@ -25,10 +26,27 @@ export default function WatchScreen({ navigation }) {
 
   return (
     <SafeAreaView style={[styles.wrap, { backgroundColor: 'transparent' }]} edges={['top']}>
-      <Text style={[styles.title, { color: colors.ink }]}>Watch</Text>
-      <Text style={[styles.sub, { color: colors.muted }]}>Longer sessions, whenever you want them.</Text>
+      <Text style={[styles.title, { color: colors.ink }]}>Explore</Text>
+      <Text style={[styles.sub, { color: colors.muted }]}>Video, audio and more, whenever you want them.</Text>
 
-      {loading ? (
+      <View style={[styles.toggle, { backgroundColor: colors.surface, borderColor: colors.line }]}>
+        {['video', 'audio'].map((key) => (
+          <Pressable
+            key={key}
+            style={[styles.seg, section === key && { backgroundColor: colors.accent }]}
+            onPress={() => setSection(key)}
+          >
+            <Text style={[styles.segText, { color: section === key ? '#fff' : colors.muted }]}>
+              {key === 'video' ? 'Video' : 'Audio'}
+            </Text>
+          </Pressable>
+        ))}
+      </View>
+
+      {section === 'audio' ? (
+        <Text style={[styles.empty, { color: colors.muted }]}>Audio is coming soon.</Text>
+
+      ) : loading ? (
         <ActivityIndicator color={colors.accent} style={{ marginTop: 40 }} />
       ) : (
         <FlatList
@@ -93,4 +111,8 @@ let styles = StyleSheet.create({
   vidSub:   { fontSize: 12, marginTop: 3 },
   badge:    { position: 'absolute', left: 10, top: 8, paddingHorizontal: 8, paddingVertical: 3, borderRadius: 100 },
   badgeText: { fontSize: 9, fontWeight: '700', letterSpacing: 0.8 },
+  toggle:   { flexDirection: 'row', borderWidth: 1, borderRadius: 100, padding: 3, marginBottom: 14 },
+  seg:      { flex: 1, paddingVertical: 8, borderRadius: 100, alignItems: 'center' },
+  segText:  { fontSize: 13, fontWeight: '600' },
+  empty:    { textAlign: 'center', marginTop: 40, fontSize: 13.5 },
 });

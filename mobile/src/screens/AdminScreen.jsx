@@ -14,7 +14,7 @@ import * as announcementsApi from '../api/announcements';
 import * as ImagePicker from 'expo-image-picker';
 import * as videosApi from '../api/videos';
 import RichText from '../components/RichText';
-
+import { EXPLORE_CATEGORIES } from '../constants/exploreCategories';
 export default function AdminScreen({ navigation }) {
   let { colors } = useTheme();
 
@@ -515,6 +515,7 @@ function VideoModal({ visible, onClose, colors }) {
   let [title, setTitle] = useState('');
   let [description, setDescription] = useState('');
   let [tier, setTier] = useState('paid');
+  let [category, setCategory] = useState('More');
   let [busy, setBusy] = useState(false);
   let [status, setStatus] = useState('');
   let [error, setError] = useState('');
@@ -529,6 +530,7 @@ function VideoModal({ visible, onClose, colors }) {
     let result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Videos,
       quality: 1,
+      videoExportPreset: ImagePicker.VideoExportPreset.H264_1280x720,
     });
 
     if (!result.canceled && result.assets?.length) {
@@ -561,12 +563,14 @@ function VideoModal({ visible, onClose, colors }) {
         thumbnailUrl: uploaded.thumbnailUrl,
         duration: uploaded.duration,
         tier,
+        category,
       });
 
       setFile(null);
       setTitle('');
       setDescription('');
       setTier('paid');
+      setCategory('More');
       onClose();
       Alert.alert('Uploaded', 'Your session is in the library.');
     } catch (err) {
@@ -613,6 +617,31 @@ function VideoModal({ visible, onClose, colors }) {
           >
             <Text style={{ color: tier === t ? colors.surface : colors.muted, fontSize: 12, fontWeight: '700' }}>
               {t === 'free' ? 'Free for everyone' : 'Members only'}
+            </Text>
+          </Pressable>
+        ))}
+      </View>
+
+      <Text style={[styles.catLabel, { color: colors.muted }]}>Category</Text>
+      <View style={styles.catRow}>
+        {EXPLORE_CATEGORIES.map((c) => (
+          <Pressable
+            key={c}
+            style={[
+              styles.catChip,
+              { borderColor: colors.line },
+              category === c && { backgroundColor: colors.accent, borderColor: colors.accent },
+            ]}
+            onPress={() => setCategory(c)}
+          >
+            <Text
+              style={{
+                color: category === c ? colors.surface : colors.muted,
+                fontSize: 12,
+                fontWeight: '700',
+              }}
+            >
+              {c}
             </Text>
           </Pressable>
         ))}
@@ -720,6 +749,9 @@ let styles = StyleSheet.create({
   error: { fontSize: 13, marginBottom: 10 },
   tierToggle: { flexDirection: 'row', borderWidth: 1, borderRadius: 100, overflow: 'hidden', marginBottom: 14 },
   tierBtn: { flex: 1, paddingVertical: 10, alignItems: 'center' },
+  catLabel: { fontSize: 12, fontWeight: '600', marginBottom: 8 },
+  catRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginBottom: 16 },
+  catChip: { borderWidth: 1, borderRadius: 100, paddingHorizontal: 14, paddingVertical: 8 },
   fmtBar: { flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 10 },
   fmtBtn: { width: 38, height: 34, borderWidth: 1, borderRadius: 8, alignItems: 'center', justifyContent: 'center' },
   fmtB: { fontSize: 15, fontWeight: '800' },

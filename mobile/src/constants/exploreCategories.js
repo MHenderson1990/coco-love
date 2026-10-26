@@ -1,0 +1,1 @@
+export let EXPLORE_CATEGORIES = ['Poetry', 'Motivational', 'Meditation', 'More'];
