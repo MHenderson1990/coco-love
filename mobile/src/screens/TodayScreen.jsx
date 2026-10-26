@@ -23,9 +23,19 @@ let widgetStorage = new ExtensionStorage('group.com.coco.houseoflove');
 console.log('WIDGET DEBUG native module linked:', !!global.expo?.modules?.ExtensionStorage);
 
 
+let HELLO_DELAY = 400;
+let HELLO_SPEED = 80;
+let HELLO_LEN = 12;
+let NAME_SPEED = 90;
+let PROMPT_LEN = 34;
+
 export default function TodayScreen({ navigation }) {
   let { colors, background, todayPhoto, themeReady } = useTheme();
   let { user } = useAuth();
+  let nameLen = (user?.name || '').length;
+  let NAME_DELAY = HELLO_DELAY + HELLO_LEN * HELLO_SPEED + 300;
+  let PROMPT_DELAY = NAME_DELAY + nameLen * NAME_SPEED + 500;
+  let CARD_DELAY = PROMPT_DELAY + PROMPT_LEN * 45 + 500;
 
   let [affirmation, setAffirmation] = useState(null);
   let [streak, setStreak] = useState(user?.currentStreak ?? 0);
@@ -36,7 +46,6 @@ export default function TodayScreen({ navigation }) {
   let [journalOpen, setJournalOpen] = useState(false);
   let [affirmationDone, setAffirmationDone] = useState(false);
   let subFade = useRef(new Animated.Value(0)).current;
-  let greetFade = useRef(new Animated.Value(0)).current;
   let cardFade = useRef(new Animated.Value(0)).current;
   let [cardReady, setCardReady] = useState(false);
   let scrollRef = useRef(null);
@@ -56,16 +65,8 @@ export default function TodayScreen({ navigation }) {
     load();
   }, []);
 
-  useEffect(() => {
+   useEffect(() => {
     if (loading) return undefined;
-    Animated.timing(greetFade, {
-      toValue: 1,
-      duration: 1800,
-      delay: 300,
-      useNativeDriver: true,
-    }).start();
-
-    let CARD_DELAY = 3600; // prompt starts at 2000ms + ~1530ms typing
     Animated.timing(cardFade, {
       toValue: 1,
       duration: 1600,
@@ -203,17 +204,29 @@ export default function TodayScreen({ navigation }) {
         <AnnouncementBanner onPress={() => navigation.navigate('Announcements')} />
 
         <View style={styles.greet}>
-          <Animated.View style={{ alignItems: 'center', opacity: greetFade }}>
-            <Text style={[styles.hello, { color: '#fff' }]}>{'Peace\u2009&\u2009love'}</Text>
-            <Text style={[styles.name, { color: '#fff' }]}>{user?.name}</Text>
-          </Animated.View>
+          <View style={{ alignItems: 'center' }}>
+            <TypewriterText
+              key="hello"
+              style={[styles.hello, { color: '#fff', textAlign: 'center' }]}
+              text={'Peace\u2009&\u2009love'}
+              delay={HELLO_DELAY}
+              speed={HELLO_SPEED}
+            />
+            <TypewriterText
+              key={`name-${user?.name}`}
+              style={[styles.name, { color: '#fff', textAlign: 'center' }]}
+              text={user?.name || ''}
+              delay={NAME_DELAY}
+              speed={NAME_SPEED}
+            />
+          </View>
 
           <View style={{ opacity: revealed ? 0 : 1 }} pointerEvents="none">
             <TypewriterText
               key="opening-message"
               style={[styles.sub, { color: '#fff', textAlign: 'center' }]}
               text={'Are you ready for today\u2019s message?'}
-              delay={2000}
+              delay={PROMPT_DELAY}
               speed={45}
             />
           </View>
@@ -294,9 +307,24 @@ let styles = StyleSheet.create({
   center: { flex: 1, alignItems: 'center', justifyContent: 'center' },
   body: { flexGrow: 1, paddingHorizontal: 22, paddingBottom: 12, justifyContent: 'flex-start' },
   greet: { marginTop: 22 },
-  hello: { fontSize: 50, fontFamily: 'BebasNeue_400Regular', letterSpacing: .5 },
+  hello: {
+    fontSize: 54,
+    fontFamily: 'BebasNeue_400Regular',
+    letterSpacing: 1,
+    textShadowColor: 'rgba(201, 168, 255, 0.95)',
+    textShadowOffset: { width: 0, height: 0 },
+    textShadowRadius: 14,
+  },
   greetRow: { flexDirection: 'row', alignItems: 'baseline', flexWrap: 'wrap' },
-  name: { fontSize: 55, fontFamily: 'PassionsConflict_400Regular', marginTop: -25, textAlign: 'center' },
+  name: {
+    fontSize: 66,
+    fontFamily: 'PassionsConflict_400Regular',
+    marginTop: -28,
+    textAlign: 'center',
+    textShadowColor: 'rgba(201, 168, 255, 0.95)',
+    textShadowOffset: { width: 0, height: 0 },
+    textShadowRadius: 12,
+  },
   sub: { fontSize: 15, fontFamily: 'PlayfairDisplay_400Regular' },
   errorBox: { minHeight: 260, marginTop: 16, borderRadius: 22, borderWidth: 1, alignItems: 'center', justifyContent: 'center', padding: 24 },
   actions: { flexDirection: 'row', gap: 8, marginTop: 14 },

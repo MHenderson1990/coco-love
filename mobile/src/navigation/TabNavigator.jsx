@@ -43,7 +43,7 @@ export default function TabNavigator() {
     >
       <Tab.Screen name="Today" component={TodayScreen} />
       <Tab.Screen name="MyJournal" component={FreeJournalScreen} options={{ tabBarLabel: 'Journal' }}/>
-      <Tab.Screen name="Watch" component={WatchScreen} />
+      <Tab.Screen name="Watch" component={WatchScreen} options={{ tabBarLabel: 'Explore' }} />
       <Tab.Screen name="You" component={ProfileScreen} />
     </Tab.Navigator>
   );
