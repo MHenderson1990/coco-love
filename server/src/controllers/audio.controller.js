@@ -36,6 +36,7 @@ exports.uploadUrl = async (req, res) => {
     let signed = await r2.presignUpload(key);
     res.json(signed);
   } catch (err) {
+    console.error('audio uploadUrl failed:', err);
     res.status(500).json({ error: err.message });
   }
 };
