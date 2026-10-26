@@ -8,6 +8,7 @@ const feedbackRoutes = require('./feedback.routes');
 const journalRoutes = require('./journal.routes');
 const announcementRoutes = require('./announcement.routes');
 const videoRoutes = require('./video.routes');
+let audioRoutes = require('./audio.routes');
 const adminRoutes = require('./admin.routes');
 const promoRoutes = require('./promo.routes');
 
@@ -19,6 +20,7 @@ router.use('/feedback', feedbackRoutes);
 router.use('/journal', journalRoutes);
 router.use('/announcements', announcementRoutes);
 router.use('/videos', videoRoutes);
+router.use('/audio', audioRoutes);
 router.use('/admin', adminRoutes);
 router.use('/promo', promoRoutes);
 
