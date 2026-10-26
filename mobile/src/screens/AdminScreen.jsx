@@ -13,6 +13,8 @@ import * as adminApi from '../api/admin';
 import * as announcementsApi from '../api/announcements';
 import * as ImagePicker from 'expo-image-picker';
 import * as videosApi from '../api/videos';
+import * as audioApi from '../api/audio';
+import * as DocumentPicker from 'expo-document-picker';
 import RichText from '../components/RichText';
 import { EXPLORE_CATEGORIES } from '../constants/exploreCategories';
 export default function AdminScreen({ navigation }) {
@@ -25,6 +27,7 @@ export default function AdminScreen({ navigation }) {
   let [showAffirmation, setShowAffirmation] = useState(false);
   let [showAnnouncement, setShowAnnouncement] = useState(false);
   let [showVideo, setShowVideo] = useState(false);
+  let [showAudio, setShowAudio] = useState(false);
   let [showPromo, setShowPromo] = useState(false);
 
   let load = useCallback(() => {
@@ -123,6 +126,13 @@ export default function AdminScreen({ navigation }) {
 
               <Pressable
                 style={[styles.btn, styles.ghost, { backgroundColor: colors.surface, borderColor: colors.line }]}
+                onPress={() => setShowAudio(true)}
+              >
+                <Text style={[styles.btnText, { color: colors.ink }]}>Upload audio</Text>
+              </Pressable>
+
+              <Pressable
+                style={[styles.btn, styles.ghost, { backgroundColor: colors.surface, borderColor: colors.line }]}
                 onPress={() => Linking.openURL(CALENDLY_URL)}
               >
                 <Text style={[styles.btnText, { color: colors.ink }]}>Open booking calendar</Text>
@@ -139,6 +149,13 @@ export default function AdminScreen({ navigation }) {
                 onPress={() => navigation.navigate('ManageVideos')}
               >
                 <Text style={[styles.btnText, { color: colors.ink }]}>Manage videos</Text>
+              </Pressable>
+
+              <Pressable
+                style={[styles.btn, styles.ghost, { backgroundColor: colors.surface, borderColor: colors.line }]}
+                onPress={() => navigation.navigate('ManageAudio')}
+              >
+                <Text style={[styles.btnText, { color: colors.ink }]}>Manage audio</Text>
               </Pressable>
 
               <Pressable
@@ -168,6 +185,12 @@ export default function AdminScreen({ navigation }) {
       <VideoModal
         visible={showVideo}
         onClose={() => setShowVideo(false)}
+        colors={colors}
+      />
+
+      <AudioModal
+        visible={showAudio}
+        onClose={() => setShowAudio(false)}
         colors={colors}
       />
 
@@ -589,6 +612,157 @@ function VideoModal({ visible, onClose, colors }) {
       >
         <Text style={{ color: file ? colors.ink : colors.muted, fontSize: 14 }}>
           {file ? `Selected · ${(file.fileSize / 1048576).toFixed(1)} MB` : 'Choose a video'}
+        </Text>
+      </Pressable>
+
+      <TextInput
+        style={[styles.input, { backgroundColor: colors.bg, color: colors.ink }]}
+        placeholder="Title"
+        placeholderTextColor={colors.muted}
+        value={title}
+        onChangeText={setTitle}
+      />
+
+      <TextInput
+        style={[styles.input, { backgroundColor: colors.bg, color: colors.ink }]}
+        placeholder="Short description"
+        placeholderTextColor={colors.muted}
+        value={description}
+        onChangeText={setDescription}
+      />
+
+      <View style={[styles.tierToggle, { borderColor: colors.line }]}>
+        {['free', 'paid'].map((t) => (
+          <Pressable
+            key={t}
+            style={[styles.tierBtn, tier === t && { backgroundColor: colors.accent }]}
+            onPress={() => setTier(t)}
+          >
+            <Text style={{ color: tier === t ? colors.surface : colors.muted, fontSize: 12, fontWeight: '700' }}>
+              {t === 'free' ? 'Free for everyone' : 'Members only'}
+            </Text>
+          </Pressable>
+        ))}
+      </View>
+
+      <Text style={[styles.catLabel, { color: colors.muted }]}>Category</Text>
+      <View style={styles.catRow}>
+        {EXPLORE_CATEGORIES.map((c) => (
+          <Pressable
+            key={c}
+            style={[
+              styles.catChip,
+              { borderColor: colors.line },
+              category === c && { backgroundColor: colors.accent, borderColor: colors.accent },
+            ]}
+            onPress={() => setCategory(c)}
+          >
+            <Text
+              style={{
+                color: category === c ? colors.surface : colors.muted,
+                fontSize: 12,
+                fontWeight: '700',
+              }}
+            >
+              {c}
+            </Text>
+          </Pressable>
+        ))}
+      </View>
+
+      {status ? <Text style={[styles.error, { color: colors.muted }]}>{status}</Text> : null}
+      {error ? <Text style={[styles.error, { color: colors.accent }]}>{error}</Text> : null}
+
+      <Pressable
+        style={[styles.btn, { backgroundColor: colors.accent, opacity: busy ? 0.6 : 1 }]}
+        onPress={upload}
+        disabled={busy}
+      >
+        <Text style={[styles.btnText, { color: colors.surface }]}>
+          {busy ? 'Working…' : 'Upload'}
+        </Text>
+      </Pressable>
+    </Sheet>
+  );
+}
+
+function AudioModal({ visible, onClose, colors }) {
+  let [file, setFile] = useState(null);
+  let [title, setTitle] = useState('');
+  let [description, setDescription] = useState('');
+  let [tier, setTier] = useState('paid');
+  let [category, setCategory] = useState('More');
+  let [busy, setBusy] = useState(false);
+  let [status, setStatus] = useState('');
+  let [error, setError] = useState('');
+
+  async function pick() {
+    let result = await DocumentPicker.getDocumentAsync({
+      type: 'audio/*',
+      copyToCacheDirectory: true,
+    });
+    if (!result.canceled && result.assets?.length) {
+      setFile(result.assets[0]);
+      setError('');
+    }
+  }
+
+  async function upload() {
+    if (!file) {
+      setError('Pick an audio file first.');
+      return;
+    }
+    if (!title.trim()) {
+      setError('Give it a title.');
+      return;
+    }
+    let ext = (file.name || '').split('.').pop().toLowerCase();
+    if (!['mp3', 'm4a', 'aac', 'wav'].includes(ext)) {
+      setError('Use an mp3, m4a, aac or wav file.');
+      return;
+    }
+
+    setError('');
+    setBusy(true);
+    try {
+      setStatus('Uploading…');
+      let audioKey = await audioApi.uploadAudioFile(file.uri, ext);
+
+      setStatus('Saving…');
+      await audioApi.createAudio({
+        title: title.trim(),
+        description: description.trim(),
+        audioKey,
+        category,
+        tier,
+      });
+
+      setFile(null);
+      setTitle('');
+      setDescription('');
+      setTier('paid');
+      setCategory('More');
+      onClose();
+      Alert.alert('Uploaded', 'Your audio is in the library.');
+
+    } catch (err) {
+      setError(err.response?.data?.error || err.message || 'Upload failed. Try again.');
+    } finally {
+      setBusy(false);
+      setStatus('');
+    }
+  }
+
+  return (
+    <Sheet visible={visible} onClose={onClose} title="Upload audio" colors={colors}>
+      <Pressable
+        style={[styles.input, { backgroundColor: colors.bg, justifyContent: 'center' }]}
+        onPress={pick}
+      >
+        <Text style={{ color: file ? colors.ink : colors.muted, fontSize: 14 }} numberOfLines={1}>
+          {file
+            ? `${file.name}${file.size ? ` · ${(file.size / 1048576).toFixed(1)} MB` : ''}`
+            : 'Choose an audio file'}
         </Text>
       </Pressable>
 

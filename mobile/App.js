@@ -14,6 +14,7 @@ import HistoryScreen from './src/screens/HistoryScreen';
 import UpgradeScreen from './src/screens/UpgradeScreen';
 import VideoPlayerScreen from './src/screens/VideoPlayerScreen';
 import ManageVideosScreen from './src/screens/ManageVideosScreen';
+import ManageAudioScreen from './src/screens/ManageAudioScreen';
 import ManageAffirmationsScreen from './src/screens/ManageAffirmationsScreen';
 import ThemedBackground from './src/components/ThemedBackground';
 import RewardScreen from './src/screens/RewardScreen';
@@ -80,6 +81,7 @@ function Root() {
               <Stack.Screen name="Upgrade" component={UpgradeScreen} />
               <Stack.Screen name="VideoPlayer" component={VideoPlayerScreen} />
               <Stack.Screen name="ManageVideos" component={ManageVideosScreen} />
+              <Stack.Screen name="ManageAudio" component={ManageAudioScreen} />
               <Stack.Screen name="ManageAffirmations" component={ManageAffirmationsScreen} />
               <Stack.Screen name="Reward" component={RewardScreen} />
               <Stack.Screen name="Saved" component={SavedScreen} />
