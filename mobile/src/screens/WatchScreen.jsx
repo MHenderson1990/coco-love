@@ -1,14 +1,20 @@
 import { useEffect, useState } from 'react';
-import { View, Text, FlatList, StyleSheet, ActivityIndicator, Pressable, Linking } from 'react-native';
+import { View, Text, FlatList, StyleSheet, ActivityIndicator, Pressable, Linking, ScrollView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTheme } from '../context/ThemeContext';
 import * as videosApi from '../api/videos';
+import { EXPLORE_CATEGORIES } from '../constants/exploreCategories';
 
 export default function WatchScreen({ navigation }) {
   let { colors } = useTheme();
   let [items, setItems] = useState([]);
   let [loading, setLoading] = useState(true);
   let [section, setSection] = useState('video');
+  let [category, setCategory] = useState('All');
+
+  let shown = category === 'All'
+    ? items
+    : items.filter((v) => (v.category || 'More') === category);
 
   useEffect(() => {
     videosApi.listVideos()
@@ -43,6 +49,29 @@ export default function WatchScreen({ navigation }) {
         ))}
       </View>
 
+      <ScrollView
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        style={{ flexGrow: 0 }}
+        contentContainerStyle={styles.chipRow}
+      >
+        {['All', ...EXPLORE_CATEGORIES].map((c) => (
+          <Pressable
+            key={c}
+            style={[
+              styles.chip,
+              { borderColor: colors.line, backgroundColor: colors.surface },
+              category === c && { backgroundColor: colors.accent, borderColor: colors.accent },
+            ]}
+            onPress={() => setCategory(c)}
+          >
+            <Text style={{ color: category === c ? '#fff' : colors.muted, fontSize: 12.5, fontWeight: '600' }}>
+              {c}
+            </Text>
+          </Pressable>
+        ))}
+      </ScrollView>
+
       {section === 'audio' ? (
         <Text style={[styles.empty, { color: colors.muted }]}>Audio is coming soon.</Text>
 
@@ -50,12 +79,12 @@ export default function WatchScreen({ navigation }) {
         <ActivityIndicator color={colors.accent} style={{ marginTop: 40 }} />
       ) : (
         <FlatList
-          data={items}
+          data={shown}
           keyExtractor={(item) => item._id}
           contentContainerStyle={styles.list}
           ListEmptyComponent={
             <Text style={[styles.empty, { color: colors.muted }]}>
-              New sessions will show up here.
+              {category === 'All' ? 'New sessions will show up here.' : `No ${category.toLowerCase()} sessions yet.`}
             </Text>
           }
           renderItem={({ item }) => (
@@ -111,6 +140,8 @@ let styles = StyleSheet.create({
   vidSub:   { fontSize: 12, marginTop: 3 },
   badge:    { position: 'absolute', left: 10, top: 8, paddingHorizontal: 8, paddingVertical: 3, borderRadius: 100 },
   badgeText: { fontSize: 9, fontWeight: '700', letterSpacing: 0.8 },
+  chipRow:  { gap: 8, paddingBottom: 14 },
+  chip:     { borderWidth: 1, borderRadius: 100, paddingHorizontal: 14, paddingVertical: 7 },
   toggle:   { flexDirection: 'row', borderWidth: 1, borderRadius: 100, padding: 3, marginBottom: 14 },
   seg:      { flex: 1, paddingVertical: 8, borderRadius: 100, alignItems: 'center' },
   segText:  { fontSize: 13, fontWeight: '600' },
