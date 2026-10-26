@@ -1,25 +1,33 @@
 let Video = require('../models/Video');
 let User = require('../models/User');
+let { EXPLORE_CATEGORIES } = require('../constants/exploreCategories');
+
+function cleanCategory(category) {
+  return EXPLORE_CATEGORIES.includes(category) ? category : 'More';
+}
 
 function gate(video, isPaid) {
-  let locked = video.tier === 'paid' && !isPaid;
-  if (!locked) return { ...video, locked: false };
+  // lean() skips schema defaults, so older videos get their category filled in here
+  let withCategory = { ...video, category: cleanCategory(video.category) };
+  let locked = withCategory.tier === 'paid' && !isPaid;
+  if (!locked) return { ...withCategory, locked: false };
 
   // strip the URL so a locked video can't be played even if the app misbehaves
-  let { videoUrl, ...rest } = video;
+  let { videoUrl, ...rest } = withCategory;
   return { ...rest, locked: true };
 }
 
 // POST /api/videos  (admin)
 exports.create = async (req, res) => {
   try {
-    let { title, description, videoUrl, thumbnailUrl, duration, tags, tier } = req.body;
+    let { title, description, videoUrl, thumbnailUrl, duration, tags, tier, category } = req.body;
     if (!title || !videoUrl) {
       return res.status(400).json({ error: 'title and videoUrl are required' });
     }
 
     let video = await Video.create({
       title, description, videoUrl, thumbnailUrl, duration, tags,
+      category: cleanCategory(category),
       tier: tier === 'free' ? 'free' : 'paid',
       createdBy: req.user.id,
     });
@@ -33,7 +41,7 @@ exports.create = async (req, res) => {
 // PATCH /api/videos/:id  (admin)
 exports.update = async (req, res) => {
   try {
-    let { title, description, videoUrl, thumbnailUrl, duration, tags, tier } = req.body;
+    let { title, description, videoUrl, thumbnailUrl, duration, tags, tier, category } = req.body;
 
     let updates = {};
     if (title !== undefined) updates.title = title;
@@ -42,6 +50,7 @@ exports.update = async (req, res) => {
     if (thumbnailUrl !== undefined) updates.thumbnailUrl = thumbnailUrl;
     if (duration !== undefined) updates.duration = duration;
     if (tags !== undefined) updates.tags = tags;
+    if (category !== undefined) updates.category = cleanCategory(category);
     if (tier !== undefined) updates.tier = tier === 'free' ? 'free' : 'paid';
 
     let video = await Video.findByIdAndUpdate(req.params.id, updates, {
