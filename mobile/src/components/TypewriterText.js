@@ -1,5 +1,5 @@
-import { useEffect, useRef, useState } from 'react';
-import { Animated, Text } from 'react-native';
+import { useEffect, useState } from 'react';
+import { Text } from 'react-native';
 
 export default function TypewriterText({
   text = '',
@@ -8,9 +8,9 @@ export default function TypewriterText({
   delay = 500,
 }) {
   const [displayedText, setDisplayedText] = useState('');
-  const [done, setDone] = useState(false);
   const [started, setStarted] = useState(false);
-  const blink = useRef(new Animated.Value(1)).current;
+  const [done, setDone] = useState(false);
+  const [cursorOn, setCursorOn] = useState(true);
 
   useEffect(() => {
     let index = 0;
@@ -18,8 +18,8 @@ export default function TypewriterText({
     let startTimer;
 
     setDisplayedText('');
-    setDone(false);
     setStarted(false);
+    setDone(false);
 
     if (!text) return undefined;
 
@@ -46,44 +46,18 @@ export default function TypewriterText({
   }, [text, speed, delay]);
 
   useEffect(() => {
-    blink.stopAnimation();
+    if (!started || done) return undefined;
+    setCursorOn(true);
+    let id = setInterval(() => setCursorOn((on) => !on), 500);
+    return () => clearInterval(id);
+  }, [started, done]);
 
-    if (done) {
-      Animated.timing(blink, {
-        toValue: 0,
-        duration: 600,
-        useNativeDriver: true,
-      }).start();
-
-      return undefined;
-    }
-
-    blink.setValue(1);
-
-    const loop = Animated.loop(
-      Animated.sequence([
-        Animated.timing(blink, {
-          toValue: 0,
-          duration: 500,
-          useNativeDriver: true,
-        }),
-        Animated.timing(blink, {
-          toValue: 1,
-          duration: 500,
-          useNativeDriver: true,
-        }),
-      ])
-    );
-
-    loop.start();
-
-    return () => loop.stop();
-  }, [done, blink]);
+  let showCursor = started && !done && cursorOn;
 
   return (
-  <Text style={style}>
-    {displayedText}
-    <Animated.Text style={{ opacity: started ? blink : 0 }}>|</Animated.Text>
-  </Text>
-);
+    <Text style={style}>
+      {displayedText}
+      <Text style={{ color: showCursor ? undefined : '#00000001' }}>|</Text>
+    </Text>
+  );
 }
