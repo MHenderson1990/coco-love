@@ -1,8 +1,10 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useState } from 'react';
+import { useFocusEffect } from '@react-navigation/native';
 import { View, Text, FlatList, StyleSheet, ActivityIndicator, Pressable, Linking, ScrollView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTheme } from '../context/ThemeContext';
 import * as videosApi from '../api/videos';
+import * as audioApi from '../api/audio';
 import { EXPLORE_CATEGORIES } from '../constants/exploreCategories';
 
 export default function WatchScreen({ navigation }) {
@@ -11,17 +13,32 @@ export default function WatchScreen({ navigation }) {
   let [loading, setLoading] = useState(true);
   let [section, setSection] = useState('video');
   let [category, setCategory] = useState('All');
+  let [audioItems, setAudioItems] = useState([]);
+  let [audioLoading, setAudioLoading] = useState(true);
 
   let shown = category === 'All'
     ? items
     : items.filter((v) => (v.category || 'More') === category);
 
-  useEffect(() => {
-    videosApi.listVideos()
-      .then(setItems)
-      .catch(() => setItems([]))
-      .finally(() => setLoading(false));
-  }, []);
+  let shownAudio = category === 'All'
+    ? audioItems
+    : audioItems.filter((a) => (a.category || 'More') === category);
+
+  
+
+  // reload each time the tab is focused, so new uploads show up without restarting the app
+  useFocusEffect(
+    useCallback(() => {
+      videosApi.listVideos()
+        .then(setItems)
+        .catch(() => setItems([]))
+        .finally(() => setLoading(false));
+      audioApi.listAudio()
+        .then(setAudioItems)
+        .catch(() => setAudioItems([]))
+        .finally(() => setAudioLoading(false));
+    }, [])
+  );
 
   function formatDuration(seconds) {
     if (!seconds) return '';
@@ -73,8 +90,36 @@ export default function WatchScreen({ navigation }) {
       </ScrollView>
 
       {section === 'audio' ? (
-        <Text style={[styles.empty, { color: colors.muted }]}>Audio is coming soon.</Text>
-
+        audioLoading ? (
+          <ActivityIndicator color={colors.accent} style={{ marginTop: 40 }} />
+        ) : (
+          <FlatList
+            data={shownAudio}
+            keyExtractor={(item) => item._id}
+            contentContainerStyle={styles.list}
+            ListEmptyComponent={
+              <Text style={[styles.empty, { color: colors.muted }]}>
+                {category === 'All' ? 'New audio will show up here.' : `No ${category.toLowerCase()} audio yet.`}
+              </Text>
+            }
+            renderItem={({ item }) => (
+              <Pressable
+                style={[styles.audioRow, { backgroundColor: colors.surface, borderColor: colors.line }]}
+              >
+                <View style={[styles.audioIcon, { backgroundColor: colors.accentSoft }]}>
+                  <Text style={{ color: colors.accent, fontSize: 15 }}>♪</Text>
+                </View>
+                <View style={{ flex: 1 }}>
+                  <Text style={[styles.vidTitle, { color: colors.ink }]}>{item.title}</Text>
+                  <Text style={[styles.vidSub, { color: colors.muted }]} numberOfLines={1}>
+                    {item.category || 'More'}{item.description ? ` · ${item.description}` : ''}
+                  </Text>
+                </View>
+                {item.locked ? <Text style={{ color: colors.muted, fontSize: 11.5, fontWeight: '600' }}>Members</Text> : null}
+              </Pressable>
+            )}
+          />
+        )
       ) : loading ? (
         <ActivityIndicator color={colors.accent} style={{ marginTop: 40 }} />
       ) : (
@@ -140,6 +185,8 @@ let styles = StyleSheet.create({
   vidSub:   { fontSize: 12, marginTop: 3 },
   badge:    { position: 'absolute', left: 10, top: 8, paddingHorizontal: 8, paddingVertical: 3, borderRadius: 100 },
   badgeText: { fontSize: 9, fontWeight: '700', letterSpacing: 0.8 },
+  audioRow:  { flexDirection: 'row', alignItems: 'center', gap: 12, borderWidth: 1, borderRadius: 15, padding: 13 },
+  audioIcon: { width: 42, height: 42, borderRadius: 21, alignItems: 'center', justifyContent: 'center' },
   chipRow:  { gap: 8, paddingBottom: 14 },
   chip:     { borderWidth: 1, borderRadius: 100, paddingHorizontal: 14, paddingVertical: 7 },
   toggle:   { flexDirection: 'row', borderWidth: 1, borderRadius: 100, padding: 3, marginBottom: 14 },
