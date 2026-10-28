@@ -9,6 +9,7 @@ export default function TypewriterText({
 }) {
   const [displayedText, setDisplayedText] = useState('');
   const [done, setDone] = useState(false);
+  const [started, setStarted] = useState(false);
   const blink = useRef(new Animated.Value(1)).current;
 
   useEffect(() => {
@@ -18,10 +19,12 @@ export default function TypewriterText({
 
     setDisplayedText('');
     setDone(false);
+    setStarted(false);
 
     if (!text) return undefined;
 
     startTimer = setTimeout(() => {
+      setStarted(true);
       const typeNextCharacter = () => {
         index += 1;
         setDisplayedText(text.slice(0, index));
@@ -80,7 +83,7 @@ export default function TypewriterText({
   return (
   <Text style={style}>
     {displayedText}
-    <Animated.Text style={{ opacity: blink }}>|</Animated.Text>
+    <Animated.Text style={{ opacity: started ? blink : 0 }}>|</Animated.Text>
   </Text>
 );
 }
