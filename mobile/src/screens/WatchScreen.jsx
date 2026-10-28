@@ -5,6 +5,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTheme } from '../context/ThemeContext';
 import * as videosApi from '../api/videos';
 import * as audioApi from '../api/audio';
+import AudioItemPlayer from '../components/AudioItemPlayer';
 import { EXPLORE_CATEGORIES } from '../constants/exploreCategories';
 
 export default function WatchScreen({ navigation }) {
@@ -15,6 +16,7 @@ export default function WatchScreen({ navigation }) {
   let [category, setCategory] = useState('All');
   let [audioItems, setAudioItems] = useState([]);
   let [audioLoading, setAudioLoading] = useState(true);
+  let [openAudioId, setOpenAudioId] = useState(null);
 
   let shown = category === 'All'
     ? items
@@ -102,22 +104,35 @@ export default function WatchScreen({ navigation }) {
                 {category === 'All' ? 'New audio will show up here.' : `No ${category.toLowerCase()} audio yet.`}
               </Text>
             }
-            renderItem={({ item }) => (
-              <Pressable
-                style={[styles.audioRow, { backgroundColor: colors.surface, borderColor: colors.line }]}
-              >
-                <View style={[styles.audioIcon, { backgroundColor: colors.accentSoft }]}>
-                  <Text style={{ color: colors.accent, fontSize: 15 }}>♪</Text>
+            renderItem={({ item }) => {
+              let open = openAudioId === item._id;
+              return (
+                <View style={[styles.audioCard, { backgroundColor: colors.surface, borderColor: colors.line }]}>
+                  <Pressable
+                    style={styles.audioHead}
+                    onPress={() => {
+                      if (item.locked) {
+                        navigation.navigate('Upgrade');
+                        return;
+                      }
+                      setOpenAudioId(open ? null : item._id);
+                    }}
+                  >
+                    <View style={[styles.audioIcon, { backgroundColor: colors.accentSoft }]}>
+                      <Text style={{ color: colors.accent, fontSize: 15 }}>{open ? '❚❚' : '♪'}</Text>
+                    </View>
+                    <View style={{ flex: 1 }}>
+                      <Text style={[styles.vidTitle, { color: colors.ink }]}>{item.title}</Text>
+                      <Text style={[styles.vidSub, { color: colors.muted }]} numberOfLines={1}>
+                        {item.category || 'More'}{item.description ? ` · ${item.description}` : ''}
+                      </Text>
+                    </View>
+                    {item.locked ? <Text style={{ color: colors.muted, fontSize: 11.5, fontWeight: '600' }}>Members</Text> : null}
+                  </Pressable>
+                  {open ? <AudioItemPlayer audioId={item._id} /> : null}
                 </View>
-                <View style={{ flex: 1 }}>
-                  <Text style={[styles.vidTitle, { color: colors.ink }]}>{item.title}</Text>
-                  <Text style={[styles.vidSub, { color: colors.muted }]} numberOfLines={1}>
-                    {item.category || 'More'}{item.description ? ` · ${item.description}` : ''}
-                  </Text>
-                </View>
-                {item.locked ? <Text style={{ color: colors.muted, fontSize: 11.5, fontWeight: '600' }}>Members</Text> : null}
-              </Pressable>
-            )}
+              );
+            }}
           />
         )
       ) : loading ? (
@@ -185,7 +200,8 @@ let styles = StyleSheet.create({
   vidSub:   { fontSize: 12, marginTop: 3 },
   badge:    { position: 'absolute', left: 10, top: 8, paddingHorizontal: 8, paddingVertical: 3, borderRadius: 100 },
   badgeText: { fontSize: 9, fontWeight: '700', letterSpacing: 0.8 },
-  audioRow:  { flexDirection: 'row', alignItems: 'center', gap: 12, borderWidth: 1, borderRadius: 15, padding: 13 },
+  audioCard: { borderWidth: 1, borderRadius: 15, padding: 13 },
+  audioHead: { flexDirection: 'row', alignItems: 'center', gap: 12 },
   audioIcon: { width: 42, height: 42, borderRadius: 21, alignItems: 'center', justifyContent: 'center' },
   chipRow:  { gap: 8, paddingBottom: 14 },
   chip:     { borderWidth: 1, borderRadius: 100, paddingHorizontal: 14, paddingVertical: 7 },
