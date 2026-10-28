@@ -23,7 +23,8 @@ let widgetStorage = new ExtensionStorage('group.com.coco.houseoflove');
 console.log('WIDGET DEBUG native module linked:', !!global.expo?.modules?.ExtensionStorage);
 
 
-let HELLO_DELAY = 400;
+let BG_FADE = 2400; // how long the photo takes to fade in
+let HELLO_DELAY = BG_FADE + 400;
 let HELLO_SPEED = 80;
 let HELLO_LEN = 12;
 let NAME_SPEED = 90;
@@ -47,6 +48,8 @@ export default function TodayScreen({ navigation }) {
   let [affirmationDone, setAffirmationDone] = useState(false);
   let subFade = useRef(new Animated.Value(0)).current;
   let cardFade = useRef(new Animated.Value(0)).current;
+  let bgFade = useRef(new Animated.Value(0)).current;
+  let promptFade = useRef(new Animated.Value(1)).current;
   let [cardReady, setCardReady] = useState(false);
   let scrollRef = useRef(null);
 
@@ -67,6 +70,11 @@ export default function TodayScreen({ navigation }) {
 
    useEffect(() => {
     if (loading) return undefined;
+    Animated.timing(bgFade, {
+      toValue: 1,
+      duration: BG_FADE,
+      useNativeDriver: true,
+    }).start();
     Animated.timing(cardFade, {
       toValue: 1,
       duration: 1600,
@@ -76,6 +84,15 @@ export default function TodayScreen({ navigation }) {
     let t = setTimeout(() => setCardReady(true), CARD_DELAY);
     return () => clearTimeout(t);
   }, [loading]);
+
+  useEffect(() => {
+    if (!revealed) return;
+    Animated.timing(promptFade, {
+      toValue: 0,
+      duration: 2200,
+      useNativeDriver: true,
+    }).start();
+  }, [revealed]);
 
   function handleAffirmationDone() {
     setAffirmationDone(true);
@@ -179,7 +196,7 @@ export default function TodayScreen({ navigation }) {
 
   if (loading || !themeReady) {
     return (
-      <View style={[styles.center, { backgroundColor: colors.bg }]}>
+      <View style={[styles.center, { backgroundColor: '#281964' }]}>
         <ActivityIndicator color={colors.accent} />
       </View>
     );
@@ -190,7 +207,10 @@ export default function TodayScreen({ navigation }) {
       : (PHOTOS[todayPhoto] || PHOTOS.default);
 
     return (
-    <ImageBackground source={bgSource} style={{ flex: 1 }} resizeMode="cover">
+    <View style={{ flex: 1, backgroundColor: '#281964' }}>
+    <Animated.View style={[StyleSheet.absoluteFill, { opacity: bgFade }]}>
+      <ImageBackground source={bgSource} style={{ flex: 1 }} resizeMode="cover" />
+    </Animated.View>
     <SafeAreaView style={[styles.wrap, { backgroundColor: 'transparent' }]} edges={['top']}>
       <ScrollView
         ref={scrollRef}
@@ -221,7 +241,7 @@ export default function TodayScreen({ navigation }) {
             />
           </View>
 
-          <View style={{ opacity: revealed ? 0 : 1 }} pointerEvents="none">
+          <Animated.View style={{ opacity: promptFade }} pointerEvents="none">
             <TypewriterText
               key="opening-message"
               style={[styles.sub, { color: '#fff', textAlign: 'center' }]}
@@ -229,7 +249,7 @@ export default function TodayScreen({ navigation }) {
               delay={PROMPT_DELAY}
               speed={45}
             />
-          </View>
+          </Animated.View>
         </View>
 
         {error ? (
@@ -298,7 +318,7 @@ export default function TodayScreen({ navigation }) {
         )}
       </ScrollView>
     </SafeAreaView>
-    </ImageBackground>
+  </View>
   );
 }
 
