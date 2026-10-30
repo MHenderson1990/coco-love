@@ -127,7 +127,7 @@ export default function LoginScreen({ navigation }) {
   return (
     <KeyboardAvoidingView
       style={[styles.wrap, { backgroundColor: sky }]}
-      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+      behavior="padding"
     >
       {/* starfield */}
       <View style={StyleSheet.absoluteFill} pointerEvents="none">

@@ -51,7 +51,7 @@ export default function ResetPasswordScreen({ navigation }) {
     <SafeAreaView style={[styles.wrap, { backgroundColor: colors.bg }]} edges={['top']}>
       <KeyboardAvoidingView
         style={styles.flex}
-        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+        behavior="padding"
       >
         <Pressable onPress={() => navigation.goBack()}>
           <Text style={[styles.back, { color: colors.muted }]}>‹ Back</Text>

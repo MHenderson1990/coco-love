@@ -207,7 +207,7 @@ function EditAffirmationModal({ affirmation, colors, onClose, onSaved, onDelete 
     <Modal visible={!!affirmation} animationType="slide" transparent onRequestClose={onClose}>
       <KeyboardAvoidingView
         style={styles.sheetWrap}
-        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+        behavior="padding"
       >
         <Pressable style={styles.backdrop} onPress={onClose} />
         <View style={[styles.sheet, { backgroundColor: colors.surface }]}>

@@ -247,7 +247,7 @@ function EntryModal({ visible, mode, entry, colors, isPaid, onClose, onCreated, 
     <Modal visible={visible} animationType="slide" transparent onRequestClose={handleClose}>
       <KeyboardAvoidingView
         style={styles.sheetWrap}
-        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+        behavior="padding"
       >
         <Pressable style={styles.backdrop} onPress={handleClose} />
         <View style={[styles.sheet, { backgroundColor: colors.surface }]}>
