@@ -1,8 +1,8 @@
 import client from './client';
 import * as FileSystem from 'expo-file-system/legacy';
 
-export async function createEntry(affirmationId, mood, text) {
-  let res = await client.post('/journal', { affirmationId, mood, text });
+export async function createEntry(affirmationId, mood, text, voiceNote) {
+  let res = await client.post('/journal', { affirmationId, mood, text, voiceNote });
   return res.data.entry;
 }
 

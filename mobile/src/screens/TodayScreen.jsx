@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef } from 'react';
-import { View, Text, StyleSheet, Pressable, ActivityIndicator, Share, Alert, Platform, KeyboardAvoidingView, ScrollView, ImageBackground, Animated } from 'react-native';
+import { View, Text, StyleSheet, Pressable, ActivityIndicator, Share, Alert, Platform, KeyboardAvoidingView, ScrollView, ImageBackground, Animated, Keyboard } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTheme } from '../context/ThemeContext';
 import { useAuth } from '../context/AuthContext';
@@ -110,6 +110,13 @@ export default function TodayScreen({ navigation }) {
     }
   }, [revealed]);
 
+  useEffect(() => {
+    let sub = Keyboard.addListener('keyboardDidShow', () => {
+      setTimeout(() => scrollRef.current?.scrollToEnd({ animated: true }), 50);
+    });
+    return () => sub.remove();
+  }, []);
+
   async function handleReveal() {
     setRevealed(true);
     try {
@@ -212,6 +219,7 @@ export default function TodayScreen({ navigation }) {
       <ImageBackground source={bgSource} style={{ flex: 1 }} resizeMode="cover" />
     </Animated.View>
     <SafeAreaView style={[styles.wrap, { backgroundColor: 'transparent' }]} edges={['top']}>
+      <KeyboardAvoidingView style={{ flex: 1 }} behavior="padding">
       <ScrollView
         ref={scrollRef}
         contentContainerStyle={styles.body}
@@ -317,6 +325,7 @@ export default function TodayScreen({ navigation }) {
           </View>
         )}
       </ScrollView>
+      </KeyboardAvoidingView>
     </SafeAreaView>
   </View>
   );

@@ -1,6 +1,8 @@
-import { useState } from 'react';
-import { View, Text, TextInput, Pressable, StyleSheet, LayoutAnimation, Platform, UIManager } from 'react-native';
+import { useEffect, useRef, useState } from 'react';
+import { View, Text, TextInput, Pressable, StyleSheet, LayoutAnimation, Platform, UIManager, ActivityIndicator, Alert } from 'react-native';
 import { useTheme } from '../context/ThemeContext';
+import { useAuth } from '../context/AuthContext';
+import VoiceRecorder from './VoiceRecorder';
 import * as journalApi from '../api/journal';
 import { BlurView } from 'expo-blur';
 
@@ -12,6 +14,18 @@ let MOODS = ['🥹', '😢', '🤗', '😌', '🤬'];
 
 export default function JournalDrawer({ affirmationId, onOpenChange }) {
   let { colors } = useTheme();
+  let { user } = useAuth();
+  let isPaid = user?.tier === 'paid';
+  let [voiceNote, setVoiceNote] = useState(null); // { key }
+  let [voiceBusy, setVoiceBusy] = useState(false);
+  let voiceRef = useRef(null);
+  voiceRef.current = voiceNote;
+
+  // if the screen closes with an unsaved recording, delete it so it doesn't sit in storage
+  useEffect(() => () => {
+    if (voiceRef.current?.key) journalApi.destroyVoice(voiceRef.current.key);
+  }, []);
+
   let [open, setOpen] = useState(false);
   let [mood, setMood] = useState(null);
   let [text, setText] = useState('');
@@ -26,13 +40,14 @@ export default function JournalDrawer({ affirmationId, onOpenChange }) {
   }
 
   async function handleSave() {
-    if (!mood && !text.trim()) return;
+    if (!mood && !text.trim() && !voiceNote) return;
     setSaving(true);
     try {
-      await journalApi.createEntry(affirmationId, mood, text.trim());
+      await journalApi.createEntry(affirmationId, mood, text.trim(), voiceNote || undefined);
       setSaved(true);
       setText('');
       setMood(null);
+      setVoiceNote(null);
       setTimeout(() => setSaved(false), 2500);
     } catch (err) {
       // non-blocking
@@ -83,13 +98,47 @@ export default function JournalDrawer({ affirmationId, onOpenChange }) {
             onChangeText={setText}
           />
 
+          {isPaid ? (
+            <View style={{ marginTop: 14 }}>
+              <Text style={[styles.label, { color: 'rgba(255,255,255,0.8)' }]}>VOICE NOTE</Text>
+              {voiceNote ? (
+                <View style={[styles.voiceChip, { backgroundColor: colors.bg, borderColor: colors.accent }]}>
+                  <Text style={{ color: colors.ink, fontSize: 13, fontWeight: '600' }}>🎙 Voice note attached</Text>
+                  <Pressable onPress={() => { journalApi.destroyVoice(voiceNote.key); setVoiceNote(null); }} hitSlop={8}>
+                    <Text style={{ color: colors.muted, fontSize: 13, fontWeight: '600' }}>Remove</Text>
+                  </Pressable>
+                </View>
+              ) : voiceBusy ? (
+                <View style={[styles.voiceChip, { backgroundColor: colors.bg, borderColor: colors.line }]}>
+                  <ActivityIndicator color={colors.accent} />
+                  <Text style={{ color: colors.muted, fontSize: 13 }}>Saving voice…</Text>
+                </View>
+              ) : (
+                <VoiceRecorder
+                  onSave={async (uri) => {
+                    setVoiceBusy(true);
+                    try {
+                      let uploaded = await journalApi.uploadVoiceNote(uri);
+                      setVoiceNote({ key: uploaded.key, durationMillis: 0 });
+                    } catch (err) {
+                      Alert.alert('Voice upload failed', String(err?.message || err));
+                    } finally {
+                      setVoiceBusy(false);
+                    }
+                  }}
+                  onDiscard={() => {}}
+                />
+              )}
+            </View>
+          ) : null}
+
           <Pressable
             style={[
               styles.save,
-              { backgroundColor: colors.accent, opacity: saving || (!mood && !text.trim()) ? 0.5 : 1 },
+              { backgroundColor: colors.accent, opacity: saving || (!mood && !text.trim() && !voiceNote) ? 0.5 : 1 },
             ]}
             onPress={handleSave}
-            disabled={saving || (!mood && !text.trim())}
+            disabled={saving || (!mood && !text.trim() && !voiceNote)}
           >
             <Text style={[styles.saveText, { color: colors.surface }]}>
               {saving ? 'Saving…' : 'Save entry'}
@@ -113,4 +162,5 @@ let styles = StyleSheet.create({
   input: { borderRadius: 12, padding: 13, fontSize: 13.5, minHeight: 80, textAlignVertical: 'top' },
   save: { borderRadius: 12, paddingVertical: 13, alignItems: 'center', marginTop: 12 },
   saveText: { fontSize: 13, fontWeight: '700' },
+  voiceChip: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', borderWidth: 1, borderRadius: 12, padding: 14 },
 });

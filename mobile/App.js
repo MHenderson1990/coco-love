@@ -70,7 +70,7 @@ function Root() {
   return (
     <ThemedBackground>
       <NavigationContainer>
-        <Stack.Navigator screenOptions={{ headerShown: false, contentStyle: { backgroundColor: 'transparent' } }}>
+        <Stack.Navigator screenOptions={{ headerShown: false, contentStyle: { backgroundColor: colors.bg } }}>
           {user ? (
             <>
               <Stack.Screen name="Main" component={TabNavigator} />
