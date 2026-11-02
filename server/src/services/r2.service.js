@@ -14,14 +14,13 @@ let client = new S3Client({
 });
 
 // presigned PUT for direct upload from the app
-async function presignUpload(key) {
-  let url = await getSignedUrl(client, new PutObjectCommand({ Bucket: bucket, Key: key }), { expiresIn: 600 });
-  return { url, key };
+async function presignUpload(key, expiresIn = 600) {
+  let url = await getSignedUrl(client, new PutObjectCommand({ Bucket: bucket, Key: key }), { expiresIn });
 }
 
 // presigned GET for playback (bucket stays private)
-async function presignDownload(key) {
-  return getSignedUrl(client, new GetObjectCommand({ Bucket: bucket, Key: key }), { expiresIn: 3600 });
+async function presignDownload(key, expiresIn = 3600) {
+  return getSignedUrl(client, new GetObjectCommand({ Bucket: bucket, Key: key }), { expiresIn });
 }
 
 async function deleteObject(key) {
