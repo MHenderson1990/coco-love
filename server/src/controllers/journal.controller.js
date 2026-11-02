@@ -19,6 +19,12 @@ exports.create = async (req, res) => {
     if (!mood && !text && (!Array.isArray(media) || media.length === 0) && !voiceNote?.key) {
       return res.status(400).json({ error: 'Provide a mood, text, media, or a voice note' });
     }
+    if (voiceNote?.key && !String(voiceNote.key).startsWith(`voice/${req.user.id}/`)) {
+      return res.status(400).json({ error: 'Invalid voice note' });
+    }
+    if (Array.isArray(media) && media.some((m) => !String(m?.publicId || '').startsWith(`house-of-love/journal/${req.user.id}/`))) {
+      return res.status(400).json({ error: 'Invalid media' });
+    }
 
     let entry = await JournalEntry.create({
       user: req.user.id,
@@ -118,7 +124,7 @@ exports.uploadSignature = async (req, res) => {
     }
 
     let timestamp = Math.round(Date.now() / 1000);
-    let folder = 'house-of-love/journal';
+    let folder = `house-of-love/journal/${req.user.id}`;
     let toSign = `folder=${folder}&timestamp=${timestamp}${cloudinaryApiSecret}`;
     let signature = crypto.createHash('sha1').update(toSign).digest('hex');
 
@@ -136,8 +142,8 @@ exports.destroyMedia = async (req, res) => {
     }
     let { publicId, type } = req.body;
     if (!publicId) return res.status(400).json({ error: 'publicId is required' });
-    // guard: only journal assets can be destroyed here (not admin videos or anything else)
-    if (!publicId.startsWith('house-of-love/journal')) {
+    // guard: only this user's own journal assets can be destroyed here
+    if (!publicId.startsWith(`house-of-love/journal/${req.user.id}/`)) {
       return res.status(400).json({ error: 'Invalid asset' });
     }
     let result = await cloudinaryService.destroy(publicId, type);
