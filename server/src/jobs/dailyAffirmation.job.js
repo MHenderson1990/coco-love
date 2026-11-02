@@ -23,7 +23,10 @@ async function runDailyNotifications() {
 
   let users = await User.find({
     notificationsEnabled: true,
-    pushToken: { $ne: null },
+    $or: [
+      { pushToken: { $ne: null } },
+      { 'pushTokens.0': { $exists: true } },
+    ],
   });
 
   // who is due this minute, in their own timezone
@@ -59,17 +62,25 @@ async function runDailyNotifications() {
 
   if (!toSend.length) return;
 
-  let messages = toSend.map((user) =>
-    buildMessage(
-      user.pushToken,
-      'Peace and love, friend.',
-      "Ready for today's message?",
-      { type: 'daily' }
-    )
-  );
+  // every device the user has: the list plus the legacy single token, de-duplicated
+  let messages = [];
+  for (let user of toSend) {
+    let tokens = new Set([...(user.pushTokens || []), user.pushToken].filter(Boolean));
+    for (let token of tokens) {
+      messages.push(
+        buildMessage(token, 'Peace and love, friend.', "Ready for today's message?", { type: 'daily' })
+      );
+    }
+  }
 
-  await sendPush(messages);
-  console.log(`Sent ${toSend.length} daily notifications`);
+  let { invalidTokens } = await sendPush(messages);
+  console.log(`Sent ${toSend.length} daily notifications to ${messages.length} devices`);
+
+  // drop tokens Expo says are dead (app uninstalled)
+  for (let token of invalidTokens || []) {
+    await User.updateMany({ pushTokens: token }, { $pull: { pushTokens: token } }).catch(() => {});
+    await User.updateMany({ pushToken: token }, { $unset: { pushToken: '' } }).catch(() => {});
+  }
 }
 
 // every minute — matches each user's chosen HH:mm in their own timezone

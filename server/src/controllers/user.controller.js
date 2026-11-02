@@ -62,11 +62,21 @@ exports.updateMe = async (req, res) => {
     if (birthday !== undefined) updates.birthday = birthday;
     if (timezone !== undefined) updates.timezone = timezone;
     if (pushToken) {
+      // one device should only ever push for one account: take the token off anyone else
       await User.updateMany(
         { pushToken, _id: { $ne: req.user.id } },
         { $unset: { pushToken: '' } }
       );
-      updates.pushToken = pushToken; // ← actually save it on the current user
+      await User.updateMany(
+        { pushTokens: pushToken, _id: { $ne: req.user.id } },
+        { $pull: { pushTokens: pushToken } }
+      );
+      // add (not replace) on this account, so a second device keeps the first one's token
+      await User.updateOne(
+        { _id: req.user.id },
+        { $addToSet: { pushTokens: pushToken } }
+      );
+      updates.pushToken = pushToken; // latest device, kept for old code paths
     }
     if (notificationsEnabled !== undefined) updates.notificationsEnabled = notificationsEnabled;
 
