@@ -16,6 +16,7 @@ let client = new S3Client({
 // presigned PUT for direct upload from the app
 async function presignUpload(key, expiresIn = 600) {
   let url = await getSignedUrl(client, new PutObjectCommand({ Bucket: bucket, Key: key }), { expiresIn });
+  return { url, key };
 }
 
 // presigned GET for playback (bucket stays private)

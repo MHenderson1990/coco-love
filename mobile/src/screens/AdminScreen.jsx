@@ -575,16 +575,17 @@ function VideoModal({ visible, onClose, colors }) {
     setError('');
     setBusy(true);
     try {
-      setStatus('Uploading to Cloudinary…');
-      let uploaded = await adminApi.uploadVideo(file.uri);
+      setStatus('Uploading… keep the app open');
+      let ext = ((file.uri || '').split('?')[0].split('.').pop() || 'mp4').toLowerCase();
+      if (!['mp4', 'mov', 'm4v'].includes(ext)) ext = 'mp4';
+      let videoKey = await videosApi.uploadVideoFile(file.uri, ext);
 
       setStatus('Saving…');
       await videosApi.createVideo({
         title: title.trim(),
         description: description.trim(),
-        videoUrl: uploaded.videoUrl,
-        thumbnailUrl: uploaded.thumbnailUrl,
-        duration: uploaded.duration,
+        videoKey,
+        duration: file.duration ? Math.round(file.duration / 1000) : undefined,
         tier,
         category,
       });
