@@ -101,11 +101,16 @@ exports.remove = async (req, res) => {
   }
 };
 
+// admins count as paid members
+async function isPaidMember(userId) {
+  let user = await User.findById(userId).select('tier role');
+  return !!user && (user.tier === 'paid' || user.role === 'admin');
+}
+
 // GET /api/journal/upload-signature  (paid users only)
 exports.uploadSignature = async (req, res) => {
   try {
-    let user = await User.findById(req.user.id).select('tier');
-    if (!user || user.tier !== 'paid') {
+    if (!(await isPaidMember(req.user.id))) {
       return res.status(403).json({ error: 'Media journaling is a members feature' });
     }
     if (!cloudinaryCloudName || !cloudinaryApiKey || !cloudinaryApiSecret) {
@@ -126,8 +131,7 @@ exports.uploadSignature = async (req, res) => {
 // POST /api/journal/media/destroy  (paid) — remove one uploaded asset from Cloudinary
 exports.destroyMedia = async (req, res) => {
   try {
-    let user = await User.findById(req.user.id).select('tier');
-    if (!user || user.tier !== 'paid') {
+    if (!(await isPaidMember(req.user.id))) {
       return res.status(403).json({ error: 'Members feature' });
     }
     let { publicId, type } = req.body;
@@ -146,8 +150,7 @@ exports.destroyMedia = async (req, res) => {
 // POST /api/journal/voice/presign-upload  (paid) — get a presigned PUT URL
 exports.presignVoiceUpload = async (req, res) => {
   try {
-    let user = await User.findById(req.user.id).select('tier');
-    if (!user || user.tier !== 'paid') return res.status(403).json({ error: 'Members feature' });
+    if (!(await isPaidMember(req.user.id))) return res.status(403).json({ error: 'Members feature' });
     let key = `voice/${req.user.id}/${crypto.randomUUID()}.m4a`;
     let { url } = await r2.presignUpload(key);
     res.json({ url, key });

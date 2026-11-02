@@ -15,7 +15,7 @@ let MOODS = ['🥹', '😢', '🤗', '😌', '🤬'];
 export default function JournalDrawer({ affirmationId, onOpenChange }) {
   let { colors } = useTheme();
   let { user } = useAuth();
-  let isPaid = user?.tier === 'paid';
+  let isPaid = user?.tier === 'paid' || user?.role === 'admin';
   let [voiceNote, setVoiceNote] = useState(null); // { key }
   let [voiceBusy, setVoiceBusy] = useState(false);
   let voiceRef = useRef(null);

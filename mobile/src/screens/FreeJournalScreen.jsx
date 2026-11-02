@@ -22,7 +22,7 @@ let MEDIA_ATTACHMENTS_ENABLED = false;
 export default function JournalScreen() {
   let { colors } = useTheme();
   let { user } = useAuth();
-  let isPaid = user?.tier === 'paid';
+  let isPaid = user?.tier === 'paid' || user?.role === 'admin';
   let [items, setItems] = useState([]);
   let [loading, setLoading] = useState(true);
   let [sheet, setSheet] = useState(null); // null | 'new' | entryObject
