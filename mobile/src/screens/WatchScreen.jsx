@@ -1,6 +1,6 @@
 import { useCallback, useState } from 'react';
 import { useFocusEffect } from '@react-navigation/native';
-import { View, Text, FlatList, StyleSheet, ActivityIndicator, Pressable, Linking, ScrollView } from 'react-native';
+import { View, Text, FlatList, StyleSheet, ActivityIndicator, Pressable, Linking, ScrollView, Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTheme } from '../context/ThemeContext';
 import * as videosApi from '../api/videos';
@@ -150,12 +150,22 @@ export default function WatchScreen({ navigation }) {
           renderItem={({ item }) => (
             <Pressable
               style={[styles.row, { backgroundColor: colors.surface, borderColor: colors.line }]}
-              onPress={() => {
-                navigation.navigate('VideoPlayer', {
-                  videoUrl: item.videoUrl,
-                  title: item.title,
-                  description: item.description,
-                });
+              onPress={async () => {
+                if (item.locked) {
+                  navigation.navigate('Upgrade');
+                  return;
+                }
+                try {
+                  // new videos live in R2 and need a fresh signed link; old ones already have a URL
+                  let videoUrl = item.r2 ? await videosApi.getPlayUrl(item._id) : item.videoUrl;
+                  navigation.navigate('VideoPlayer', {
+                    videoUrl,
+                    title: item.title,
+                    description: item.description,
+                  });
+                } catch (err) {
+                  Alert.alert('Could not open this video', err.response?.data?.error || 'Try again in a moment.');
+                }
               }}
             >
               <View style={[styles.thumb, { backgroundColor: colors.accentSoft }]}>
