@@ -15,9 +15,12 @@ struct Provider: TimelineProvider {
   let presetImageNames: [String: String] = [
     "default": "bg_default",
     "woman": "bg_woman",
-    "fall": "bg_fall",
-    "stars": "bg_stars",
-    "flowers": "bg_flowers",
+    "sky": "bg_sky",
+    "blush": "bg_blush",
+    "tree": "bg_tree",
+    "sun": "bg_sun",
+    "forest": "bg_forest",
+    "sage": "bg_sage",
   ]
 
   func placeholder(in context: Context) -> AffirmationEntry {

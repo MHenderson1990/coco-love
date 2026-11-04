@@ -47,7 +47,7 @@ export default function SavedScreen({ navigation }) {
       }
       ExtensionStorage.reloadWidget();
     } else if (Platform.OS === 'android') {
-      let photoKey = (await AsyncStorage.getItem('widgetTodayPhoto')) || 'default';
+      let photoKey = (await AsyncStorage.getItem('widgetTodayPhoto')) || 'woman';
       let newText;
 
       if (pinnedId === affirmationId) {

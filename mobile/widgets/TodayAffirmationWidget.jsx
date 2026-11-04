@@ -4,7 +4,7 @@ import { PHOTOS } from '../src/theme/photos';
 
 export function TodayAffirmationWidget({ text, photoKey }) {
   let imageSource =
-    photoKey && photoKey.startsWith('http') ? photoKey : PHOTOS[photoKey] || PHOTOS.default;
+    photoKey && photoKey.startsWith('http') ? photoKey : PHOTOS[photoKey] || PHOTOS.woman;
 
   return (
     <OverlapWidget style={{ height: 'match_parent', width: 'match_parent' }}>
