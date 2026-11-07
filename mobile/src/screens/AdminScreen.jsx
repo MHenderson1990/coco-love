@@ -153,6 +153,13 @@ export default function AdminScreen({ navigation }) {
 
               <Pressable
                 style={[styles.btn, styles.ghost, { backgroundColor: colors.surface, borderColor: colors.line }]}
+                onPress={() => navigation.navigate('MessageBank')}
+              >
+                <Text style={[styles.btnText, { color: colors.ink }]}>Message bank</Text>
+              </Pressable>
+
+              <Pressable
+                style={[styles.btn, styles.ghost, { backgroundColor: colors.surface, borderColor: colors.line }]}
                 onPress={() => navigation.navigate('ManageAudio')}
               >
                 <Text style={[styles.btnText, { color: colors.ink }]}>Manage audio</Text>

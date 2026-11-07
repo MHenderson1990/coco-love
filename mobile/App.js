@@ -31,6 +31,7 @@ import { Dongle_400Regular } from '@expo-google-fonts/dongle';
 import EngagementScreen from './src/screens/EngagementScreen';
 import { usePushToken } from './src/hooks/usePushToken';
 import { useState } from 'react';
+import MessageBankScreen from './src/screens/MessageBankScreen';
 
 let Stack = createNativeStackNavigator();
 
@@ -80,6 +81,7 @@ function Root() {
               <Stack.Screen name="History" component={HistoryScreen} />
               <Stack.Screen name="Upgrade" component={UpgradeScreen} />
               <Stack.Screen name="VideoPlayer" component={VideoPlayerScreen} />
+              <Stack.Screen name="MessageBank" component={MessageBankScreen} />
               <Stack.Screen name="ManageVideos" component={ManageVideosScreen} />
               <Stack.Screen name="ManageAudio" component={ManageAudioScreen} />
               <Stack.Screen name="ManageAffirmations" component={ManageAffirmationsScreen} />

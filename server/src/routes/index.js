@@ -11,6 +11,7 @@ const videoRoutes = require('./video.routes');
 let audioRoutes = require('./audio.routes');
 const adminRoutes = require('./admin.routes');
 const promoRoutes = require('./promo.routes');
+const fallbackRoutes = require('./fallback.routes');
 
 router.use('/auth', authRoutes);
 router.use('/users', userRoutes);
@@ -23,5 +24,6 @@ router.use('/videos', videoRoutes);
 router.use('/audio', audioRoutes);
 router.use('/admin', adminRoutes);
 router.use('/promo', promoRoutes);
+router.use('/fallback', fallbackRoutes);
 
 module.exports = router;

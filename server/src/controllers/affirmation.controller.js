@@ -1,4 +1,5 @@
 const Affirmation = require('../models/Affirmation');
+const FallbackMessage = require('../models/FallbackMessage');
 
 
 // "Today's message" is anchored to the app's home timezone (Central) so it's the same for
@@ -14,6 +15,32 @@ function dayAnchor(input) {
 
 function scheduledDateAnchor(dateString) {
   return new Date(`${dateString}T00:00:00.000Z`);
+}
+
+// No message scheduled for today → claim the least-recently-used one from the bank
+// and save it as today's shared message, so everyone sees the same one all day.
+async function claimFallback(start, end) {
+  let pick = await FallbackMessage.findOneAndUpdate(
+    { active: true },
+    { $set: { lastUsedAt: new Date() }, $inc: { useCount: 1 } },
+    { sort: { lastUsedAt: 1, createdAt: 1 }, new: true }
+  );
+  if (!pick) return null;
+
+  try {
+    return await Affirmation.create({
+      text: pick.text,
+      scheduledDate: start,
+      tags: pick.tags,
+      targetUser: null,
+    });
+  } catch (err) {
+    if (err.code === 11000) {
+      // another request claimed today at the same moment, use theirs
+      return Affirmation.findOne({ scheduledDate: { $gte: start, $lt: end }, targetUser: null });
+    }
+    throw err;
+  }
 }
 
 // GET /api/affirmations/today
@@ -32,6 +59,10 @@ exports.getToday = async (req, res) => {
         scheduledDate: { $gte: start, $lt: end },
         targetUser: null,
       });
+    }
+
+    if (!affirmation) {
+      affirmation = await claimFallback(start, end);
     }
 
     if (!affirmation) {
