@@ -61,6 +61,7 @@ export default function RevealCard({ text, revealed, onReveal, compact, onAffirm
             key={text}
             text={text}
             style={[styles.affirm, { color: '#fff' }]}
+            fonts={{ bold: 'PlayfairDisplay_700Bold', italic: 'PlayfairDisplay_400Regular_Italic' }}
           />
         </Animated.View>
 
@@ -83,5 +84,5 @@ let styles = StyleSheet.create({
     overflow: 'hidden', alignItems: 'center', justifyContent: 'flex-start',
     paddingHorizontal: 24, paddingVertical: 28,
   },
-  affirm: { fontSize: 34, lineHeight: 35, textAlign: 'center', fontFamily: 'Dongle_400Regular' },
+  affirm: { fontSize: 22, lineHeight: 32, textAlign: 'center', fontFamily: 'PlayfairDisplay_400Regular' },
 });

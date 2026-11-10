@@ -26,7 +26,7 @@ import { useFonts, Lora_400Regular, Lora_400Regular_Italic, Lora_700Bold } from 
 import { BebasNeue_400Regular } from '@expo-google-fonts/bebas-neue';
 import { PassionsConflict_400Regular } from '@expo-google-fonts/passions-conflict';
 import { PlaywriteGBS_400Regular } from '@expo-google-fonts/playwrite-gb-s';
-import { PlayfairDisplay_400Regular, PlayfairDisplay_500Medium } from '@expo-google-fonts/playfair-display';
+import { PlayfairDisplay_400Regular, PlayfairDisplay_500Medium, PlayfairDisplay_400Regular_Italic, PlayfairDisplay_700Bold } from '@expo-google-fonts/playfair-display';
 import { Dongle_400Regular } from '@expo-google-fonts/dongle';
 import EngagementScreen from './src/screens/EngagementScreen';
 import { usePushToken } from './src/hooks/usePushToken';
@@ -52,7 +52,7 @@ function Root() {
     BebasNeue_400Regular,
     PassionsConflict_400Regular,
     PlaywriteGBS_400Regular,
-    PlayfairDisplay_400Regular, PlayfairDisplay_500Medium,
+    PlayfairDisplay_400Regular, PlayfairDisplay_500Medium, PlayfairDisplay_400Regular_Italic, PlayfairDisplay_700Bold,
     Dongle_400Regular,
   });
   
