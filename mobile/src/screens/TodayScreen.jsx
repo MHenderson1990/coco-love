@@ -133,7 +133,7 @@ export default function TodayScreen({ navigation }) {
           ExtensionStorage.reloadWidget();
         } else if (Platform.OS === 'android') {
           await AsyncStorage.setItem('widgetLastRevealedText', affirmation.text);
-          await AsyncStorage.setItem('widgetTodayPhoto', todayPhoto || 'woman');
+          await AsyncStorage.setItem('widgetTodayPhoto', todayPhoto || 'sky');
 
           let isPinned = (await AsyncStorage.getItem('widgetIsPinned')) === '1';
           if (!isPinned) {
@@ -147,7 +147,7 @@ export default function TodayScreen({ navigation }) {
           requestWidgetUpdate({
             widgetName: 'TodayAffirmation',
             renderWidget: () => (
-              <TodayAffirmationWidget text={displayText} photoKey={todayPhoto || 'woman'} />
+              <TodayAffirmationWidget text={displayText} photoKey={todayPhoto || 'sky'} />
             ),
           });
         }
@@ -211,7 +211,7 @@ export default function TodayScreen({ navigation }) {
 
     let bgSource = todayPhoto && todayPhoto.startsWith('http')
       ? { uri: todayPhoto }
-      : (PHOTOS[todayPhoto] || PHOTOS.woman);
+      : (PHOTOS[todayPhoto] || PHOTOS.sky);
 
     return (
     <View style={{ flex: 1, backgroundColor: '#281964' }}>

@@ -14,7 +14,6 @@ struct Provider: TimelineProvider {
 
   let presetImageNames: [String: String] = [
     "default": "bg_default",
-    "woman": "bg_woman",
     "sky": "bg_sky",
     "blush": "bg_blush",
     "tree": "bg_tree",

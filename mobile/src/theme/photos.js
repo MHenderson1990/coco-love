@@ -1,5 +1,4 @@
 export let PHOTOS = {
-  woman: require('../../assets/placeholder3.png'),
   sky: require('../../assets/sky.png'),
   blush: require('../../assets/blush.png'),
   tree: require('../../assets/tree.png'),

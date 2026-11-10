@@ -18,7 +18,7 @@ export function ThemeProvider({ children }) {
   let [palette, setPaletteState] = useState('purple');
   let [mode, setModeState] = useState('light');
   let [background, setBackgroundState] = useState('default');
-  let [todayPhoto, setTodayPhotoState] = useState('woman');
+  let [todayPhoto, setTodayPhotoState] = useState('sky');
   let [themeReady, setThemeReady] = useState(false);
   // adopt the user's saved preferences on login
   useEffect(() => {
