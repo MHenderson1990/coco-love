@@ -27,7 +27,7 @@ export default function MessageBankScreen({ navigation }) {
   useFocusEffect(load);
 
   async function add() {
-    let texts = draft.split('\n').map((t) => t.trim()).filter(Boolean);
+    let texts = draft.replace(/\r\n/g, '\n').split(/\n\s*\n/).map((t) => t.trim()).filter(Boolean);
     if (!texts.length) {
       Alert.alert('Nothing to add', 'Type or paste at least one message.');
       return;
@@ -98,7 +98,7 @@ export default function MessageBankScreen({ navigation }) {
               <View style={{ marginBottom: 6 }}>
                 <TextInput
                   style={[styles.input, { backgroundColor: colors.surface, color: colors.ink, borderColor: colors.line }]}
-                  placeholder={'Add messages. One per line, paste as many as you like.'}
+                  placeholder={'Add messages. Separate each one with a blank line.'}
                   placeholderTextColor={colors.muted}
                   multiline
                   value={draft}
