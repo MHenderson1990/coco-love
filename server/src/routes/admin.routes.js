@@ -11,7 +11,6 @@ router.get('/users/:id/favorites', auth, admin, adminController.userFavorites);
 router.get('/users', auth, admin, adminController.searchUsers);
 router.get('/affirmations/top', auth, admin, adminController.topAffirmations);
 router.post('/notifications/run', auth, admin, adminController.runNotifications);
-router.get('/upload-signature', auth, admin, adminController.uploadSignature);
 router.get('/promo', auth, admin, adminController.getPromo);
 router.put('/promo', auth, admin, adminController.setPromo);
 

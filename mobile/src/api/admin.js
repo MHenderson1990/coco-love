@@ -15,43 +15,6 @@ export async function createAffirmation(text, scheduledDate, tags, targetUser) {
   return res.data.affirmation;
 }
 
-export async function getUploadSignature() {
-  let res = await client.get('/admin/upload-signature');
-  return res.data;
-}
-
-export async function uploadVideo(fileUri, onProgress) {
-  let sig = await getUploadSignature();
-
-  let form = new FormData();
-  form.append('file', { uri: fileUri, type: 'video/mp4', name: 'upload.mp4' });
-  form.append('api_key', sig.apiKey);
-  form.append('timestamp', String(sig.timestamp));
-  form.append('signature', sig.signature);
-  form.append('folder', sig.folder);
-
-  // straight to Cloudinary — not through our server
-  let res = await fetch(
-    `https://api.cloudinary.com/v1_1/${sig.cloudName}/video/upload`,
-    { method: 'POST', body: form }
-  );
-
-  let raw = await res.text();
-  let data;
-  try {
-    data = JSON.parse(raw);
-  } catch (e) {
-    throw new Error(`Cloudinary ${res.status}: ${raw.slice(0, 160)}`);
-  }
-  if (!res.ok) throw new Error(data.error?.message || 'Upload failed');
-
-  return {
-    videoUrl: data.secure_url,
-    duration: data.duration ? Math.round(data.duration) : undefined,
-    thumbnailUrl: data.secure_url.replace(/\.\w+$/, '.jpg'),
-  };
-}
-
 export async function listAllAffirmations() {
   let res = await client.get('/affirmations/all');
   return res.data.affirmations;
