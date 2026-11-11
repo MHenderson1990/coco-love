@@ -20,7 +20,6 @@ import { requestWidgetUpdate } from 'react-native-android-widget';
 import { TodayAffirmationWidget } from '../../widgets/TodayAffirmationWidget';
 
 let widgetStorage = new ExtensionStorage('group.com.coco.houseoflove');
-console.log('WIDGET DEBUG native module linked:', !!global.expo?.modules?.ExtensionStorage);
 
 
 let BG_FADE = 2400; // how long the photo takes to fade in
@@ -45,8 +44,6 @@ export default function TodayScreen({ navigation }) {
   let [loading, setLoading] = useState(true);
   let [error, setError] = useState('');
   let [journalOpen, setJournalOpen] = useState(false);
-  let [affirmationDone, setAffirmationDone] = useState(false);
-  let subFade = useRef(new Animated.Value(0)).current;
   let cardFade = useRef(new Animated.Value(0)).current;
   let bgFade = useRef(new Animated.Value(0)).current;
   let promptFade = useRef(new Animated.Value(1)).current;
@@ -92,22 +89,6 @@ export default function TodayScreen({ navigation }) {
       duration: 2200,
       useNativeDriver: true,
     }).start();
-  }, [revealed]);
-
-  function handleAffirmationDone() {
-    setAffirmationDone(true);
-    Animated.timing(subFade, {
-      toValue: 1,
-      duration: 500,
-      useNativeDriver: true,
-    }).start();
-  }
-
-  useEffect(() => {
-    if (!revealed) {
-      setAffirmationDone(false);
-      subFade.setValue(0);
-    }
   }, [revealed]);
 
   useEffect(() => {
@@ -274,7 +255,6 @@ export default function TodayScreen({ navigation }) {
               revealed={revealed}
               onReveal={handleReveal}
               compact={journalOpen}
-              onAffirmationDone={handleAffirmationDone}
             />
           </Animated.View>
         )}
