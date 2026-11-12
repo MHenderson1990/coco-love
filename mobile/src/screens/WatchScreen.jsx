@@ -178,12 +178,9 @@ export default function WatchScreen({ navigation }) {
                
               </View>
               <View style={styles.meta}>
-                <Text style={[styles.vidTitle, { color: colors.ink }]}>{item.title}</Text>
-                {item.description ? (
-                  <Text style={[styles.vidSub, { color: colors.muted }]} numberOfLines={1}>
-                    {item.description}
-                  </Text>
-                ) : null}
+                <Text style={[styles.vidTitle, { color: colors.ink }]} numberOfLines={2}>
+                  {item.description || item.title}
+                </Text>
               </View>
             </Pressable>
           )}
