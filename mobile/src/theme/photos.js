@@ -8,3 +8,4 @@ export let PHOTOS = {
 };
 
 export let PHOTO_KEYS = Object.keys(PHOTOS);
+export let LIGHT_PHOTOS = ['blush', 'sky'];

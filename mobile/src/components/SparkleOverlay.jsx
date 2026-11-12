@@ -42,7 +42,7 @@ function twinkle(value) {
   return Animated.loop(Animated.sequence(seq));
 }
 
-export default function SparkleOverlay({ width, height, lineHeight = 35 }) {
+export default function SparkleOverlay({ width, height, lineHeight = 35, dark = false }) {
   let layers = useMemo(() => {
     let out = Array.from({ length: LAYERS }, () => ({
       specks: [],
@@ -64,14 +64,16 @@ export default function SparkleOverlay({ width, height, lineHeight = 35 }) {
             y: cy - BAND / 2 + Math.random() * BAND,
             size: 0.7 + Math.random() * 0.8,
             opacity: 0.7 + Math.random() * 0.3,
-            color: Math.random() > 0.2 ? '#ffffff' : '#d9d9e8',
+            color: dark
+              ? (Math.random() > 0.2 ? '#3a1d6e' : '#5a3a8f')
+              : (Math.random() > 0.2 ? '#ffffff' : '#d9d9e8'),
           });
         }
         x += segW + 8 + Math.random() * 10;
       }
     }
     return out;
-  }, [width, height, lineHeight]);
+  }, [width, height, lineHeight, dark]);
 
   useEffect(() => {
     let anims = [];
@@ -91,7 +93,14 @@ export default function SparkleOverlay({ width, height, lineHeight = 35 }) {
           key={li}
           style={[
             StyleSheet.absoluteFill,
-            { opacity: l.fade, transform: [{ translateX: l.tx }, { translateY: l.ty }] },
+            {
+              opacity: l.fade,
+              transform: [{ translateX: l.tx }, { translateY: l.ty }],
+              shadowColor: '#1a0f2e',
+              shadowOpacity: dark ? 0 : 0.6,
+              shadowRadius: 1.5,
+              shadowOffset: { width: 0, height: 0 },
+            },
           ]}
         >
           {l.specks.map((s, i) => (

@@ -13,7 +13,7 @@ import JournalDrawer from '../components/JournalDrawer';
 import AnnouncementBanner from '../components/AnnouncementBanner';
 import TypewriterText from '../components/TypewriterText';
 import { BlurView } from 'expo-blur';
-import { PHOTOS } from '../theme/photos';
+import { PHOTOS, LIGHT_PHOTOS } from '../theme/photos';
 import { ExtensionStorage } from '@bacons/apple-targets';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { requestWidgetUpdate } from 'react-native-android-widget';
@@ -255,6 +255,7 @@ export default function TodayScreen({ navigation }) {
               revealed={revealed}
               onReveal={handleReveal}
               compact={journalOpen}
+              darkSparkles={LIGHT_PHOTOS.includes(todayPhoto)}
             />
           </Animated.View>
         )}
@@ -334,7 +335,12 @@ let styles = StyleSheet.create({
     textShadowOffset: { width: 0, height: 0 },
     textShadowRadius: 12,
   },
-  sub: { fontSize: 15, fontFamily: 'PlayfairDisplay_400Regular' },
+  sub: {
+    fontSize: 15, fontFamily: 'PlayfairDisplay_400Regular',
+    textShadowColor: 'rgba(20, 10, 40, 0.6)',
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 6,
+  },
   errorBox: { minHeight: 260, marginTop: 16, borderRadius: 22, borderWidth: 1, alignItems: 'center', justifyContent: 'center', padding: 24 },
   actions: { flexDirection: 'row', gap: 8, marginTop: 14 },
   actWrap: { flex: 1, borderRadius: 14, overflow: 'hidden' },

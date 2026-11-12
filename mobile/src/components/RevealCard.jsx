@@ -3,7 +3,7 @@ import { View, StyleSheet, Animated, Easing, Pressable } from 'react-native';
 import RichText from './RichText';
 import SparkleOverlay from './SparkleOverlay';
 
-export default function RevealCard({ text, revealed, onReveal, compact, onAffirmationDone }) {
+export default function RevealCard({ text, revealed, onReveal, compact, darkSparkles }) {
   let [textSize, setTextSize] = useState({ w: 0, h: 0 });
   let [sparkling, setSparkling] = useState(true);
   let textFade = useRef(new Animated.Value(0)).current;
@@ -31,7 +31,6 @@ export default function RevealCard({ text, revealed, onReveal, compact, onAffirm
       }),
     ]).start(() => {
       setSparkling(false);
-      onAffirmationDone?.();
     });
     return undefined;
   }, [revealed]);
@@ -70,7 +69,7 @@ export default function RevealCard({ text, revealed, onReveal, compact, onAffirm
             style={[StyleSheet.absoluteFill, { opacity: sparkFade }]}
             pointerEvents="none"
           >
-            <SparkleOverlay width={textSize.w} height={textSize.h} />
+            <SparkleOverlay width={textSize.w} height={textSize.h} lineHeight={32} dark={darkSparkles} />
           </Animated.View>
         )}
       </View>
@@ -84,5 +83,10 @@ let styles = StyleSheet.create({
     overflow: 'hidden', alignItems: 'center', justifyContent: 'flex-start',
     paddingHorizontal: 24, paddingVertical: 28,
   },
-  affirm: { fontSize: 22, lineHeight: 32, textAlign: 'center', fontFamily: 'PlayfairDisplay_400Regular' },
+  affirm: {
+    fontSize: 22, lineHeight: 32, textAlign: 'center', fontFamily: 'PlayfairDisplay_400Regular',
+    textShadowColor: 'rgba(20, 10, 40, 0.55)',
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 8,
+  },
 });
