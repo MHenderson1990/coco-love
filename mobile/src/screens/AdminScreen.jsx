@@ -61,7 +61,7 @@ export default function AdminScreen({ navigation }) {
         ) : (
           <>
             <View style={styles.stats}>
-              <Stat label="Members" value={stats?.totalUsers} colors={colors} />
+              <Stat label="Members" value={stats?.totalUsers} colors={colors} onPress={() => navigation.navigate('Members')} />
               <Stat label="On a streak" value={stats?.activeStreaks} colors={colors} />
               <Stat label="Messages queued" value={stats?.totalAffirmations} colors={colors} />
               <Stat label="Rewards earned" value={stats?.promoUnlocked} colors={colors} />
@@ -202,12 +202,18 @@ export default function AdminScreen({ navigation }) {
   );
 }
 
-function Stat({ label, value, colors }) {
+function Stat({ label, value, colors, onPress }) {
+  let Wrapper = onPress ? Pressable : View;
   return (
-    <View style={[styles.stat, { backgroundColor: colors.surface, borderColor: colors.line }]}>
+    <Wrapper
+      onPress={onPress}
+      style={[styles.stat, { backgroundColor: colors.surface, borderColor: colors.line }]}
+    >
       <Text style={[styles.statNum, { color: colors.ink }]}>{value ?? '—'}</Text>
-      <Text style={[styles.statLabel, { color: colors.muted }]}>{label.toUpperCase()}</Text>
-    </View>
+      <Text style={[styles.statLabel, { color: colors.muted }]}>
+        {label.toUpperCase()}{onPress ? '  ›' : ''}
+      </Text>
+    </Wrapper>
   );
 }
 

@@ -32,6 +32,7 @@ import EngagementScreen from './src/screens/EngagementScreen';
 import { usePushToken } from './src/hooks/usePushToken';
 import { useState } from 'react';
 import MessageBankScreen from './src/screens/MessageBankScreen';
+import MembersScreen from './src/screens/MembersScreen';
 
 let Stack = createNativeStackNavigator();
 
@@ -82,6 +83,7 @@ function Root() {
               <Stack.Screen name="Upgrade" component={UpgradeScreen} />
               <Stack.Screen name="VideoPlayer" component={VideoPlayerScreen} />
               <Stack.Screen name="MessageBank" component={MessageBankScreen} />
+              <Stack.Screen name="Members" component={MembersScreen} />
               <Stack.Screen name="ManageVideos" component={ManageVideosScreen} />
               <Stack.Screen name="ManageAudio" component={ManageAudioScreen} />
               <Stack.Screen name="ManageAffirmations" component={ManageAffirmationsScreen} />

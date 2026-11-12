@@ -196,3 +196,34 @@ exports.searchUsers = async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 };
+
+// GET /api/admin/members?search=&tier=free|paid&page=1  (admin)
+exports.listMembers = async (req, res) => {
+  try {
+    let { search, tier } = req.query;
+    let page = Math.max(parseInt(req.query.page) || 1, 1);
+    let limit = 50;
+
+    let query = {};
+    if (tier === 'free' || tier === 'paid') query.tier = tier;
+    if (search && search.trim()) {
+      // escape the text so symbols in a search can't break the pattern
+      let safe = search.trim().replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      let re = new RegExp(safe, 'i');
+      query.$or = [{ name: re }, { email: re }];
+    }
+
+    let [members, total] = await Promise.all([
+      User.find(query)
+        .select('name email tier role createdAt currentStreak longestStreak lastOpenedDate')
+        .sort({ createdAt: -1 })
+        .skip((page - 1) * limit)
+        .limit(limit),
+      User.countDocuments(query),
+    ]);
+
+    res.json({ members, total, page, pages: Math.ceil(total / limit) });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};

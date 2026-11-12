@@ -9,6 +9,7 @@ router.get('/affirmations/engagement', auth, admin, adminController.affirmationE
 router.get('/affirmations/:id/savers', auth, admin, adminController.affirmationSavers);
 router.get('/users/:id/favorites', auth, admin, adminController.userFavorites);
 router.get('/users', auth, admin, adminController.searchUsers);
+router.get('/members', auth, admin, adminController.listMembers);
 router.get('/affirmations/top', auth, admin, adminController.topAffirmations);
 router.post('/notifications/run', auth, admin, adminController.runNotifications);
 router.get('/promo', auth, admin, adminController.getPromo);

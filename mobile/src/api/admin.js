@@ -58,3 +58,11 @@ export async function getUserFavorites(userId) {
   let res = await client.get(`/admin/users/${userId}/favorites`);
   return res.data.liked;
 }
+export async function listMembers({ search, tier, page } = {}) {
+  let params = {};
+  if (search) params.search = search;
+  if (tier) params.tier = tier;
+  if (page) params.page = page;
+  let res = await client.get('/admin/members', { params });
+  return res.data;
+}
