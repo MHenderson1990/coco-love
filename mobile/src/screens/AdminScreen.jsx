@@ -60,13 +60,40 @@ export default function AdminScreen({ navigation }) {
           <ActivityIndicator color={colors.accent} style={{ marginTop: 40 }} />
         ) : (
           <>
-            <View style={styles.stats}>
-              <Stat label="Members" value={stats?.totalUsers} colors={colors} onPress={() => navigation.navigate('Members')} />
-              <Stat label="On a streak" value={stats?.activeStreaks} colors={colors} />
-              <Stat label="Messages queued" value={stats?.totalAffirmations} colors={colors} />
-              <Stat label="Rewards earned" value={stats?.promoUnlocked} colors={colors} />
-              <Stat label="Members paid" value={stats?.paidMembers} colors={colors} />
+            <View style={styles.statsRow}>
+              <MiniStat label="Members" value={stats?.totalUsers} colors={colors} onPress={() => navigation.navigate('Members')} />
+              <MiniStat label="Paid" value={stats?.paidMembers} colors={colors} />
+              <MiniStat label="On a streak" value={stats?.activeStreaks} colors={colors} />
             </View>
+            <Text style={[styles.statsNote, { color: colors.muted }]}>
+              {stats?.totalAffirmations ?? '—'} messages queued  ·  {stats?.promoUnlocked ?? '—'} rewards earned
+            </Text>
+
+            <Pressable
+              style={[styles.btn, { backgroundColor: colors.accent, marginBottom: 22 }]}
+              onPress={() => setShowAffirmation(true)}
+            >
+              <Text style={[styles.btnText, { color: colors.surface }]}>Write a message</Text>
+            </Pressable>
+
+            <Group title="MESSAGES" colors={colors}>
+              <Row label="Message bank" colors={colors} onPress={() => navigation.navigate('MessageBank')} />
+              <Row label="Manage messages" colors={colors} divider onPress={() => navigation.navigate('ManageAffirmations')} />
+              <Row label="Send an announcement" colors={colors} divider onPress={() => setShowAnnouncement(true)} />
+            </Group>
+
+            <Group title="LIBRARY" colors={colors}>
+              <Row label="Upload a video" colors={colors} onPress={() => setShowVideo(true)} />
+              <Row label="Upload audio" colors={colors} divider onPress={() => setShowAudio(true)} />
+              <Row label="Manage videos" colors={colors} divider onPress={() => navigation.navigate('ManageVideos')} />
+              <Row label="Manage audio" colors={colors} divider onPress={() => navigation.navigate('ManageAudio')} />
+            </Group>
+
+            <Group title="COMMUNITY" colors={colors}>
+              <Row label="Members" colors={colors} onPress={() => navigation.navigate('Members')} />
+              <Row label="Who's loving what" colors={colors} divider onPress={() => navigation.navigate('Engagement')} />
+              <Row label="Set reward code" colors={colors} divider onPress={() => setShowPromo(true)} />
+            </Group>
 
             <Text style={[styles.label, { color: colors.muted }]}>LANDING BEST</Text>
             {top.length === 0 ? (
@@ -74,7 +101,7 @@ export default function AdminScreen({ navigation }) {
                 No feedback yet — this fills in as people respond.
               </Text>
             ) : (
-              top.slice(0, 5).map((a) => (
+              top.slice(0, 3).map((a) => (
                 <View key={a._id} style={styles.barRow}>
                   <Text style={[styles.barText, { color: colors.ink }]} numberOfLines={2}>
                     {a.text}
@@ -93,77 +120,6 @@ export default function AdminScreen({ navigation }) {
                 </View>
               ))
             )}
-
-            <View style={styles.buttons}>
-              <Pressable
-                style={[styles.btn, { backgroundColor: colors.accent }]}
-                onPress={() => setShowAffirmation(true)}
-              >
-                <Text style={[styles.btnText, { color: colors.surface }]}>Write a message</Text>
-              </Pressable>
-
-            <Pressable
-                style={[styles.btn, styles.ghost, { backgroundColor: colors.surface, borderColor: colors.line }]}
-                onPress={() => navigation.navigate('Engagement')}
-              >
-                <Text style={[styles.btnText, { color: colors.ink }]}>Who's loving what</Text>
-              </Pressable>
-
-              <Pressable
-                style={[styles.btn, styles.ghost, { backgroundColor: colors.surface, borderColor: colors.line }]}
-                onPress={() => setShowAnnouncement(true)}
-              >
-                <Text style={[styles.btnText, { color: colors.ink }]}>Send an announcement</Text>
-              </Pressable>
-
-            <Pressable
-                style={[styles.btn, styles.ghost, { backgroundColor: colors.surface, borderColor: colors.line }]}
-                onPress={() => setShowVideo(true)}
-              >
-                <Text style={[styles.btnText, { color: colors.ink }]}>Upload a video</Text>
-              </Pressable>
-
-              <Pressable
-                style={[styles.btn, styles.ghost, { backgroundColor: colors.surface, borderColor: colors.line }]}
-                onPress={() => setShowAudio(true)}
-              >
-                <Text style={[styles.btnText, { color: colors.ink }]}>Upload audio</Text>
-              </Pressable>
-              <Pressable
-                style={[styles.btn, styles.ghost, { backgroundColor: colors.surface, borderColor: colors.line }]}
-                onPress={() => navigation.navigate('ManageAffirmations')}
-              >
-                <Text style={[styles.btnText, { color: colors.ink }]}>Manage messages</Text>
-              </Pressable>
-
-              <Pressable
-                style={[styles.btn, styles.ghost, { backgroundColor: colors.surface, borderColor: colors.line }]}
-                onPress={() => navigation.navigate('ManageVideos')}
-              >
-                <Text style={[styles.btnText, { color: colors.ink }]}>Manage videos</Text>
-              </Pressable>
-
-              <Pressable
-                style={[styles.btn, styles.ghost, { backgroundColor: colors.surface, borderColor: colors.line }]}
-                onPress={() => navigation.navigate('MessageBank')}
-              >
-                <Text style={[styles.btnText, { color: colors.ink }]}>Message bank</Text>
-              </Pressable>
-
-              <Pressable
-                style={[styles.btn, styles.ghost, { backgroundColor: colors.surface, borderColor: colors.line }]}
-                onPress={() => navigation.navigate('ManageAudio')}
-              >
-                <Text style={[styles.btnText, { color: colors.ink }]}>Manage audio</Text>
-              </Pressable>
-
-              <Pressable
-                style={[styles.btn, styles.ghost, { backgroundColor: colors.surface, borderColor: colors.line }]}
-                onPress={() => setShowPromo(true)}
-              >
-                <Text style={[styles.btnText, { color: colors.ink }]}>Set reward code</Text>
-              </Pressable>
-            </View>
           </>
         )}
       </ScrollView>
@@ -202,18 +158,44 @@ export default function AdminScreen({ navigation }) {
   );
 }
 
-function Stat({ label, value, colors, onPress }) {
+function MiniStat({ label, value, colors, onPress }) {
   let Wrapper = onPress ? Pressable : View;
   return (
     <Wrapper
       onPress={onPress}
-      style={[styles.stat, { backgroundColor: colors.surface, borderColor: colors.line }]}
+      style={[styles.miniStat, { backgroundColor: colors.surface, borderColor: colors.line }]}
     >
-      <Text style={[styles.statNum, { color: colors.ink }]}>{value ?? '—'}</Text>
-      <Text style={[styles.statLabel, { color: colors.muted }]}>
-        {label.toUpperCase()}{onPress ? '  ›' : ''}
+      <Text style={[styles.miniNum, { color: colors.ink }]}>{value ?? '—'}</Text>
+      <Text style={[styles.miniLabel, { color: colors.muted }]}>
+        {label.toUpperCase()}{onPress ? ' ›' : ''}
       </Text>
     </Wrapper>
+  );
+}
+
+function Group({ title, colors, children }) {
+  return (
+    <View style={{ marginBottom: 20 }}>
+      <Text style={[styles.label, { color: colors.muted }]}>{title}</Text>
+      <View style={[styles.group, { backgroundColor: colors.surface, borderColor: colors.line }]}>
+        {children}
+      </View>
+    </View>
+  );
+}
+
+function Row({ label, onPress, colors, divider }) {
+  return (
+    <Pressable
+      onPress={onPress}
+      style={[
+        styles.groupRow,
+        divider && { borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: colors.line },
+      ]}
+    >
+      <Text style={[styles.groupRowText, { color: colors.ink }]}>{label}</Text>
+      <Text style={{ color: colors.muted, fontSize: 18 }}>›</Text>
+    </Pressable>
   );
 }
 
@@ -940,4 +922,12 @@ let styles = StyleSheet.create({
   fmtHint: { fontSize: 11, marginLeft: 4 },
   preview: { borderWidth: 1, borderRadius: 12, padding: 12, marginBottom: 12 },
   previewLabel: { fontSize: 9.5, fontWeight: '700', letterSpacing: 1.2, marginBottom: 6 },
+  statsRow: { flexDirection: 'row', gap: 8, marginBottom: 10 },
+  miniStat: { flex: 1, borderWidth: 1, borderRadius: 15, padding: 12 },
+  miniNum: { fontSize: 22, fontWeight: '400', letterSpacing: -0.5 },
+  miniLabel: { fontSize: 9, fontWeight: '700', letterSpacing: 1, marginTop: 6 },
+  statsNote: { fontSize: 12, marginBottom: 18 },
+  group: { borderWidth: 1, borderRadius: 15, overflow: 'hidden' },
+  groupRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingVertical: 15, paddingHorizontal: 16 },
+  groupRowText: { fontSize: 14.5, fontWeight: '500' },
 });

@@ -99,6 +99,21 @@ export default function ProfileScreen({ navigation }) {
         <Text style={[styles.title, { color: colors.ink }]}>Make it yours</Text>
         <Text style={[styles.sub, { color: colors.muted }]}>{user?.name} · {user?.email}</Text>
 
+        {user?.role === 'admin' && (
+          <Pressable
+            style={[styles.card, { backgroundColor: colors.surface, borderColor: colors.accent }]}
+            onPress={() => navigation.navigate('Admin')}
+          >
+            <View style={styles.row}>
+              <Text style={[styles.label, { color: colors.ink }]}>Your dashboard</Text>
+              <Text style={{ color: colors.accent, fontSize: 18 }}>›</Text>
+            </View>
+            <Text style={{ fontSize: 12, color: colors.muted, marginTop: -8 }}>
+              Members, messages, and announcements
+            </Text>
+          </Pressable>
+        )}
+
         
         <View style={[styles.card, { backgroundColor: colors.surface, borderColor: colors.line }]}>
           <Text style={[styles.label, { color: colors.ink }]}>Color</Text>
@@ -264,25 +279,13 @@ export default function ProfileScreen({ navigation }) {
           </Text>
         </Pressable>
 
-        {user?.role === 'admin' && (
-          <Pressable
-            style={[styles.card, { backgroundColor: colors.surface, borderColor: colors.line }]}
-            onPress={() => navigation.navigate('Admin')}
-          >
-            <Text style={[styles.label, { color: colors.ink }]}>Your dashboard</Text>
-            <Text style={{ fontSize: 12, color: colors.muted, marginTop: -8 }}>
-              Members, messages, and announcements
-            </Text>
-          </Pressable>
-        )}
-
         <Pressable
           style={[styles.signout, { borderColor: colors.accent, backgroundColor: colors.accent }]}
           onPress={() => Linking.openURL(SESSION_FORM_URL)}
         >
           <Text style={[styles.signoutText, { color: colors.surface }]}>Request a session</Text>
         </Pressable>
-        
+
         <Pressable
           style={[styles.signout, { borderColor: colors.line, backgroundColor: colors.surface }]}
           onPress={logout}
