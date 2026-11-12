@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import {
-  View, Text, FlatList, StyleSheet, ActivityIndicator, Pressable, TextInput,
+  View, Text, FlatList, StyleSheet, ActivityIndicator, Pressable, TextInput, ScrollView,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTheme } from '../context/ThemeContext';
@@ -89,44 +89,47 @@ export default function MembersScreen({ navigation }) {
     let saved = favs[item._id];
     let isPaid = item.tier === 'paid';
     return (
-      <Pressable
-        style={[styles.row, { backgroundColor: colors.surface, borderColor: colors.line }]}
-        onPress={() => toggle(item)}
-      >
-        <View style={styles.rowTop}>
-          <Text style={[styles.name, { color: colors.ink }]} numberOfLines={1}>{item.name}</Text>
-          <View style={[styles.badge, { backgroundColor: isPaid ? colors.accent : colors.accentSoft }]}>
-            <Text style={{ color: isPaid ? colors.surface : colors.muted, fontSize: 10.5, fontWeight: '700' }}>
-              {item.role === 'admin' ? 'ADMIN' : isPaid ? 'PAID' : 'FREE'}
-            </Text>
+      <View style={[styles.row, { backgroundColor: colors.surface, borderColor: colors.line }]}>
+        <Pressable onPress={() => toggle(item)}>
+          <View style={styles.rowTop}>
+            <Text style={[styles.name, { color: colors.ink }]} numberOfLines={1}>{item.name}</Text>
+            <View style={[styles.badge, { backgroundColor: isPaid ? colors.accent : colors.accentSoft }]}>
+              <Text style={{ color: isPaid ? colors.surface : colors.muted, fontSize: 10.5, fontWeight: '700' }}>
+                {item.role === 'admin' ? 'ADMIN' : isPaid ? 'PAID' : 'FREE'}
+              </Text>
+            </View>
           </View>
-        </View>
-        <Text style={[styles.email, { color: colors.muted }]} numberOfLines={1}>{item.email}</Text>
-        <Text style={[styles.meta, { color: colors.muted }]}>
-          Joined {fmt(item.createdAt) || '—'}
-          {item.currentStreak ? `  ·  ${item.currentStreak} day streak` : ''}
-          {item.lastOpenedDate ? `  ·  Last active ${fmt(item.lastOpenedDate)}` : ''}
-        </Text>
+          <Text style={[styles.email, { color: colors.muted }]} numberOfLines={1}>{item.email}</Text>
+          <Text style={[styles.meta, { color: colors.muted }]}>
+            Joined {fmt(item.createdAt) || '—'}
+            {item.currentStreak ? `  ·  ${item.currentStreak} day streak` : ''}
+            {item.lastOpenedDate ? `  ·  Last active ${fmt(item.lastOpenedDate)}` : ''}
+          </Text>
+        </Pressable>
 
         {open ? (
           <View style={[styles.saved, { borderTopColor: colors.line }]}>
-            <Text style={[styles.savedLabel, { color: colors.muted }]}>SAVED MESSAGES</Text>
+            <Text style={[styles.savedLabel, { color: colors.muted }]}>
+              SAVED MESSAGES{Array.isArray(saved) ? ` (${saved.length})` : ''}
+            </Text>
             {saved === 'loading' || !saved ? (
               <ActivityIndicator color={colors.accent} style={{ alignSelf: 'flex-start' }} />
             ) : saved.length === 0 ? (
               <Text style={{ color: colors.muted, fontSize: 13 }}>Nothing saved yet.</Text>
             ) : (
-              saved.slice(0, 10).map((a) => (
-                <RichText
-                  key={a.affirmationId}
-                  style={{ color: colors.ink, fontSize: 13, lineHeight: 19, marginBottom: 8 }}
-                  text={a.text}
-                />
-              ))
+              <ScrollView style={{ maxHeight: 220 }} nestedScrollEnabled showsVerticalScrollIndicator>
+                {saved.map((a) => (
+                  <RichText
+                    key={a.affirmationId}
+                    style={{ color: colors.ink, fontSize: 13, lineHeight: 19, marginBottom: 8 }}
+                    text={a.text}
+                  />
+                ))}
+              </ScrollView>
             )}
           </View>
         ) : null}
-      </Pressable>
+      </View>
     );
   }
 
