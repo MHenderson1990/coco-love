@@ -8,7 +8,6 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useFocusEffect } from '@react-navigation/native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { useTheme } from '../context/ThemeContext';
-import { CALENDLY_URL } from '../constants/config';
 import * as adminApi from '../api/admin';
 import * as announcementsApi from '../api/announcements';
 import * as ImagePicker from 'expo-image-picker';
@@ -129,13 +128,6 @@ export default function AdminScreen({ navigation }) {
                 onPress={() => setShowAudio(true)}
               >
                 <Text style={[styles.btnText, { color: colors.ink }]}>Upload audio</Text>
-              </Pressable>
-
-              <Pressable
-                style={[styles.btn, styles.ghost, { backgroundColor: colors.surface, borderColor: colors.line }]}
-                onPress={() => Linking.openURL(CALENDLY_URL)}
-              >
-                <Text style={[styles.btnText, { color: colors.ink }]}>Open booking calendar</Text>
               </Pressable>
               <Pressable
                 style={[styles.btn, styles.ghost, { backgroundColor: colors.surface, borderColor: colors.line }]}
