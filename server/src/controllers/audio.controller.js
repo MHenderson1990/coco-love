@@ -3,6 +3,7 @@ let Audio = require('../models/Audio');
 let User = require('../models/User');
 let r2 = require('../services/r2.service');
 let { EXPLORE_CATEGORIES } = require('../constants/exploreCategories');
+const { resolveTitle } = require('../utils/title');
 
 let ALLOWED_EXT = ['mp3', 'm4a', 'aac', 'wav'];
 
@@ -45,8 +46,9 @@ exports.uploadUrl = async (req, res) => {
 exports.create = async (req, res) => {
   try {
     let { title, description, audioKey, duration, category, tier } = req.body;
+    title = resolveTitle(title, description);
     if (!title || !audioKey) {
-      return res.status(400).json({ error: 'title and audioKey are required' });
+      return res.status(400).json({ error: 'a title or description, and an audioKey, are required' });
     }
     if (!String(audioKey).startsWith('audio/')) {
       return res.status(400).json({ error: 'Invalid audioKey' });
@@ -72,7 +74,8 @@ exports.update = async (req, res) => {
     let { title, description, duration, category, tier } = req.body;
 
     let updates = {};
-    if (title !== undefined) updates.title = title;
+    let nextTitle = resolveTitle(title, description);
+    if (title !== undefined && nextTitle) updates.title = nextTitle;
     if (description !== undefined) updates.description = description;
     if (duration !== undefined) updates.duration = duration;
     if (category !== undefined) updates.category = cleanCategory(category);

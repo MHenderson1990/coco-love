@@ -134,8 +134,8 @@ function EditAudioModal({ audio, colors, onClose, onSaved, onDelete }) {
   if (!audio && ready) setReady(false);
 
   async function save() {
-    if (!title.trim()) {
-      Alert.alert('Title required', 'Give it a title.');
+    if (!title.trim() && !description.trim()) {
+      Alert.alert('Add something', 'Add a title or a description.');
       return;
     }
     setBusy(true);
@@ -171,7 +171,7 @@ function EditAudioModal({ audio, colors, onClose, onSaved, onDelete }) {
 
           <TextInput
             style={[styles.input, { backgroundColor: colors.bg, color: colors.ink }]}
-            placeholder="Title"
+            placeholder="Title (optional)"
             placeholderTextColor={colors.muted}
             value={title}
             onChangeText={setTitle}

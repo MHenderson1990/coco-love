@@ -108,7 +108,7 @@ export default function SavedScreen({ navigation }) {
             let isPinned = pinnedId === item.affirmation?._id;
             return (
               <View style={[styles.row, { backgroundColor: colors.surface, borderColor: colors.line }]}>
-                <RichText style={[styles.text, { color: colors.ink }]} text={item.affirmation?.text} />
+               <RichText style={[styles.text, { color: colors.ink }]} text={item.affirmation?.text} fonts={{ bold: 'PlayfairDisplay_700Bold', italic: 'PlayfairDisplay_400Regular_Italic' }} />
                 <View style={styles.rowFooter}>
                   <Text style={[styles.meta, { color: colors.muted }]}>
                     Saved {new Date(item.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
@@ -135,7 +135,7 @@ let styles = StyleSheet.create({
   sub: { fontSize: 13.5, marginTop: 5, marginBottom: 16 },
   list: { gap: 9, paddingBottom: 24 },
   row: { borderWidth: 1, borderRadius: 15, padding: 15 },
-  text: { fontSize: 15, lineHeight: 21 },
+  text: { fontSize: 15, lineHeight: 22, fontFamily: 'PlayfairDisplay_400Regular' },
   meta: { fontSize: 11 },
   rowFooter: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginTop: 8 },
   empty: { textAlign: 'center', marginTop: 40, fontSize: 14 },

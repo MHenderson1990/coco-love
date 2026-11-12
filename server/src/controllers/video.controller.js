@@ -3,6 +3,7 @@ let User = require('../models/User');
 let { EXPLORE_CATEGORIES } = require('../constants/exploreCategories');
 let crypto = require('crypto');
 let r2 = require('../services/r2.service');
+const { resolveTitle } = require('../utils/title');
 
 function cleanCategory(category) {
   return EXPLORE_CATEGORIES.includes(category) ? category : 'More';
@@ -25,8 +26,9 @@ function gate(video, isPaid) {
 exports.create = async (req, res) => {
   try {
     let { title, description, videoUrl, videoKey, thumbnailUrl, duration, tags, tier, category } = req.body;
+    title = resolveTitle(title, description);
     if (!title || (!videoUrl && !videoKey)) {
-      return res.status(400).json({ error: 'title and a video file are required' });
+      return res.status(400).json({ error: 'a title or description, and a video file, are required' });
     }
     if (videoKey && !String(videoKey).startsWith('video/')) {
       return res.status(400).json({ error: 'Invalid videoKey' });
@@ -52,7 +54,8 @@ exports.update = async (req, res) => {
     let { title, description, videoUrl, thumbnailUrl, duration, tags, tier, category } = req.body;
 
     let updates = {};
-    if (title !== undefined) updates.title = title;
+    let nextTitle = resolveTitle(title, description);
+    if (title !== undefined && nextTitle) updates.title = nextTitle;
     if (description !== undefined) updates.description = description;
     if (videoUrl !== undefined) updates.videoUrl = videoUrl;
     if (thumbnailUrl !== undefined) updates.thumbnailUrl = thumbnailUrl;

@@ -554,8 +554,8 @@ function VideoModal({ visible, onClose, colors }) {
       setError('Pick a video first.');
       return;
     }
-    if (!title.trim()) {
-      setError('Give it a title.');
+    if (!title.trim() && !description.trim()) {
+      setError('Add a title or a description.');
       return;
     }
 
@@ -605,7 +605,7 @@ function VideoModal({ visible, onClose, colors }) {
 
       <TextInput
         style={[styles.input, { backgroundColor: colors.bg, color: colors.ink }]}
-        placeholder="Title"
+        placeholder="Title (optional)"
         placeholderTextColor={colors.muted}
         value={title}
         onChangeText={setTitle}

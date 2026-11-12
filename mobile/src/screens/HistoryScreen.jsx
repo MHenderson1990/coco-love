@@ -83,7 +83,7 @@ export default function HistoryScreen({ navigation }) {
               <Text style={[styles.date, { color: colors.accent }]}>
                 {formatDate(item.scheduledDate).toUpperCase()}
               </Text>
-              <RichText style={[styles.text, { color: colors.ink }]} text={item.text} />
+              <RichText style={[styles.text, { color: colors.ink }]} text={item.text} fonts={{ bold: 'PlayfairDisplay_700Bold', italic: 'PlayfairDisplay_400Regular_Italic' }} />
             </Pressable>
           )}
         />
@@ -152,7 +152,7 @@ function MessageSheet({ affirmation, colors, onClose }) {
             </Pressable>
           </View>
 
-          <RichText style={[styles.message, { color: colors.ink }]} text={affirmation?.text} />
+          <RichText style={[styles.message, { color: colors.ink }]} text={affirmation?.text} fonts={{ bold: 'PlayfairDisplay_700Bold', italic: 'PlayfairDisplay_400Regular_Italic' }} />
 
           <Pressable
             style={[
@@ -216,7 +216,7 @@ let styles = StyleSheet.create({
   list: { gap: 9, paddingBottom: 24 },
   row: { borderWidth: 1, borderRadius: 15, padding: 15 },
   date: { fontSize: 10, fontWeight: '700', letterSpacing: 1.2, marginBottom: 7 },
-  text: { fontSize: 15, lineHeight: 21 },
+  text: { fontSize: 15, lineHeight: 22, fontFamily: 'PlayfairDisplay_400Regular' },
   empty: { textAlign: 'center', marginTop: 40, fontSize: 14, lineHeight: 21 },
 
   sheetWrap: { flex: 1, justifyContent: 'flex-end' },
@@ -224,7 +224,7 @@ let styles = StyleSheet.create({
   sheet: { borderTopLeftRadius: 24, borderTopRightRadius: 24, padding: 22, paddingBottom: 34 },
   sheetHead: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 },
   sheetTitle: { fontSize: 18, fontWeight: '600' },
-  message: { fontSize: 16, lineHeight: 23, marginBottom: 16 },
+  message: { fontSize: 17, lineHeight: 25, marginBottom: 16, fontFamily: 'PlayfairDisplay_400Regular' },
   saveBtn: { borderWidth: 1, borderRadius: 13, paddingVertical: 13, alignItems: 'center', marginBottom: 18 },
   saveText: { fontSize: 13, fontWeight: '700' },
   label: { fontSize: 10.5, fontWeight: '700', letterSpacing: 1.3, marginBottom: 10 },
