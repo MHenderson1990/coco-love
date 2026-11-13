@@ -19,7 +19,7 @@ export default function AnimatedSplashScreen({ onFinish }) {
         useNativeDriver: true,
       }),
     ]).start(() => {
-      setTimeout(() => onFinish?.(), 700);
+      setTimeout(() => onFinish?.(), 4000);
     });
   }, []);
 
