@@ -18,6 +18,7 @@
       "buildNumber": "3",
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false,
+        "UIBackgroundModes": ["audio"],
         "CFBundleDisplayName": "G.E.M.S."
       },
       "entitlements": {

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { View, Text, Pressable, StyleSheet, ActivityIndicator } from 'react-native';
 import { Ionicons, MaterialIcons } from '@expo/vector-icons';
 import { useAudioPlayer, useAudioPlayerStatus, setAudioModeAsync } from 'expo-audio';
@@ -10,7 +10,7 @@ function fmt(s) {
   return `${m}:${String(Math.floor((s || 0) % 60)).padStart(2, '0')}`;
 }
 
-export default function AudioItemPlayer({ audioId }) {
+export default function AudioItemPlayer({ audioId, title }) {
   let { colors } = useTheme();
   let [url, setUrl] = useState(null);
   let [error, setError] = useState('');
@@ -19,7 +19,11 @@ export default function AudioItemPlayer({ audioId }) {
     let active = true;
     (async () => {
       try {
-        await setAudioModeAsync({ playsInSilentMode: true });
+        await setAudioModeAsync({
+          playsInSilentMode: true,
+          shouldPlayInBackground: true,
+          interruptionMode: 'doNotMix',
+        });
         let u = await audioApi.getPlayUrl(audioId);
         if (active) setUrl(u);
       } catch (err) {
@@ -41,10 +45,10 @@ export default function AudioItemPlayer({ audioId }) {
     );
   }
 
-  return <LoadedPlayer url={url} colors={colors} />;
+    return <LoadedPlayer url={url} colors={colors} title={title} />;
 }
 
-function LoadedPlayer({ url, colors }) {
+function LoadedPlayer({ url, colors, title }) {
   let player = useAudioPlayer(url);
   let status = useAudioPlayerStatus(player);
   let playing = status?.playing ?? status?.isPlaying;
@@ -52,6 +56,23 @@ function LoadedPlayer({ url, colors }) {
   let dur = status?.duration || 0;
 
   useEffect(() => { player.play(); }, []); // auto-play once loaded
+
+  // attach lock screen controls once audio is actually playing
+  let lockSet = useRef(false);
+  useEffect(() => {
+    if (playing && !lockSet.current) {
+      lockSet.current = true;
+      try {
+        player.setActiveForLockScreen(true, { title: title || 'G.E.M.S.', artist: 'Coco Love' });
+      } catch (err) {
+        // lock screen controls are optional, keep playing without them
+      }
+    }
+  }, [playing]);
+
+  useEffect(() => () => {
+    try { player.clearLockScreenControls(); } catch (err) {}
+  }, []);
 
   function toggle() {
     if (playing) player.pause();

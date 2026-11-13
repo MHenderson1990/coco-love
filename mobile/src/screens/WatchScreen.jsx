@@ -129,7 +129,7 @@ export default function WatchScreen({ navigation }) {
                     </View>
                     {item.locked ? <Text style={{ color: colors.muted, fontSize: 11.5, fontWeight: '600' }}>Members</Text> : null}
                   </Pressable>
-                  {open ? <AudioItemPlayer audioId={item._id} /> : null}
+                  {open ? <AudioItemPlayer audioId={item._id} title={item.title} /> : null}
                 </View>
               );
             }}
