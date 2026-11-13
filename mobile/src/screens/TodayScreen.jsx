@@ -3,7 +3,6 @@ import { View, Text, StyleSheet, Pressable, ActivityIndicator, Share, Alert, Pla
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTheme } from '../context/ThemeContext';
 import { useAuth } from '../context/AuthContext';
-import StreakRing from '../components/StreakRing';
 import RevealCard from '../components/RevealCard';
 import * as affirmationsApi from '../api/affirmations';
 import * as userApi from '../api/user';
@@ -209,7 +208,6 @@ export default function TodayScreen({ navigation }) {
         bounces={false}
         overScrollMode="never"
       >
-        <StreakRing streak={streak} />
         <AnnouncementBanner onPress={() => navigation.navigate('Announcements')} />
 
         <View style={styles.greet}>

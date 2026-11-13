@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { View, Text, StyleSheet, Pressable, ScrollView, Switch, Platform, Alert, Linking } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import DateTimePicker from '@react-native-community/datetimepicker';
@@ -13,6 +13,9 @@ import * as ImagePicker from 'expo-image-picker';
 import * as userApi from '../api/user';
 import { ActivityIndicator } from 'react-native';
 import { SESSION_FORM_URL } from '../constants/config';
+import { useFocusEffect } from '@react-navigation/native';
+import * as authApi from '../api/auth';
+import StreakRing from '../components/StreakRing';
 function timeStringToDate(hhmm) {
   let [h, m] = (hhmm || '11:11').split(':').map(Number);
   let d = new Date();
@@ -33,6 +36,18 @@ function formatTimeDisplay(hhmm) {
 export default function ProfileScreen({ navigation }) {
   let { colors, palette, setPalette, mode, setMode, background, setBackground, todayPhoto, setTodayPhoto } = useTheme();
   let { user, logout } = useAuth();
+    let [streak, setStreak] = useState(user?.currentStreak ?? 0);
+
+  // fetch the current streak every time this tab opens, so it matches what Today just saved
+  useFocusEffect(
+    useCallback(() => {
+      let active = true;
+      authApi.getMe()
+        .then((me) => { if (active) setStreak(me?.currentStreak ?? 0); })
+        .catch(() => {});
+      return () => { active = false; };
+    }, [])
+  );
   let { expoPushToken, error: pushError } = usePushToken();
 
   let [notificationsEnabled, setNotificationsEnabled] = useState(true);
@@ -96,8 +111,13 @@ export default function ProfileScreen({ navigation }) {
   return (
     <SafeAreaView style={[styles.wrap, { backgroundColor: 'transparent' }]} edges={['top']}>
       <ScrollView contentContainerStyle={styles.body}>
-        <Text style={[styles.title, { color: colors.ink }]}>Make it yours</Text>
-        <Text style={[styles.sub, { color: colors.muted }]}>{user?.name} · {user?.email}</Text>
+         <View style={{ flexDirection: 'row', alignItems: 'flex-start', justifyContent: 'space-between', gap: 12 }}>
+          <View style={{ flex: 1 }}>
+            <Text style={[styles.title, { color: colors.ink }]}>Make it yours</Text>
+            <Text style={[styles.sub, { color: colors.muted }]}>{user?.name} · {user?.email}</Text>
+          </View>
+          <StreakRing streak={streak} compact style={{ marginTop: 20 }} />
+        </View>
 
         {user?.role === 'admin' && (
           <Pressable
