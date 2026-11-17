@@ -8,7 +8,6 @@ import * as affirmationsApi from '../api/affirmations';
 import * as userApi from '../api/user';
 import * as favoritesApi from '../api/favorites';
 import * as feedbackApi from '../api/feedback';
-import JournalDrawer from '../components/JournalDrawer';
 import AnnouncementBanner from '../components/AnnouncementBanner';
 import TypewriterText from '../components/TypewriterText';
 import { BlurView } from 'expo-blur';
@@ -17,6 +16,7 @@ import { ExtensionStorage } from '@bacons/apple-targets';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { requestWidgetUpdate } from 'react-native-android-widget';
 import { TodayAffirmationWidget } from '../../widgets/TodayAffirmationWidget';
+import { Ionicons } from '@expo/vector-icons';
 
 let widgetStorage = new ExtensionStorage('group.com.coco.houseoflove');
 
@@ -48,6 +48,14 @@ export default function TodayScreen({ navigation }) {
   let promptFade = useRef(new Animated.Value(1)).current;
   let [cardReady, setCardReady] = useState(false);
   let scrollRef = useRef(null);
+  let [controlsHidden, setControlsHidden] = useState(false);
+  let controlsFade = useRef(new Animated.Value(1)).current;
+
+  function toggleControls() {
+    let next = !controlsHidden;
+    setControlsHidden(next);
+    Animated.timing(controlsFade, { toValue: next ? 0 : 1, duration: 200, useNativeDriver: true }).start();
+  }
 
   useEffect(() => {
     async function load() {
@@ -89,13 +97,6 @@ export default function TodayScreen({ navigation }) {
       useNativeDriver: true,
     }).start();
   }, [revealed]);
-
-  useEffect(() => {
-    let sub = Keyboard.addListener('keyboardDidShow', () => {
-      setTimeout(() => scrollRef.current?.scrollToEnd({ animated: true }), 50);
-    });
-    return () => sub.remove();
-  }, []);
 
   async function handleReveal() {
     setRevealed(true);
@@ -196,7 +197,7 @@ export default function TodayScreen({ navigation }) {
     return (
     <View style={{ flex: 1, backgroundColor: '#281964' }}>
     <Animated.View style={[StyleSheet.absoluteFill, { opacity: bgFade }]}>
-      <ImageBackground source={bgSource} style={{ flex: 1 }} resizeMode="cover" />
+    <ImageBackground source={bgSource} style={{ flex: 1 }} resizeMode="cover" />
     </Animated.View>
     <SafeAreaView style={[styles.wrap, { backgroundColor: 'transparent' }]} edges={['top']}>
       <KeyboardAvoidingView style={{ flex: 1 }} behavior="padding">
@@ -208,6 +209,7 @@ export default function TodayScreen({ navigation }) {
         bounces={false}
         overScrollMode="never"
       >
+        
         <AnnouncementBanner onPress={() => navigation.navigate('Announcements')} />
 
         <View style={styles.greet}>
@@ -248,60 +250,50 @@ export default function TodayScreen({ navigation }) {
             style={{ opacity: cardFade }}
             pointerEvents={cardReady ? 'auto' : 'none'}
           >
-            <RevealCard
-              text={affirmation?.text}
-              revealed={revealed}
-              onReveal={handleReveal}
-              compact={journalOpen}
-              darkSparkles={LIGHT_PHOTOS.includes(todayPhoto)}
-            />
+            <Pressable onPress={revealed ? toggleControls : undefined}>
+              <RevealCard
+                text={affirmation?.text}
+                revealed={revealed}
+                onReveal={handleReveal}
+                onTap={toggleControls}
+                compact={journalOpen}
+                darkSparkles={LIGHT_PHOTOS.includes(todayPhoto)}
+              />
+            </Pressable>
           </Animated.View>
         )}
-
+        
         {revealed && (
-          <View style={{ marginTop: 'auto' }}>
+         <Animated.View
+            pointerEvents={controlsHidden ? 'none' : 'auto'}
+            style={{ marginTop: 'auto', opacity: controlsFade }}
+          >
             <View style={styles.actions}>
-              <Pressable style={styles.actWrap} onPress={handleSave}>
-                <BlurView
-                  intensity={30}
-                  tint="dark"
-                  style={[styles.act, Platform.OS === 'android' && styles.androidBlurFallback, saved && styles.actSaved]}
-                >
-                  <Text style={[styles.actText, { color: '#fff' }]}>{saved ? 'Saved' : 'Save'}</Text>
-                </BlurView>
+              <Pressable style={styles.actItem} onPress={handleSave}>
+                <View style={[styles.actCircle, Platform.OS === 'android' && styles.androidBlurFallback, saved && styles.actSaved]}>
+                  <BlurView intensity={30} tint="dark" style={StyleSheet.absoluteFill} />
+                  <Ionicons name={saved ? 'bookmark' : 'bookmark-outline'} size={22} color="#fff" />
+                </View>
+                <Text style={styles.actText}>{saved ? 'Saved' : 'Save'}</Text>
               </Pressable>
 
-              <Pressable style={styles.actWrap} onPress={handleShare}>
-                <BlurView
-                  intensity={30}
-                  tint="dark"
-                  style={[styles.act, Platform.OS === 'android' && styles.androidBlurFallback]}
-                >
-                  <Text style={[styles.actText, { color: '#fff' }]}>Share</Text>
-                </BlurView>
+              <Pressable style={styles.actItem} onPress={handleShare}>
+                <View style={[styles.actCircle, Platform.OS === 'android' && styles.androidBlurFallback]}>
+                  <BlurView intensity={30} tint="dark" style={StyleSheet.absoluteFill} />
+                  <Ionicons name="share-outline" size={22} color="#fff" />
+                </View>
+                <Text style={styles.actText}>Share</Text>
               </Pressable>
 
-              <Pressable style={styles.actWrap} onPress={() => handleFeedback('more')}>
-                <BlurView
-                  intensity={30}
-                  tint="dark"
-                  style={[styles.act, Platform.OS === 'android' && styles.androidBlurFallback]}
-                >
-                  <Text style={[styles.actText, { color: '#fff' }]}>More like this</Text>
-                </BlurView>
+              <Pressable style={styles.actItem} onPress={() => handleFeedback('more')}>
+                <View style={[styles.actCircle, Platform.OS === 'android' && styles.androidBlurFallback]}>
+                  <BlurView intensity={30} tint="dark" style={StyleSheet.absoluteFill} />
+                  <Ionicons name="heart-outline" size={24} color="#fff" />
+                </View>
+                <Text style={styles.actText}>Love</Text>
               </Pressable>
             </View>
-
-            <JournalDrawer
-              affirmationId={affirmation?._id}
-              onOpenChange={(open) => {
-                setJournalOpen(open);
-                if (open) {
-                  setTimeout(() => scrollRef.current?.scrollToEnd({ animated: true }), 250);
-                }
-              }}
-            />
-          </View>
+          </Animated.View>
         )}
       </ScrollView>
       </KeyboardAvoidingView>
@@ -340,11 +332,13 @@ let styles = StyleSheet.create({
     textShadowRadius: 6,
   },
   errorBox: { minHeight: 260, marginTop: 16, borderRadius: 22, borderWidth: 1, alignItems: 'center', justifyContent: 'center', padding: 24 },
-  actions: { flexDirection: 'row', gap: 8, marginTop: 14 },
-  actWrap: { flex: 1, borderRadius: 14, overflow: 'hidden' },
-  act: { paddingVertical: 13, alignItems: 'center', justifyContent: 'center' },
+  actions: { flexDirection: 'row', justifyContent: 'center', gap: 32, marginTop: 14, paddingBottom: 8 },
+  actItem: { alignItems: 'center', width: 64 },
+  actCircle: { width: 56, height: 56, borderRadius: 28, overflow: 'hidden', alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: 'rgba(255,255,255,0.25)' },
   actSaved: { backgroundColor: 'rgba(255,255,255,0.22)' },
   androidBlurFallback: { backgroundColor: 'rgba(0,0,0,0.45)' },
-  actText: { fontSize: 11, fontWeight: '600' },
-  actText: { fontSize: 11, fontWeight: '600' },
+  actText: {
+    fontSize: 11, fontWeight: '600', color: '#fff', marginTop: 6,
+    textShadowColor: 'rgba(20, 10, 40, 0.6)', textShadowOffset: { width: 0, height: 1 }, textShadowRadius: 4,
+  },
 });
