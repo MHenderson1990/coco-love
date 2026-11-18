@@ -16,6 +16,8 @@ import * as audioApi from '../api/audio';
 import * as DocumentPicker from 'expo-document-picker';
 import RichText from '../components/RichText';
 import { EXPLORE_CATEGORIES } from '../constants/exploreCategories';
+import CoverPicker from '../components/CoverPicker';
+
 export default function AdminScreen({ navigation }) {
   let { colors } = useTheme();
 
@@ -527,6 +529,7 @@ function VideoModal({ visible, onClose, colors }) {
   let [tier, setTier] = useState('paid');
   let [category, setCategory] = useState('More');
   let [busy, setBusy] = useState(false);
+  let [coverKey, setCoverKey] = useState(null);
   let [status, setStatus] = useState('');
   let [error, setError] = useState('');
 
@@ -572,12 +575,14 @@ function VideoModal({ visible, onClose, colors }) {
         title: title.trim(),
         description: description.trim(),
         videoKey,
+        coverKey: coverKey || undefined,
         duration: file.duration ? Math.round(file.duration / 1000) : undefined,
         tier,
         category,
       });
 
       setFile(null);
+      setCoverKey(null);
       setTitle('');
       setDescription('');
       setTier('paid');
@@ -618,6 +623,8 @@ function VideoModal({ visible, onClose, colors }) {
         value={description}
         onChangeText={setDescription}
       />
+
+      <CoverPicker kind="videos" colors={colors} onChange={setCoverKey} />
 
       <View style={[styles.tierToggle, { borderColor: colors.line }]}>
         {['free', 'paid'].map((t) => (
@@ -681,6 +688,7 @@ function AudioModal({ visible, onClose, colors }) {
   let [tier, setTier] = useState('paid');
   let [category, setCategory] = useState('More');
   let [busy, setBusy] = useState(false);
+  let [coverKey, setCoverKey] = useState(null);
   let [status, setStatus] = useState('');
   let [error, setError] = useState('');
 
@@ -700,8 +708,8 @@ function AudioModal({ visible, onClose, colors }) {
       setError('Pick an audio file first.');
       return;
     }
-    if (!title.trim()) {
-      setError('Give it a title.');
+    if (!title.trim() && !description.trim()) {
+      setError('Add a title or a description.');
       return;
     }
     let ext = (file.name || '').split('.').pop().toLowerCase();
@@ -721,11 +729,13 @@ function AudioModal({ visible, onClose, colors }) {
         title: title.trim(),
         description: description.trim(),
         audioKey,
+        coverKey: coverKey || undefined,
         category,
         tier,
       });
 
       setFile(null);
+      setCoverKey(null);
       setTitle('');
       setDescription('');
       setTier('paid');
@@ -756,7 +766,7 @@ function AudioModal({ visible, onClose, colors }) {
 
       <TextInput
         style={[styles.input, { backgroundColor: colors.bg, color: colors.ink }]}
-        placeholder="Title"
+        placeholder="Title (optional)"
         placeholderTextColor={colors.muted}
         value={title}
         onChangeText={setTitle}
@@ -769,6 +779,8 @@ function AudioModal({ visible, onClose, colors }) {
         value={description}
         onChangeText={setDescription}
       />
+
+      <CoverPicker kind="audio" colors={colors} onChange={setCoverKey} />
 
       <View style={[styles.tierToggle, { borderColor: colors.line }]}>
         {['free', 'paid'].map((t) => (

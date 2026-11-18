@@ -9,6 +9,7 @@ import { useTheme } from '../context/ThemeContext';
 import MonthFilter from '../components/MonthFilter';
 import { EXPLORE_CATEGORIES } from '../constants/exploreCategories';
 import * as videosApi from '../api/videos';
+import CoverPicker from '../components/CoverPicker';
 
 export default function ManageVideosScreen({ navigation }) {
   let { colors } = useTheme();
@@ -122,6 +123,8 @@ function EditVideoModal({ video, colors, onClose, onSaved, onDelete }) {
   let [tier, setTier] = useState('paid');
   let [category, setCategory] = useState('More');
   let [busy, setBusy] = useState(false);
+  let [coverKey, setCoverKey] = useState(undefined);
+  let [featured, setFeatured] = useState(false);
   let [ready, setReady] = useState(false);
 
   if (video && !ready) {
@@ -129,6 +132,8 @@ function EditVideoModal({ video, colors, onClose, onSaved, onDelete }) {
     setDescription(video.description || '');
     setTier(video.tier || 'paid');
     setCategory(video.category || 'More');
+    setCoverKey(undefined);
+    setFeatured(!!video.featured);
     setReady(true);
   }
   if (!video && ready) setReady(false);
@@ -140,12 +145,15 @@ function EditVideoModal({ video, colors, onClose, onSaved, onDelete }) {
     }
     setBusy(true);
     try {
-      let updated = await videosApi.updateVideo(video._id, {
+      let payload = {
         title: title.trim(),
         description: description.trim(),
         tier,
         category,
-      });
+        featured,
+      };
+      if (coverKey !== undefined) payload.coverKey = coverKey;
+      let updated = await videosApi.updateVideo(video._id, payload);
 
       onSaved(updated);
     } catch (err) {
@@ -184,6 +192,18 @@ function EditVideoModal({ video, colors, onClose, onSaved, onDelete }) {
             value={description}
             onChangeText={setDescription}
           />
+
+          <CoverPicker
+            kind="videos"
+            coverUrl={video?.coverUrl}
+            colors={colors}
+            onChange={setCoverKey}
+          />
+
+          <View style={styles.featRow}>
+            <Text style={{ color: colors.ink, fontSize: 14, fontWeight: '600' }}>Feature on Explore</Text>
+            <Switch value={featured} onValueChange={setFeatured} />
+          </View>
 
           <View style={[styles.tierToggle, { borderColor: colors.line }]}>
             {['free', 'paid'].map((t) => (
@@ -270,4 +290,5 @@ let styles = StyleSheet.create({
   btnText: { fontSize: 13, fontWeight: '700' },
   deleteBtn: { alignItems: 'center', paddingVertical: 14 },
   deleteText: { fontSize: 13, fontWeight: '600' },
+  featRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 },
 });

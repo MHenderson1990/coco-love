@@ -18,9 +18,11 @@ const r2 = require('../src/services/r2.service');
 const Audio = require('../src/models/Audio');
 const Video = require('../src/models/Video');
 const { EXPLORE_CATEGORIES } = require('../src/constants/exploreCategories');
+const sharp = require('sharp');
 
 const AUDIO_TYPES = { '.mp3': 'audio/mpeg', '.m4a': 'audio/mp4', '.aac': 'audio/aac', '.wav': 'audio/wav' };
 const VIDEO_TYPES = { '.mp4': 'video/mp4', '.mov': 'video/quicktime', '.m4v': 'video/x-m4v' };
+const FOCUS = ['centre', 'top', 'bottom', 'left', 'right', 'entropy', 'attention'];
 
 const s3 = new S3Client({
   region: 'auto',
@@ -85,6 +87,17 @@ async function main() {
       continue;
     }
 
+    let thumbPath;
+    if (it.thumbnail) {
+      thumbPath = path.join(baseDir, it.thumbnail);
+      if (!fs.existsSync(thumbPath)) { problems.push(`${label}: thumbnail not found at ${thumbPath}`); continue; }
+    }
+    let focus = it.thumbnailFocus || 'centre';
+    if (!FOCUS.includes(focus)) {
+      problems.push(`${label}: thumbnailFocus '${focus}' is not valid. Use one of: ${FOCUS.join(', ')}`);
+      continue;
+    }
+
     plan.push({
       kind, filePath, ext,
       size: fs.statSync(filePath).size,
@@ -94,6 +107,7 @@ async function main() {
       category: category || 'More',
       tier: it.tier === 'free' ? 'free' : 'paid',
       duration: getDuration(filePath),
+      thumbPath, focus,
     });
   }
 
@@ -110,7 +124,7 @@ async function main() {
   for (let p of plan) {
     let Model = p.kind === 'audio' ? Audio : Video;
     let mb = (p.size / 1048576).toFixed(1);
-    let desc = `${p.kind}  "${p.title}"  ${mb} MB  ${p.category}  ${p.tier}  ${p.duration ? p.duration + 's' : 'no duration'}`;
+    let desc = `${p.kind}  "${p.title}"  ${mb} MB  ${p.category}  ${p.tier}  ${p.duration ? p.duration + 's' : 'no duration'}${p.thumbPath ? '  +cover (' + p.focus + ')' : ''}`;
 
     if (await Model.exists({ title: p.title })) {
       console.log(`SKIP (title already exists): ${desc}`);
@@ -131,14 +145,32 @@ async function main() {
       ContentType: p.contentType,
     }));
 
+    let coverKey;
     try {
+      if (p.thumbPath) {
+        let buf = await sharp(p.thumbPath)
+          .rotate()
+          .resize(800, 800, { fit: 'cover', position: p.focus })
+          .jpeg({ quality: 82 })
+          .toBuffer();
+        coverKey = `cover/${crypto.randomUUID()}.jpg`;
+        await s3.send(new PutObjectCommand({
+          Bucket: process.env.R2_BUCKET,
+          Key: coverKey,
+          Body: buf,
+          ContentType: 'image/jpeg',
+        }));
+      }
+
       let doc = { title: p.title, description: p.description, duration: p.duration, category: p.category, tier: p.tier };
+      if (coverKey) doc.coverKey = coverKey;
       if (p.kind === 'audio') doc.audioKey = key; else doc.videoKey = key;
       await Model.create(doc);
       added++;
       console.log('done');
     } catch (err) {
-      await r2.deleteObject(key); // don't leave an orphan file in R2
+      await r2.deleteObject(key); // don't leave orphan files in R2
+      if (coverKey) await r2.deleteObject(coverKey);
       console.log('FAILED, upload removed: ' + err.message);
     }
   }
