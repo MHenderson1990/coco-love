@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef } from 'react';
-import { View, Text, StyleSheet, Pressable, ActivityIndicator, Share, Alert, Platform, KeyboardAvoidingView, ScrollView, ImageBackground, Animated, Keyboard } from 'react-native';
+import { View, Text, StyleSheet, Pressable, ActivityIndicator, Share, Alert, Platform, KeyboardAvoidingView, ScrollView, ImageBackground, Animated, } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTheme } from '../context/ThemeContext';
 import { useAuth } from '../context/AuthContext';
@@ -42,7 +42,6 @@ export default function TodayScreen({ navigation }) {
   let [saved, setSaved] = useState(false);
   let [loading, setLoading] = useState(true);
   let [error, setError] = useState('');
-  let [journalOpen, setJournalOpen] = useState(false);
   let cardFade = useRef(new Animated.Value(0)).current;
   let bgFade = useRef(new Animated.Value(0)).current;
   let promptFade = useRef(new Animated.Value(1)).current;
@@ -256,7 +255,6 @@ export default function TodayScreen({ navigation }) {
                 revealed={revealed}
                 onReveal={handleReveal}
                 onTap={toggleControls}
-                compact={journalOpen}
                 darkSparkles={LIGHT_PHOTOS.includes(todayPhoto)}
               />
             </Pressable>
