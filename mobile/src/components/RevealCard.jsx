@@ -3,7 +3,7 @@ import { View, StyleSheet, Animated, Easing, Pressable } from 'react-native';
 import RichText from './RichText';
 import SparkleOverlay from './SparkleOverlay';
 
-export default function RevealCard({ text, revealed, onReveal, compact, darkSparkles }) {
+export default function RevealCard({ text, revealed, onReveal, onTap, darkSparkles }) {
   let [textSize, setTextSize] = useState({ w: 0, h: 0 });
   let [sparkling, setSparkling] = useState(true);
   let textFade = useRef(new Animated.Value(0)).current;
@@ -37,11 +37,10 @@ export default function RevealCard({ text, revealed, onReveal, compact, darkSpar
 
   return (
     <Pressable
-      disabled={revealed}
-      onPress={onReveal}
+      onPress={revealed ? onTap : onReveal}
       accessibilityRole="button"
       accessibilityLabel="Tap to reveal today's message"
-      style={[styles.card, compact && { minHeight: 130, paddingVertical: 20 }]}
+      style={styles.card}
     >
       <View
         style={{ alignSelf: 'stretch' }}

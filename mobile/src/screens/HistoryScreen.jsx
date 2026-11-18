@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useState, useRef } from 'react';
 import {
   View, Text, FlatList, StyleSheet, ActivityIndicator, Pressable,
   Modal, TextInput, Alert, Platform, KeyboardAvoidingView,
@@ -11,6 +11,8 @@ import * as favoritesApi from '../api/favorites';
 import * as journalApi from '../api/journal';
 import MonthFilter from '../components/MonthFilter';
 import RichText from '../components/RichText';
+import VoiceRecorder from '../components/VoiceRecorder';
+import { useAuth } from '../context/AuthContext';
 
 let MOODS = ['🥹', '😢', '🤗', '😌', '🤬'];
 
@@ -105,6 +107,16 @@ function MessageSheet({ affirmation, colors, onClose }) {
   let [mood, setMood] = useState(null);
   let [text, setText] = useState('');
   let [busy, setBusy] = useState(false);
+  let { user } = useAuth();
+  let isPaid = user?.tier === 'paid' || user?.role === 'admin';
+  let [voiceNote, setVoiceNote] = useState(null);
+  let [voiceBusy, setVoiceBusy] = useState(false);
+  let savedRef = useRef(false);
+
+  function handleClose() {
+    if (!savedRef.current && voiceNote?.key) journalApi.destroyVoice(voiceNote.key);
+    onClose();
+  }
 
   async function save() {
     if (!affirmation || saved) return;
@@ -121,13 +133,14 @@ function MessageSheet({ affirmation, colors, onClose }) {
   }
 
   async function writeEntry() {
-    if (!mood && !text.trim()) {
-      Alert.alert('Nothing to save', 'Add a mood or write something.');
+    if (!mood && !text.trim() && !voiceNote) {
+      Alert.alert('Nothing to save', 'Add a mood, write something, or record a voice note.');
       return;
     }
     setBusy(true);
     try {
-      await journalApi.createEntry(affirmation._id, mood, text.trim());
+      await journalApi.createEntry(affirmation._id, mood, text.trim(), voiceNote || undefined);
+      savedRef.current = true;
       Alert.alert('Saved to your journal', 'Find it in the Journal tab.');
       onClose();
     } catch (err) {
@@ -138,16 +151,16 @@ function MessageSheet({ affirmation, colors, onClose }) {
   }
 
   return (
-    <Modal visible={!!affirmation} animationType="slide" transparent onRequestClose={onClose}>
+    <Modal visible={!!affirmation} animationType="slide" transparent onRequestClose={handleClose}>
       <KeyboardAvoidingView
         style={styles.sheetWrap}
         behavior="padding"
       >
-        <Pressable style={styles.backdrop} onPress={onClose} />
+        <Pressable style={styles.backdrop} onPress={handleClose} />
         <View style={[styles.sheet, { backgroundColor: colors.surface }]}>
           <View style={styles.sheetHead}>
             <Text style={[styles.sheetTitle, { color: colors.ink }]}>Message</Text>
-            <Pressable onPress={onClose}>
+            <Pressable onPress={handleClose}>
               <Text style={{ color: colors.muted, fontSize: 20 }}>✕</Text>
             </Pressable>
           </View>
@@ -193,6 +206,40 @@ function MessageSheet({ affirmation, colors, onClose }) {
             onChangeText={setText}
           />
 
+          {isPaid ? (
+            <>
+              <Text style={[styles.label, { color: colors.muted }]}>VOICE NOTE</Text>
+              {voiceNote ? (
+                <View style={[styles.voiceChip, { backgroundColor: colors.bg, borderColor: colors.accent }]}>
+                  <Text style={{ color: colors.ink, fontSize: 13, fontWeight: '600' }}>🎙 Voice note attached</Text>
+                  <Pressable onPress={() => { journalApi.destroyVoice(voiceNote.key); setVoiceNote(null); }} hitSlop={8}>
+                    <Text style={{ color: colors.muted, fontSize: 13, fontWeight: '600' }}>Remove</Text>
+                  </Pressable>
+                </View>
+              ) : voiceBusy ? (
+                <View style={[styles.voiceChip, { backgroundColor: colors.bg, borderColor: colors.line }]}>
+                  <ActivityIndicator color={colors.accent} />
+                  <Text style={{ color: colors.muted, fontSize: 13 }}>Saving voice…</Text>
+                </View>
+              ) : (
+                <VoiceRecorder
+                  onSave={async (uri) => {
+                    setVoiceBusy(true);
+                    try {
+                      let saved = await journalApi.uploadVoiceNote(uri);
+                      setVoiceNote({ key: saved.key, durationMillis: 0 });
+                    } catch (err) {
+                      Alert.alert('Voice upload failed', String(err?.message || err));
+                    } finally {
+                      setVoiceBusy(false);
+                    }
+                  }}
+                  onDiscard={() => {}}
+                />
+              )}
+            </>
+          ) : null}
+
           <Pressable
             style={[styles.btn, { backgroundColor: colors.accent, opacity: busy ? 0.6 : 1 }]}
             onPress={writeEntry}
@@ -233,4 +280,5 @@ let styles = StyleSheet.create({
   input: { borderRadius: 12, padding: 13, fontSize: 14, minHeight: 80, textAlignVertical: 'top', marginBottom: 16 },
   btn: { borderRadius: 13, paddingVertical: 14, alignItems: 'center' },
   btnText: { fontSize: 13, fontWeight: '700' },
+  voiceChip: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', borderWidth: 1, borderRadius: 12, padding: 14, marginBottom: 16 },
 });
