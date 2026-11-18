@@ -1,7 +1,7 @@
 import { useCallback, useState } from 'react';
 import {
   View, Text, FlatList, StyleSheet, ActivityIndicator, Pressable,
-  Modal, TextInput, Alert, Platform, KeyboardAvoidingView,
+  Modal, TextInput, Alert, Platform, KeyboardAvoidingView, Switch,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useFocusEffect } from '@react-navigation/native';
