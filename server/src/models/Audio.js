@@ -5,6 +5,8 @@ let audioSchema = new mongoose.Schema({
   title:       { type: String, required: true, trim: true },
   description: { type: String, trim: true },
   audioKey:    { type: String, required: true, trim: true },   // R2 object key, e.g. audio/<id>.mp3
+  coverKey:    { type: String, trim: true },                   // square cover image: R2 object key
+  featured:    { type: Boolean, default: false },
   duration:    { type: Number },                                // seconds
   category:    { type: String, enum: EXPLORE_CATEGORIES, default: 'More' },
   tier:        { type: String, enum: ['free', 'paid'], default: 'paid' },

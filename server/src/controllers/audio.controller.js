@@ -4,6 +4,7 @@ let User = require('../models/User');
 let r2 = require('../services/r2.service');
 let { EXPLORE_CATEGORIES } = require('../constants/exploreCategories');
 const { resolveTitle } = require('../utils/title');
+let { clearFeatured } = require('../utils/featured');
 
 let ALLOWED_EXT = ['mp3', 'm4a', 'aac', 'wav'];
 
@@ -16,13 +17,14 @@ async function isPaidUser(userId) {
   return user?.tier === 'paid' || user?.role === 'admin';
 }
 
-// the R2 key never goes to the app, only a short-lived play link does
-function shape(audio, isPaid) {
-  let { audioKey, ...rest } = audio;
+// the R2 keys never go to the app, only short-lived links do
+async function shape(audio, isPaid) {
+  let { audioKey, coverKey, ...rest } = audio;
   return {
     ...rest,
     category: cleanCategory(audio.category),
     locked: audio.tier === 'paid' && !isPaid,
+    coverUrl: coverKey ? await r2.presignDownload(coverKey) : null,
   };
 }
 
@@ -42,10 +44,22 @@ exports.uploadUrl = async (req, res) => {
   }
 };
 
+// POST /api/audio/cover-url  (admin) — presigned PUT for a square cover image
+exports.coverUrl = async (req, res) => {
+  try {
+    let key = `cover/${crypto.randomUUID()}.jpg`;
+    let signed = await r2.presignUpload(key);
+    res.json(signed);
+  } catch (err) {
+    console.error('audio coverUrl failed:', err);
+    res.status(500).json({ error: err.message });
+  }
+};
+
 // POST /api/audio  (admin)
 exports.create = async (req, res) => {
   try {
-    let { title, description, audioKey, duration, category, tier } = req.body;
+    let { title, description, audioKey, coverKey, duration, category, tier } = req.body;
     title = resolveTitle(title, description);
     if (!title || !audioKey) {
       return res.status(400).json({ error: 'a title or description, and an audioKey, are required' });
@@ -53,16 +67,19 @@ exports.create = async (req, res) => {
     if (!String(audioKey).startsWith('audio/')) {
       return res.status(400).json({ error: 'Invalid audioKey' });
     }
+    if (coverKey && !String(coverKey).startsWith('cover/')) {
+      return res.status(400).json({ error: 'Invalid coverKey' });
+    }
 
     let audio = await Audio.create({
       title, description, audioKey, duration,
+      coverKey: coverKey || undefined,
       category: cleanCategory(category),
       tier: tier === 'free' ? 'free' : 'paid',
       createdBy: req.user.id,
     });
 
-    let { audioKey: _omit, ...safe } = audio.toObject();
-    res.status(201).json({ audio: safe });
+    res.status(201).json({ audio: await shape(audio.toObject(), true) });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -71,7 +88,12 @@ exports.create = async (req, res) => {
 // PATCH /api/audio/:id  (admin)
 exports.update = async (req, res) => {
   try {
-    let { title, description, duration, category, tier } = req.body;
+    let { title, description, duration, category, tier, coverKey, featured } = req.body;
+
+    let existing = await Audio.findById(req.params.id).select('coverKey');
+    if (!existing) {
+      return res.status(404).json({ error: 'Audio not found' });
+    }
 
     let updates = {};
     let nextTitle = resolveTitle(title, description);
@@ -80,17 +102,25 @@ exports.update = async (req, res) => {
     if (duration !== undefined) updates.duration = duration;
     if (category !== undefined) updates.category = cleanCategory(category);
     if (tier !== undefined) updates.tier = tier === 'free' ? 'free' : 'paid';
+    if (featured !== undefined) updates.featured = !!featured;
+    if (coverKey !== undefined) {
+      if (coverKey && !String(coverKey).startsWith('cover/')) {
+        return res.status(400).json({ error: 'Invalid coverKey' });
+      }
+      updates.coverKey = coverKey || null;
+    }
 
     let audio = await Audio.findByIdAndUpdate(req.params.id, updates, {
       new: true,
       runValidators: true,
     }).lean();
 
-    if (!audio) {
-      return res.status(404).json({ error: 'Audio not found' });
+    if (updates.featured) await clearFeatured(audio._id);
+    if (coverKey !== undefined && existing.coverKey && existing.coverKey !== updates.coverKey) {
+      await r2.deleteObject(existing.coverKey).catch(() => {});
     }
-    let { audioKey, ...safe } = audio;
-    res.json({ audio: safe });
+
+    res.json({ audio: await shape(audio, true) });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -101,7 +131,7 @@ exports.list = async (req, res) => {
   try {
     let isPaid = await isPaidUser(req.user.id);
     let items = await Audio.find().sort({ createdAt: -1 }).lean();
-    res.json({ audio: items.map((a) => shape(a, isPaid)) });
+    res.json({ audio: await Promise.all(items.map((a) => shape(a, isPaid))) });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -133,6 +163,7 @@ exports.remove = async (req, res) => {
       return res.status(404).json({ error: 'Audio not found' });
     }
     await r2.deleteObject(audio.audioKey);
+    if (audio.coverKey) await r2.deleteObject(audio.coverKey).catch(() => {});
     res.json({ success: true });
   } catch (err) {
     res.status(500).json({ error: err.message });

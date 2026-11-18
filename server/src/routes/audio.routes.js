@@ -5,6 +5,7 @@ let admin = require('../middleware/admin.middleware');
 let audioController = require('../controllers/audio.controller');
 
 router.post('/upload-url', auth, admin, audioController.uploadUrl);
+router.post('/cover-url', auth, admin, audioController.coverUrl);
 router.post('/', auth, admin, audioController.create);
 router.get('/', auth, audioController.list);
 router.get('/:id/play', auth, audioController.play);

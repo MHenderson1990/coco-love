@@ -5,6 +5,7 @@ let admin = require('../middleware/admin.middleware');
 let videoController = require('../controllers/video.controller');
 
 router.post('/upload-url', auth, admin, videoController.uploadUrl);
+router.post('/cover-url', auth, admin, videoController.coverUrl);
 router.post('/', auth, admin, videoController.create);
 router.get('/', auth, videoController.list);
 router.get('/:id/play', auth, videoController.play);

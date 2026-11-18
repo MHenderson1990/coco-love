@@ -7,6 +7,8 @@ let videoSchema = new mongoose.Schema({
   videoUrl:     { type: String, trim: true, required: function () { return !this.videoKey; } },   // old Cloudinary videos
   videoKey:     { type: String, trim: true },                                                      // new videos: R2 object key
   thumbnailUrl: { type: String, trim: true },
+  coverKey:     { type: String, trim: true },                                                      // square cover image: R2 object key
+  featured:     { type: Boolean, default: false },
   duration:     { type: Number },              // seconds
   category:     { type: String, enum: EXPLORE_CATEGORIES, default: 'More' },
   tags:         [{ type: String, trim: true }],
