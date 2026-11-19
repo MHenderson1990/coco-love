@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef } from 'react';
-import { View, Text, StyleSheet, Pressable, ActivityIndicator, Share, Alert, Platform, KeyboardAvoidingView, ScrollView, ImageBackground, Animated, } from 'react-native';
+import { View, Text, StyleSheet, Pressable, ActivityIndicator, Share, Alert, Platform, KeyboardAvoidingView, ScrollView, ImageBackground, Animated, AppState } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTheme } from '../context/ThemeContext';
 import { useAuth } from '../context/AuthContext';
@@ -32,6 +32,7 @@ export default function TodayScreen({ navigation }) {
   let { colors, background, todayPhoto, themeReady } = useTheme();
   let { user } = useAuth();
   let nameLen = (user?.name || '').length;
+  let userId = user?._id || user?.id;
   let NAME_DELAY = HELLO_DELAY + HELLO_LEN * HELLO_SPEED + 300;
   let PROMPT_DELAY = NAME_DELAY + nameLen * NAME_SPEED + 500;
   let CARD_DELAY = PROMPT_DELAY + PROMPT_LEN * 45 + 500;
@@ -39,6 +40,9 @@ export default function TodayScreen({ navigation }) {
   let [affirmation, setAffirmation] = useState(null);
   let [streak, setStreak] = useState(user?.currentStreak ?? 0);
   let [revealed, setRevealed] = useState(false);
+  let [instant, setInstant] = useState(false);
+  let [runKey, setRunKey] = useState(0);
+  let affRef = useRef(null);
   let [saved, setSaved] = useState(false);
   let [loading, setLoading] = useState(true);
   let [error, setError] = useState('');
@@ -59,7 +63,17 @@ export default function TodayScreen({ navigation }) {
   useEffect(() => {
     async function load() {
       try {
-        let today = await affirmationsApi.getToday();
+       let today = await affirmationsApi.getToday();
+        let seen = userId
+          ? await AsyncStorage.getItem(`revealed:${userId}`).catch(() => null)
+          : null;
+        if (today?._id && seen === today._id) {
+          setInstant(true);
+          setRevealed(true);
+          promptFade.setValue(0);
+          cardFade.setValue(1);
+          setCardReady(true);
+        }
         setAffirmation(today);
 
       } catch (err) {
@@ -69,6 +83,36 @@ export default function TodayScreen({ navigation }) {
       }
     }
     load();
+  }, []);
+
+    useEffect(() => {
+    affRef.current = affirmation;
+  }, [affirmation]);
+
+  // coming back to the app on a new day: start over with the new message
+  useEffect(() => {
+    let sub = AppState.addEventListener('change', async (state) => {
+      if (state !== 'active') return;
+      try {
+        let today = await affirmationsApi.getToday();
+        if (today?._id && affRef.current?._id && today._id !== affRef.current._id) {
+          setRevealed(false);
+          setInstant(false);
+          setSaved(false);
+          setControlsHidden(false);
+          controlsFade.setValue(1);
+          setCardReady(false);
+          cardFade.setValue(0);
+          promptFade.setValue(1);
+          scrollRef.current?.scrollTo({ y: 0, animated: false });
+          setAffirmation(today);
+          setRunKey((k) => k + 1);
+        }
+      } catch (err) {
+        // offline or server hiccup: keep showing what's there
+      }
+    });
+    return () => sub.remove();
   }, []);
 
    useEffect(() => {
@@ -86,7 +130,7 @@ export default function TodayScreen({ navigation }) {
     }).start();
     let t = setTimeout(() => setCardReady(true), CARD_DELAY);
     return () => clearTimeout(t);
-  }, [loading]);
+  }, [loading, runKey]);
 
   useEffect(() => {
     if (!revealed) return;
@@ -102,6 +146,10 @@ export default function TodayScreen({ navigation }) {
     try {
       let checkin = await userApi.checkIn();
       setStreak(checkin.currentStreak);
+
+      if (userId && affirmation?._id) {
+        AsyncStorage.setItem(`revealed:${userId}`, affirmation._id).catch(() => {});
+      }
 
       if (affirmation?.text) {
         if (Platform.OS === 'ios') {
@@ -213,25 +261,34 @@ export default function TodayScreen({ navigation }) {
 
         <View style={styles.greet}>
           <View style={{ alignItems: 'center' }}>
-            <TypewriterText
-              key="hello"
-              style={[styles.hello, { color: '#fff', textAlign: 'center' }]}
-              text={'Peace\u2009&\u2009love'}
-              delay={HELLO_DELAY}
-              speed={HELLO_SPEED}
-            />
-            <TypewriterText
-              key={`name-${user?.name}`}
-              style={[styles.name, { color: '#fff', textAlign: 'center' }]}
-              text={user?.name || ''}
-              delay={NAME_DELAY}
-              speed={NAME_SPEED}
-            />
+            {instant ? (
+              <>
+                <Text style={[styles.hello, { color: '#fff', textAlign: 'center' }]}>{'Peace\u2009&\u2009love'}</Text>
+                <Text style={[styles.name, { color: '#fff', textAlign: 'center' }]}>{user?.name || ''}</Text>
+              </>
+            ) : (
+              <>
+                <TypewriterText
+                  key={`hello-${runKey}`}
+                  style={[styles.hello, { color: '#fff', textAlign: 'center' }]}
+                  text={'Peace\u2009&\u2009love'}
+                  delay={HELLO_DELAY}
+                  speed={HELLO_SPEED}
+                />
+                <TypewriterText
+                  key={`name-${user?.name}-${runKey}`}
+                  style={[styles.name, { color: '#fff', textAlign: 'center' }]}
+                  text={user?.name || ''}
+                  delay={NAME_DELAY}
+                  speed={NAME_SPEED}
+                />
+              </>
+            )}
           </View>
 
           <Animated.View style={{ opacity: promptFade }} pointerEvents="none">
             <TypewriterText
-              key="opening-message"
+              key={`opening-message-${runKey}`}
               style={[styles.sub, { color: '#fff', textAlign: 'center' }]}
               text={'Are you ready for today\u2019s message?'}
               delay={PROMPT_DELAY}
@@ -256,6 +313,7 @@ export default function TodayScreen({ navigation }) {
                 onReveal={handleReveal}
                 onTap={toggleControls}
                 darkSparkles={LIGHT_PHOTOS.includes(todayPhoto)}
+                instant={instant}
               />
             </Pressable>
           </Animated.View>

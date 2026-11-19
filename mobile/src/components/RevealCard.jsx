@@ -3,7 +3,7 @@ import { View, StyleSheet, Animated, Easing, Pressable } from 'react-native';
 import RichText from './RichText';
 import SparkleOverlay from './SparkleOverlay';
 
-export default function RevealCard({ text, revealed, onReveal, onTap, darkSparkles }) {
+export default function RevealCard({ text, revealed, onReveal, onTap, instant, darkSparkles }) {
   let [textSize, setTextSize] = useState({ w: 0, h: 0 });
   let [sparkling, setSparkling] = useState(true);
   let textFade = useRef(new Animated.Value(0)).current;
@@ -16,6 +16,13 @@ export default function RevealCard({ text, revealed, onReveal, onTap, darkSparkl
       setSparkling(true);
       return undefined;
     }
+    if (instant) {
+      textFade.setValue(1);
+      sparkFade.setValue(0);
+      setSparkling(false);
+      return undefined;
+    }
+    
     Animated.parallel([
       Animated.timing(textFade, {
         toValue: 1,
