@@ -255,8 +255,8 @@ export default function TodayScreen({ navigation }) {
         showsVerticalScrollIndicator={false}
         bounces={false}
         overScrollMode="never"
-      >
-        
+        >
+       <Pressable style={{ flexGrow: 1 }} onPress={revealed ? toggleControls : undefined}> 
         <AnnouncementBanner onPress={() => navigation.navigate('Announcements')} />
 
         <View style={styles.greet}>
@@ -306,16 +306,14 @@ export default function TodayScreen({ navigation }) {
             style={{ opacity: cardFade }}
             pointerEvents={cardReady ? 'auto' : 'none'}
           >
-            <Pressable onPress={revealed ? toggleControls : undefined}>
-              <RevealCard
-                text={affirmation?.text}
-                revealed={revealed}
-                onReveal={handleReveal}
-                onTap={toggleControls}
-                darkSparkles={LIGHT_PHOTOS.includes(todayPhoto)}
-                instant={instant}
-              />
-            </Pressable>
+            <RevealCard
+              text={affirmation?.text}
+              revealed={revealed}
+              onReveal={handleReveal}
+              onTap={toggleControls}
+              instant={instant}
+              darkSparkles={LIGHT_PHOTOS.includes(todayPhoto)}
+            />
           </Animated.View>
         )}
         
@@ -351,6 +349,7 @@ export default function TodayScreen({ navigation }) {
             </View>
           </Animated.View>
         )}
+        </Pressable>
       </ScrollView>
       </KeyboardAvoidingView>
     </SafeAreaView>
