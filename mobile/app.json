@@ -93,7 +93,7 @@
         "targetCellWidth": 3,
         "targetCellHeight": 2,
         "description": "Shows today's affirmation",
-        "previewImage": "./assets/placeholder.png",
+        "previewImage": "./assets/widget-preview.png",
         "updatePeriodMillis": 0
       }
     ]
