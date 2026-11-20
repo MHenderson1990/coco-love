@@ -65,6 +65,7 @@ export default function WatchScreen({ navigation }) {
   let [audioLoading, setAudioLoading] = useState(true);
   let [playing, setPlaying] = useState(null);
   let [section, setSection] = useState('video');
+  let [seeAll, setSeeAll] = useState(null);
 
   // reload each time the tab is focused, so new uploads show up without restarting the app
   useFocusEffect(
@@ -88,6 +89,7 @@ export default function WatchScreen({ navigation }) {
   let inSection = all.filter((i) => i.kind === section);
   let featured = all.find((i) => i.featured);
   let busy = videosLoading || audioLoading;
+  let gridCard = Math.floor((width - 44 - 12) / 2);
 
   async function open(item) {
     if (item.locked) {
@@ -121,7 +123,7 @@ export default function WatchScreen({ navigation }) {
           <Pressable
             key={key}
             style={[styles.seg, section === key && { backgroundColor: colors.accent }]}
-            onPress={() => setSection(key)}
+            onPress={() => { setSection(key); setSeeAll(null); }}
           >
             <Text style={[styles.segText, { color: section === key ? '#fff' : colors.muted }]}>
               {key === 'video' ? 'Video' : 'Audio'}
@@ -136,6 +138,26 @@ export default function WatchScreen({ navigation }) {
         <Text style={[styles.empty, { color: colors.muted }]}>
           {section === 'video' ? 'New sessions will show up here.' : 'New audio will show up here.'}
         </Text>
+     ) : seeAll ? (
+        <View style={{ flex: 1 }}>
+          <Pressable onPress={() => setSeeAll(null)} style={styles.backRow} hitSlop={8}>
+            <Ionicons name="chevron-back" size={18} color={colors.accent} />
+            <Text style={{ color: colors.accent, fontSize: 14, fontWeight: '600' }}>Back</Text>
+          </Pressable>
+          <Text style={[styles.rowHead, { color: colors.ink, fontSize: 20 }]}>{seeAll}</Text>
+          <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.grid}>
+            {inSection
+              .filter((i) => (i.category || 'More') === seeAll)
+              .map((item) => (
+                <Pressable key={`${item.kind}-${item._id}`} style={{ width: gridCard }} onPress={() => open(item)}>
+                  <Thumb item={item} size={gridCard} colors={colors} />
+                  <Text style={[styles.cap, { color: colors.ink }]} numberOfLines={2}>
+                    {labelOf(item)}
+                  </Text>
+                </Pressable>
+              ))}
+          </ScrollView>
+        </View>
       ) : (
         <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 24 }}>
           {featured ? (
@@ -153,7 +175,14 @@ export default function WatchScreen({ navigation }) {
             if (!list.length) return null;
             return (
               <View key={cat} style={{ marginBottom: 20 }}>
-                <Text style={[styles.rowHead, { color: colors.ink }]}>{cat}</Text>
+                <View style={styles.rowHeadWrap}>
+                  <Text style={[styles.rowHead, { color: colors.ink, marginBottom: 0 }]}>{cat}</Text>
+                  {list.length > 2 ? (
+                    <Pressable onPress={() => setSeeAll(cat)} hitSlop={8}>
+                      <Text style={{ color: colors.accent, fontSize: 13, fontWeight: '600' }}>See all</Text>
+                    </Pressable>
+                  ) : null}
+                </View>
                 <ScrollView
                   horizontal
                   showsHorizontalScrollIndicator={false}
@@ -239,4 +268,7 @@ let styles = StyleSheet.create({
   toggle:   { flexDirection: 'row', borderWidth: 1, borderRadius: 100, padding: 3, marginBottom: 16 },
   seg:      { flex: 1, paddingVertical: 8, borderRadius: 100, alignItems: 'center' },
   segText:  { fontSize: 13, fontWeight: '600' },
+  rowHeadWrap: { flexDirection: 'row', alignItems: 'baseline', justifyContent: 'space-between', marginBottom: 10 },
+  backRow:  { flexDirection: 'row', alignItems: 'center', gap: 2, marginBottom: 8 },
+  grid:     { flexDirection: 'row', flexWrap: 'wrap', gap: 12, paddingBottom: 24 },
 });
