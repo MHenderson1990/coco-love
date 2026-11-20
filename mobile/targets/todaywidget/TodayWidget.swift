@@ -143,7 +143,7 @@ struct TodayWidgetEntryView: View {
 
   private var smallView: some View {
     VStack(alignment: .leading, spacing: 6) {
-      Text(entry.text)
+      Text(.init(entry.text))
         .font(.system(size: 13, weight: .medium))
         .lineLimit(5)
         .minimumScaleFactor(0.7)
@@ -162,7 +162,7 @@ struct TodayWidgetEntryView: View {
 
   private var mediumView: some View {
     VStack(alignment: .leading, spacing: 8) {
-      Text(entry.text)
+      Text(.init(entry.text))
         .font(.system(size: 15, weight: .medium))
         .lineLimit(4)
         .minimumScaleFactor(0.7)
@@ -186,7 +186,7 @@ struct TodayWidgetEntryView: View {
         .font(.system(size: 11, weight: .bold))
         .opacity(0.7)
 
-      Text(entry.text)
+      Text(.init(entry.text))
         .font(.system(size: 20, weight: .medium))
         .lineLimit(8)
         .minimumScaleFactor(0.7)
