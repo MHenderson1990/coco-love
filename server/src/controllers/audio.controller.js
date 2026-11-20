@@ -115,7 +115,7 @@ exports.update = async (req, res) => {
       runValidators: true,
     }).lean();
 
-    if (updates.featured) await clearFeatured(audio._id);
+    if (updates.featured) await clearFeatured('audio', audio._id);
     if (coverKey !== undefined && existing.coverKey && existing.coverKey !== updates.coverKey) {
       await r2.deleteObject(existing.coverKey).catch(() => {});
     }

@@ -87,7 +87,7 @@ export default function WatchScreen({ navigation }) {
   ].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
 
   let inSection = all.filter((i) => i.kind === section);
-  let featured = all.find((i) => i.featured);
+  let featured = inSection.find((i) => i.featured);
   let busy = videosLoading || audioLoading;
   let gridCard = Math.floor((width - 44 - 12) / 2);
 

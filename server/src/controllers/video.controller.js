@@ -90,7 +90,7 @@ exports.update = async (req, res) => {
       runValidators: true,
     });
 
-    if (updates.featured) await clearFeatured(video._id);
+    if (updates.featured) await clearFeatured('video', video._id);
     if (coverKey !== undefined && existing.coverKey && existing.coverKey !== updates.coverKey) {
       await r2.deleteObject(existing.coverKey);
     }
